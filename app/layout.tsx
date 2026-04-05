@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-zinc-950 text-zinc-100 antialiased`}>
         <Nav />
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <main className="w-full px-4 py-6 sm:px-6 lg:px-8">
           {children}
         </main>
       </body>
