@@ -20,14 +20,14 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
 
   return (
     <div className={cn(
-      "group flex items-center gap-6 border bg-zinc-900/40 p-4 transition-all hover:bg-zinc-900/60 rounded-md backdrop-blur-sm",
+      "group flex items-center gap-4 border bg-zinc-900/40 p-4 transition-all hover:bg-zinc-900/60 rounded backdrop-blur-sm",
       priceAlert ? "border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]" : "border-white/5 shadow-sm"
     )}>
       {/* Symbol + Identity */}
       <div className="min-w-[140px] border-r border-white/5 pr-6">
         <div className="flex items-center gap-2">
           <span className="text-base font-bold text-white tracking-tight">{item.symbol}</span>
-          <span className="bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-zinc-400 rounded-md uppercase tracking-tighter">{item.strategy}</span>
+          <span className="bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-zinc-400 rounded uppercase tracking-tighter">{item.strategy}</span>
         </div>
         <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-zinc-500">
           <span>${item.strike.toFixed(2)}</span>
@@ -58,7 +58,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
             </span>
             {priceAlert && <AlertTriangle className="h-3.5 w-3.5 text-amber-500 animate-pulse" />}
             <div className={cn(
-              "flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md", 
+              "flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded", 
               priceDiff! >= 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
             )}>
               {priceDiff! >= 0 ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
@@ -76,7 +76,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* QTY Control */}
       <div className="flex items-center gap-4 border-l border-white/5 pl-6">
         <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Qty</span>
-        <div className="flex items-center border border-white/10 bg-black/40 rounded-md overflow-hidden shadow-inner">
+        <div className="flex items-center border border-white/10 bg-black/40 rounded overflow-hidden shadow-inner">
           <button
             onClick={() => onQuantityChange(item.queue_id, Math.max(1, item.quantity - 1))}
             className="flex h-8 w-8 items-center justify-center text-zinc-500 hover:bg-white/5 hover:text-white transition-colors"
@@ -96,7 +96,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* REMOVE ACTION */}
       <button
         onClick={() => onRemove(item.queue_id)}
-        className="ml-auto flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-md border border-transparent hover:border-red-500/20 group/trash"
+        className="ml-auto flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded border border-transparent hover:border-red-500/20 group/trash"
         title="Remove order"
       >
         <Trash2 className="h-5 w-5 transition-transform group-hover/trash:scale-110" />

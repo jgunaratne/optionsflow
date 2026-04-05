@@ -21,7 +21,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
 
   return (
     <div className={cn(
-      "group relative flex flex-col justify-between overflow-hidden rounded-md border bg-zinc-900/60 p-5 backdrop-blur-sm transition-all duration-300 hover:bg-zinc-800/80 hover:shadow-xl hover:shadow-black/60 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-black",
+      "group relative flex flex-col justify-between overflow-hidden rounded border bg-zinc-900/60 p-4 backdrop-blur-sm transition-all duration-300 hover:bg-zinc-800/80 hover:shadow-xl hover:shadow-black/60 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-black",
       flagBorderClass
     )}>
       {/* Background Glow */}
@@ -36,7 +36,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
           <div>
             <h3 className="text-2xl font-extrabold tracking-tight text-white">{candidate.symbol}</h3>
             <div className="mt-1 flex items-center gap-3">
-              <span className="rounded-md bg-white/10 border border-white/20 px-2 py-0.5 text-xs font-bold text-zinc-300">
+              <span className="rounded bg-white/10 border border-white/20 px-2 py-0.5 text-xs font-bold text-zinc-300">
                 {candidate.strategy}
               </span>
               <span className="text-sm font-semibold text-zinc-400">${candidate.underlying_price.toFixed(2)}</span>

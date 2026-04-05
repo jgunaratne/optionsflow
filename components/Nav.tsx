@@ -48,7 +48,7 @@ function BrokerSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-md border border-white/20 bg-zinc-900 backdrop-blur-xl shadow-2xl p-1">
+        <div className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded border border-white/20 bg-zinc-900 backdrop-blur-xl shadow-2xl p-1">
           {supported.map(broker => {
             const m = BROKER_META[broker] || { label: broker, color: 'text-zinc-200', bg: '' };
             const isActive = broker === active;
@@ -110,7 +110,7 @@ export default function Nav() {
     <nav className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/80 backdrop-blur-xl">
       <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8">
         {/* Brand */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black rounded p-1">
             <div className="flex h-8 w-8 items-center justify-center rounded bg-primary shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
               <Activity className="w-5 h-5 text-white" aria-hidden="true" />
@@ -146,7 +146,7 @@ export default function Nav() {
         </div>
 
         {/* Right side controls */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4">
           {/* Market Status */}
           <div className="hidden sm:flex items-center gap-2 rounded border border-white/10 bg-white/10 px-4 py-1.5 text-sm" role="status">
             <div className={cn("h-2 w-2 rounded-full", statusDot)} aria-hidden="true" />
