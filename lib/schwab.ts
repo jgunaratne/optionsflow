@@ -188,8 +188,16 @@ async function getAccountHash(): Promise<string> {
       return cachedAccountHash;
     } catch (error) {
       lastError = error;
-      // Don't retry on 401 — it's a permissions issue (Trader API not enabled), not transient
       const errMsg = error instanceof Error ? error.message : '';
+      // Preserve auth/setup failures instead of wrapping them as account-hash failures.
+      if (
+        errMsg.includes('No tokens found')
+        || errMsg.includes('REFRESH_TOKEN_EXPIRED')
+        || errMsg.includes('Token refresh failed')
+      ) {
+        throw error;
+      }
+      // Don't retry on 401 — it's a permissions issue (Trader API not enabled), not transient
       if (errMsg.includes('401') && errMsg.includes('Client not authorized')) {
         break;
       }
