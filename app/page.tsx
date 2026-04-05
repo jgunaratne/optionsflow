@@ -28,6 +28,42 @@ interface ScreenerProgress {
 
 type ViewMode = 'grid' | 'list';
 
+function getRecommendation(candidate: Candidate) {
+  if (candidate.is_eligible === 0) {
+    return {
+      label: 'Skip',
+      tone: 'text-zinc-400 border-zinc-600/40 bg-zinc-800/60',
+      summary: candidate.rejection_reason || 'Did not pass the screener rules.',
+      action: 'Do not buy this one right now.',
+    };
+  }
+
+  if (candidate.ai_flag === 'GREEN') {
+    return {
+      label: 'Best Pick',
+      tone: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10',
+      summary: 'Strong fit for the screener rules.',
+      action: 'Start here if you want the app’s top ideas.',
+    };
+  }
+
+  if (candidate.ai_flag === 'YELLOW') {
+    return {
+      label: 'Maybe',
+      tone: 'text-amber-400 border-amber-500/20 bg-amber-500/10',
+      summary: 'Some good signs, but not as clean as the best picks.',
+      action: 'Review this before you buy.',
+    };
+  }
+
+  return {
+    label: 'Risky',
+    tone: 'text-red-400 border-red-500/20 bg-red-500/10',
+    summary: 'The app sees more risk or weaker setup quality here.',
+    action: 'Only consider this if you understand why it still passed.',
+  };
+}
+
 function CandidateListRow({
   candidate,
   inQueue,
@@ -37,13 +73,7 @@ function CandidateListRow({
   inQueue: boolean;
   onAddToQueue: (id: number) => void;
 }) {
-  const flagTone = candidate.ai_flag === 'GREEN'
-    ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
-    : candidate.ai_flag === 'YELLOW'
-      ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
-      : candidate.is_eligible === 0
-        ? 'text-zinc-400 border-zinc-600/40 bg-zinc-800/60'
-        : 'text-red-400 border-red-500/20 bg-red-500/10';
+  const recommendation = getRecommendation(candidate);
 
   return (
     <div className={cn(
@@ -52,8 +82,8 @@ function CandidateListRow({
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-bold text-white">{candidate.symbol}</span>
-          <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", flagTone)}>
-            {candidate.is_eligible === 0 ? 'GRAY' : candidate.ai_flag}
+          <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", recommendation.tone)}>
+            {recommendation.label}
           </span>
         </div>
         <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
@@ -89,22 +119,22 @@ function CandidateListRow({
         <div className="font-semibold text-zinc-100">{candidate.delta.toFixed(3)}</div>
       </div>
       <div className="min-w-0 group relative cursor-help">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">AI</div>
-        <div className="truncate text-xs text-zinc-400">{candidate.is_eligible === 0 ? (candidate.rejection_reason || candidate.ai_brief) : candidate.ai_brief}</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Why</div>
+        <div className="truncate text-xs text-zinc-400">{recommendation.summary}</div>
         
         {/* Tooltip Card */}
         <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-72 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <div className="rounded border border-white/10 bg-zinc-900/95 p-4 shadow-xl backdrop-blur-md relative overflow-hidden">
              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-zinc-500 to-zinc-700" aria-hidden="true" />
              <div className="mb-2 flex items-center justify-between">
-               <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">AI Insight</span>
+               <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Plain English</span>
                <span className={cn(
                  "text-sm font-black",
                  candidate.ai_score > 80 ? "text-emerald-400" : candidate.ai_score > 60 ? "text-amber-400" : "text-red-400"
                )}>{candidate.ai_score.toFixed(0)}/100</span>
              </div>
              <p className="text-sm leading-relaxed text-zinc-300 whitespace-normal">
-               &quot;{candidate.is_eligible === 0 ? (candidate.rejection_reason || candidate.ai_brief) : candidate.ai_brief}&quot;
+               {recommendation.action} {candidate.is_eligible === 0 ? (candidate.rejection_reason || candidate.ai_brief) : candidate.ai_brief}
              </p>
           </div>
         </div>
@@ -123,7 +153,7 @@ function CandidateListRow({
           )}
         >
           {inQueue ? <CheckCircle2 className="h-3.5 w-3.5" /> : <PlusCircle className="h-3.5 w-3.5" />}
-          <span>{inQueue ? 'Queued' : candidate.is_eligible === 0 ? 'Rejected' : 'Queue'}</span>
+          <span>{inQueue ? 'Queued' : candidate.is_eligible === 0 ? 'Skip' : 'Buy'}</span>
         </button>
       </div>
     </div>
@@ -211,6 +241,9 @@ export default function ScreenerPage() {
   const progressPercent = progress && progress.totalSymbols > 0
     ? Math.round((progress.currentIndex / progress.totalSymbols) * 100)
     : 0;
+  const dataAsOfLabel = lastScreenedAt
+    ? new Date(lastScreenedAt * 1000).toLocaleString()
+    : 'No screener data yet';
 
   return (
     <div className="flex flex-col gap-4">
@@ -463,6 +496,25 @@ export default function ScreenerPage() {
             List
           </button>
         </div>
+      </div>
+
+      <div className="grid gap-3 rounded border border-white/10 bg-zinc-900/40 p-4 text-sm text-zinc-300 md:grid-cols-3">
+        <div className="rounded border border-emerald-500/20 bg-emerald-500/10 p-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">Best Pick</div>
+          <p className="mt-1">Green cards are the app’s favorite ideas. If you want the clearest starting point, look here first.</p>
+        </div>
+        <div className="rounded border border-amber-500/20 bg-amber-500/10 p-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-amber-400">Maybe</div>
+          <p className="mt-1">Yellow cards have some good signs, but they are not as clean. Check them before buying.</p>
+        </div>
+        <div className="rounded border border-zinc-700 bg-zinc-800/60 p-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-zinc-300">Skip</div>
+          <p className="mt-1">Gray cards did not make the cut. They stay on screen so you can see what was rejected and why.</p>
+        </div>
+      </div>
+
+      <div className="rounded border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-300">
+        <span className="font-bold text-white">Data as of:</span> {dataAsOfLabel}
       </div>
 
       {/* Content Grid */}

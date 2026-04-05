@@ -15,6 +15,14 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
   const isRejected = candidate.is_eligible === 0;
   const isGreen = candidate.ai_flag === 'GREEN';
   const isYellow = candidate.ai_flag === 'YELLOW';
+  const recommendationLabel = isRejected ? 'Skip' : isGreen ? 'Best Pick' : isYellow ? 'Maybe' : 'Risky';
+  const recommendationText = isRejected
+    ? (candidate.rejection_reason || 'This one did not pass the screener rules.')
+    : isGreen
+      ? 'This is one of the strongest matches on the screen.'
+      : isYellow
+        ? 'This could work, but it needs a closer look.'
+        : 'This passed, but the app sees more risk here.';
   
   const flagColorClass = isRejected ? 'text-zinc-400' : isGreen ? 'text-emerald-400' : isYellow ? 'text-amber-400' : 'text-red-400';
   const flagBgClass = isRejected ? 'bg-zinc-800/60' : isGreen ? 'bg-emerald-900/30' : isYellow ? 'bg-amber-900/30' : 'bg-red-900/30';
@@ -45,22 +53,27 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
             </div>
           </div>
           <div className={cn("flex items-center gap-2 rounded px-3 py-1 backdrop-blur-md border", flagBgClass, flagBorderClass)}>
-            <div className={cn("h-2 w-2 rounded-full", isGreen ? 'bg-emerald-400' : isYellow ? 'bg-amber-400' : 'bg-red-400')} aria-hidden="true" />
+            <div className={cn("h-2 w-2 rounded-full", isRejected ? 'bg-zinc-400' : isGreen ? 'bg-emerald-400' : isYellow ? 'bg-amber-400' : 'bg-red-400')} aria-hidden="true" />
             <span className={cn("text-xs font-bold uppercase tracking-wider", flagColorClass)}>
-              {isRejected ? 'GRAY' : candidate.ai_flag}
+              {recommendationLabel}
             </span>
           </div>
+        </div>
+
+        <div className={cn("mb-5 rounded border px-3 py-2.5", flagBgClass, flagBorderClass)}>
+          <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">What The App Thinks</div>
+          <p className="mt-1 text-sm font-medium text-zinc-200">{recommendationText}</p>
         </div>
 
         {/* Contract Details */}
         <div className="mb-5 flex rounded bg-zinc-950/50 p-1 border border-white/10">
           <div className="flex-1 px-3 py-2 text-center">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Strike</div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Buy At</div>
             <div className="text-base font-bold text-white">${candidate.strike.toFixed(2)}</div>
           </div>
           <div className="my-2 w-px bg-white/20" />
           <div className="flex-1 px-3 py-2 text-center">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Expiry</div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Ends On</div>
             <div className="text-base font-bold text-zinc-200">{candidate.expiry} <span className="text-[11px] text-zinc-400">({candidate.dte}d)</span></div>
           </div>
         </div>
@@ -68,19 +81,19 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
         {/* Primary Metrics Grid */}
         <div className="mb-5 grid grid-cols-2 gap-3">
           <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
-            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Premium</div>
+            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Money In</div>
             <div className="text-lg font-extrabold text-emerald-400">${candidate.premium.toFixed(2)}</div>
           </div>
           <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
-            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Max Loss</div>
+            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Worst Case</div>
             <div className="text-lg font-extrabold text-red-400">${candidate.max_loss.toLocaleString()}</div>
           </div>
           <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
-            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Prob. Profit</div>
+            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Chance It Works</div>
             <div className="text-lg font-extrabold text-zinc-100">{(candidate.pop * 100).toFixed(0)}%</div>
           </div>
           <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
-            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">IV Rank</div>
+            <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Volatility</div>
             <div className="text-lg font-extrabold text-zinc-100">{candidate.iv_rank.toFixed(1)}</div>
           </div>
         </div>
@@ -131,7 +144,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
         ) : (
           <>
             <PlusCircle className="h-4 w-4" aria-hidden="true" />
-            <span>{isRejected ? 'Rejected' : 'Add to Queue'}</span>
+            <span>{isRejected ? 'Skip This One' : 'Add Good Pick'}</span>
           </>
         )}
       </button>
