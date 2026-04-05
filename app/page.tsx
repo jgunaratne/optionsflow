@@ -26,6 +26,15 @@ interface ScreenerProgress {
   logs: ScreenerLogEntry[];
 }
 
+interface ScreenerUniverse {
+  mode: 'watchlist' | 'sp500';
+  symbols: string[];
+  totalAvailable: number;
+  batchSize: number | null;
+  startIndex: number | null;
+  summary: string;
+}
+
 type ViewMode = 'grid' | 'list';
 
 function getRecommendation(candidate: Candidate) {
@@ -177,6 +186,9 @@ export default function ScreenerPage() {
   const [progress, setProgress] = useState<ScreenerProgress | null>(null);
   const [sortBy, setSortBy] = useState<string>('ai_score');
   const [ivRankMin, setIvRankMin] = useState<number>(50);
+  const [screenerUniverse, setScreenerUniverse] = useState<'watchlist' | 'sp500'>('watchlist');
+  const [sp500BatchSize, setSp500BatchSize] = useState<number>(50);
+  const [universeSummary, setUniverseSummary] = useState<ScreenerUniverse | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [applyingPreset, setApplyingPreset] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
@@ -187,7 +199,25 @@ export default function ScreenerPage() {
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(data => {
       if (data.settings?.iv_rank_min !== undefined) setIvRankMin(data.settings.iv_rank_min);
+      if (data.settings?.screener_universe === 'sp500' || data.settings?.screener_universe === 'watchlist') {
+        setScreenerUniverse(data.settings.screener_universe);
+      }
+      if (typeof data.settings?.sp500_batch_size === 'number') {
+        setSp500BatchSize(data.settings.sp500_batch_size);
+      }
     }).catch(() => {});
+  }, []);
+
+  const fetchUniverseSummary = async () => {
+    try {
+      const res = await fetch('/api/screener/universe');
+      const data = await res.json();
+      if (data.universe) setUniverseSummary(data.universe);
+    } catch {}
+  };
+
+  useEffect(() => {
+    fetchUniverseSummary();
   }, []);
 
   // Auto-scroll activity feed to bottom
@@ -229,6 +259,7 @@ export default function ScreenerPage() {
       if (first && !first.running) {
         setScreenerRunning(false);
         await fetchCandidates();
+        await fetchUniverseSummary();
         setTimeout(() => setProgress(null), 5000);
         return;
       }
@@ -238,6 +269,7 @@ export default function ScreenerPage() {
           clearInterval(interval);
           setScreenerRunning(false);
           await fetchCandidates();
+          await fetchUniverseSummary();
           setTimeout(() => setProgress(null), 5000);
         }
       }, 1000);
@@ -271,6 +303,27 @@ export default function ScreenerPage() {
     } finally {
       setApplyingPreset(false);
     }
+  };
+
+  const updateUniverseSetting = async (nextUniverse: 'watchlist' | 'sp500') => {
+    setScreenerUniverse(nextUniverse);
+    await fetch('/api/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ screener_universe: nextUniverse }),
+    }).catch(() => {});
+    await fetchUniverseSummary();
+  };
+
+  const updateSp500BatchSize = async (nextBatchSize: number) => {
+    const clamped = Math.max(25, Math.min(100, nextBatchSize || 50));
+    setSp500BatchSize(clamped);
+    await fetch('/api/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sp500_batch_size: clamped }),
+    }).catch(() => {});
+    await fetchUniverseSummary();
   };
 
   const progressPercent = progress && progress.totalSymbols > 0
@@ -511,6 +564,46 @@ export default function ScreenerPage() {
 
         <div className="flex items-center gap-1 rounded-2xl-xl border border-white/10 bg-zinc-950/30 p-1">
           <button
+            onClick={() => updateUniverseSetting('watchlist')}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
+              screenerUniverse === 'watchlist' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
+            )}
+          >
+            Watchlist
+          </button>
+          <button
+            onClick={() => updateUniverseSetting('sp500')}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
+              screenerUniverse === 'sp500' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
+            )}
+          >
+            S&amp;P 500
+          </button>
+        </div>
+
+        {screenerUniverse === 'sp500' && (
+          <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+            <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">Batch Size</span>
+            <input
+              type="number"
+              min="25"
+              max="100"
+              step="5"
+              value={sp500BatchSize}
+              onChange={(e) => {
+                const next = parseInt(e.target.value, 10);
+                setSp500BatchSize(Number.isNaN(next) ? 50 : next);
+              }}
+              onBlur={(e) => updateSp500BatchSize(parseInt(e.target.value, 10))}
+              className="w-12 bg-transparent text-sm font-bold text-zinc-100 outline-none text-center"
+            />
+          </div>
+        )}
+
+        <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-zinc-950/50 p-1">
+          <button
             onClick={() => setViewMode('grid')}
             className={cn(
               "inline-flex items-center gap-2 rounded-2xl-lg px-3 py-2 text-sm font-bold transition-colors",
@@ -565,6 +658,40 @@ export default function ScreenerPage() {
       <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-300">
         <span className="font-bold text-white">Data as of:</span> {dataAsOfLabel}
       </div>
+
+      <div className="rounded border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-300">
+        <span className="font-bold text-white">Universe:</span> {screenerUniverse === 'sp500' ? `S&P 500 (rotating batch of ${sp500BatchSize})` : 'Watchlist'}
+      </div>
+
+      {universeSummary && (
+        <div className="rounded border border-white/10 bg-zinc-900/40 p-4 text-sm text-zinc-300">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-zinc-500">Stocks Being Screened</div>
+              <p className="mt-1 text-white">
+                {universeSummary.mode === 'watchlist'
+                  ? `The screener is checking these ${universeSummary.symbols.length} watchlist names right now.`
+                  : `The screener is checking this batch of ${universeSummary.symbols.length} stocks from the S&P 500 right now.`}
+              </p>
+            </div>
+            <div className="text-xs font-medium text-zinc-400">
+              {universeSummary.mode === 'sp500' && universeSummary.startIndex !== null
+                ? `Batch ${universeSummary.startIndex + 1}-${(universeSummary.startIndex || 0) + universeSummary.symbols.length} of ${universeSummary.totalAvailable}`
+                : `${universeSummary.totalAvailable} total symbols`}
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {universeSummary.symbols.map((symbol) => (
+              <span
+                key={symbol}
+                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-zinc-200"
+              >
+                {symbol}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {topPicks.length > 0 && (
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6">

@@ -1,10 +1,10 @@
-import { getWatchlist, getConfig, setConfig, insertCandidate, cleanOldCandidates } from './db';
+import { getConfig, setConfig, insertCandidate, cleanOldCandidates } from './db';
 import { analyzeCandidatesBatch } from './ai';
 import { fetchTickerNews } from './news';
 import type { Broker, OptionContract } from './broker';
 import { SchwabBroker, hasSchwabTokens } from './schwab';
 import { WebullBroker } from './webull';
-import { getSP500Symbols } from './sp500';
+import { consumeScreenerUniverseSummary } from './screener-universe';
 
 interface IVRankCache { ivRank: number; cachedAt: number; }
 
@@ -95,38 +95,6 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-async function getUniverseSymbols() {
-  const screenerUniverse = ((getConfig('screener_universe') as string) || 'watchlist') === 'sp500' ? 'sp500' : 'watchlist';
-
-  if (screenerUniverse === 'watchlist') {
-    const watchlist = getWatchlist();
-    return {
-      mode: 'watchlist' as const,
-      symbols: watchlist.map((item) => ({ symbol: item.symbol })),
-      summary: `${watchlist.length} watchlist symbols`,
-    };
-  }
-
-  const allSymbols = await getSP500Symbols();
-  const batchSize = Math.max(25, Math.min(100, Math.round((getConfig('sp500_batch_size') as number) || 50)));
-  const cursor = Math.max(0, Math.round((getConfig('sp500_cursor') as number) || 0));
-  const normalizedCursor = allSymbols.length > 0 ? cursor % allSymbols.length : 0;
-  const symbols = Array.from({ length: Math.min(batchSize, allSymbols.length) }, (_, index) => ({
-    symbol: allSymbols[(normalizedCursor + index) % allSymbols.length],
-  }));
-
-  setConfig('sp500_cursor', (normalizedCursor + symbols.length) % allSymbols.length);
-
-  return {
-    mode: 'sp500' as const,
-    symbols,
-    batchSize,
-    total: allSymbols.length,
-    start: normalizedCursor,
-    summary: `next ${symbols.length} of ${allSymbols.length} S&P symbols`,
-  };
-}
-
 export async function runScreener(): Promise<void> {
   if (progress.running) { console.log('[Screener] Already running, skipping.'); return; }
   progress = { running: true, currentSymbol: '', currentIndex: 0, totalSymbols: 0, status: 'Starting...', candidatesFound: 0, logs: [] };
@@ -134,8 +102,8 @@ export async function runScreener(): Promise<void> {
   console.log('[Screener] Starting screening pipeline...');
 
   try {
-    const universe = await getUniverseSymbols();
-    const watchlist = universe.symbols;
+    const universe = await consumeScreenerUniverseSummary();
+    const watchlist = universe.symbols.map((symbol) => ({ symbol }));
     const dteMin = (getConfig('dte_min') as number) || 21;
     const dteMax = (getConfig('dte_max') as number) || 45;
     const deltaMin = (getConfig('delta_min') as number) || 0.15;
