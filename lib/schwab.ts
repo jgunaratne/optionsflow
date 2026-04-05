@@ -188,6 +188,11 @@ async function getAccountHash(): Promise<string> {
       return cachedAccountHash;
     } catch (error) {
       lastError = error;
+      // Don't retry on 401 — it's a permissions issue (Trader API not enabled), not transient
+      const errMsg = error instanceof Error ? error.message : '';
+      if (errMsg.includes('401') && errMsg.includes('Client not authorized')) {
+        break;
+      }
       if (attempt < 3) {
         await new Promise(resolve => setTimeout(resolve, attempt * 750));
       }

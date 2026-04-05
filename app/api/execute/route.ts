@@ -12,7 +12,12 @@ export async function POST() {
       return NextResponse.json({ error: 'No pending trades in queue' }, { status: 400 });
     }
 
-    const { balances } = await broker.getAccountDetails();
+    const { balances } = await broker.getAccountDetails().catch((err: Error) => {
+      if (err.message.includes('Client not authorized') && err.message.includes('401')) {
+        throw new Error('Schwab Trader API is not enabled. Cannot execute trades. Add "Trader API" product in the Schwab developer portal.');
+      }
+      throw err;
+    });
     const buyingPower = balances.buyingPower;
     const totalValue = balances.liquidationValue;
     const totalQueueMaxLoss = queueItems.reduce((sum, item) => sum + item.max_loss * item.quantity, 0);

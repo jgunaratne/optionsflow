@@ -48,7 +48,15 @@ export async function GET() {
     const needsAuth = message.includes('No tokens found') || message.includes('No Webull')
       || message.includes('auth-setup') || message.includes('must be set in .env')
       || message.includes('INVALID_TOKEN') || message.includes('access token');
+    const noTraderApi = message.includes('Client not authorized') && message.includes('401');
     console.error('[API] GET /api/positions error:', error);
+    if (noTraderApi) {
+      return NextResponse.json({
+        error: 'trader_api_not_enabled',
+        message: 'Schwab Trader API not enabled. Positions unavailable.',
+        positions: [], balances: { buyingPower: 0, liquidationValue: 0, cashBalance: 0, availableFunds: 0, maintenanceRequirement: 0 }, schwabBalances: null,
+      }, { status: 200 });
+    }
     return NextResponse.json(
       { error: needsAuth ? 'not_authenticated' : 'Failed to fetch positions', message },
       { status: needsAuth ? 401 : 500 }

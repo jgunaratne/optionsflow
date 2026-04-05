@@ -19,7 +19,15 @@ export async function GET() {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     const needsAuth = message.includes('No tokens found') || message.includes('No Webull') || message.includes('auth-setup') || message.includes('must be set in .env') || message.includes('INVALID_TOKEN') || message.includes('access token');
+    const noTraderApi = message.includes('Client not authorized') && message.includes('401');
     console.error('[API] GET /api/account error:', error);
+    if (noTraderApi) {
+      return NextResponse.json({
+        error: 'trader_api_not_enabled',
+        message: 'Schwab Trader API is not enabled for this app. Account data is unavailable. Add "Trader API" product in the Schwab developer portal to enable account features.',
+        account: { totalValue: 0, buyingPower: 0, cashBalance: 0, deployedCapital: 0, deployedPct: 0, availableFunds: 0 },
+      }, { status: 200 });
+    }
     return NextResponse.json(
       { error: needsAuth ? 'not_authenticated' : 'Failed to fetch account data', message },
       { status: needsAuth ? 401 : 500 }
