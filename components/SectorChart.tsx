@@ -15,14 +15,14 @@ const COLORS = [
 export default function SectorChart({ data }: SectorChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50">
+      <div className="flex h-64 items-center justify-center rounded-md border border-zinc-800 bg-zinc-900/50">
         <p className="text-sm text-zinc-500">No sector data available</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+    <div className="rounded-md border border-zinc-800 bg-zinc-900/50 p-4">
       <h3 className="mb-3 text-sm font-semibold text-zinc-300">Sector Exposure</h3>
       <div className="flex items-center gap-6">
         <div className="h-52 w-52">

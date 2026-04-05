@@ -10,14 +10,14 @@ interface ScenarioTableProps {
 export default function ScenarioTable({ scenarios, totalValue }: ScenarioTableProps) {
   if (scenarios.length === 0) {
     return (
-      <div className="flex h-32 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50">
+      <div className="flex h-32 items-center justify-center rounded-md border border-zinc-800 bg-zinc-900/50">
         <p className="text-sm text-zinc-500">No scenario data available</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
+    <div className="overflow-hidden rounded-md border border-zinc-800 bg-zinc-900/50">
       <div className="border-b border-zinc-800 px-4 py-3">
         <h3 className="text-sm font-semibold text-zinc-300">Crash Scenario Stress Test</h3>
         <p className="text-xs text-zinc-500 mt-0.5">Estimated portfolio impact under market drawdowns</p>

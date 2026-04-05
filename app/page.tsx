@@ -116,7 +116,7 @@ export default function ScreenerPage() {
           onClick={handleRunScreener}
           disabled={screenerRunning}
           className={cn(
-            "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-6 py-3 text-sm font-bold transition-all duration-300",
+            "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-md px-6 py-3 text-sm font-bold transition-all duration-300",
             screenerRunning
               ? "bg-zinc-900 text-zinc-500 border border-white/5"
               : "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
@@ -138,11 +138,11 @@ export default function ScreenerPage() {
 
       {/* Progress Monitor */}
       {progress && progress.running && (
-        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 p-1 backdrop-blur-sm">
-          <div className="rounded-xl bg-zinc-950/40 p-4">
+        <div className="relative overflow-hidden rounded-md border border-primary/20 bg-primary/5 p-1 backdrop-blur-sm">
+          <div className="rounded-md bg-zinc-950/40 p-4">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
                   <Loader2 className="h-4 w-4 animate-spin" />
                 </div>
                 <div>
@@ -218,8 +218,8 @@ export default function ScreenerPage() {
       )}
 
       {/* Toolbar & Filters */}
-      <div className="flex flex-wrap items-center gap-3 bg-white/5 p-3 border border-white/5 rounded-2xl backdrop-blur-sm">
-        <div className="flex items-center gap-2 rounded-xl bg-zinc-950/50 px-3 py-2 border border-white/5">
+      <div className="flex flex-wrap items-center gap-3 bg-white/5 p-3 border border-white/5 rounded-md backdrop-blur-sm">
+        <div className="flex items-center gap-2 rounded-md bg-zinc-950/50 px-3 py-2 border border-white/5">
           <Filter className="h-4 w-4 text-zinc-500" />
           <select
             value={filters.strategy || ''}
@@ -234,7 +234,7 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded-xl bg-zinc-950/50 px-3 py-2 border border-white/5">
+        <div className="flex items-center gap-2 rounded-md bg-zinc-950/50 px-3 py-2 border border-white/5">
           <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Flag:</span>
           <select
             value={filters.flag || ''}
@@ -248,7 +248,7 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded-xl bg-zinc-950/50 px-3 py-2 border border-white/5">
+        <div className="flex items-center gap-2 rounded-md bg-zinc-950/50 px-3 py-2 border border-white/5">
           <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Min Pop:</span>
           <input
             type="number"
@@ -259,7 +259,7 @@ export default function ScreenerPage() {
           />
         </div>
 
-        <div className="sm:ml-auto flex items-center gap-2 rounded-xl bg-primary/10 px-4 py-2 border border-primary/20">
+        <div className="sm:ml-auto flex items-center gap-2 rounded-md bg-primary/10 px-4 py-2 border border-primary/20">
           <SortDesc className="h-4 w-4 text-primary" />
           <select
             value={sortBy}
@@ -276,13 +276,13 @@ export default function ScreenerPage() {
 
       {/* Content Grid */}
       {loading ? (
-        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-white/5">
+        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded border border-dashed border-white/10 bg-white/5">
           <Loader2 className="h-10 w-10 animate-spin text-primary opacity-50" />
           <span className="text-sm font-medium text-zinc-500 uppercase tracking-widest">Loading Market Data...</span>
         </div>
       ) : sorted.length === 0 ? (
-        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-white/5 text-zinc-500">
-          <div className="rounded-full bg-zinc-900 p-6 border border-white/5 mb-2">
+        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded border border-dashed border-white/10 bg-white/5 text-zinc-500">
+          <div className="rounded-md bg-zinc-900 p-6 border border-white/5 mb-2">
             <Search className="h-10 w-10 opacity-20" />
           </div>
           <div className="text-center">

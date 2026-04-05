@@ -146,7 +146,7 @@ export default function PositionsPage() {
         </div>
         <button 
           onClick={fetchPositions} 
-          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded-xl"
+          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded-md"
         >
           <RefreshCw className="h-4 w-4" />
           Refresh Feed
@@ -154,12 +154,12 @@ export default function PositionsPage() {
       </div>
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center border border-dashed border-white/5 rounded-3xl">
+        <div className="flex h-64 items-center justify-center border border-dashed border-white/5 rounded">
           <Loader2 className="h-8 w-8 animate-spin text-zinc-700" />
         </div>
       ) : needsAuth ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/5 bg-white/5 p-8 text-center rounded-3xl backdrop-blur-sm">
-          <div className="rounded-2xl bg-zinc-900 p-4 border border-white/5 shadow-xl">
+        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/5 bg-white/5 p-8 text-center rounded backdrop-blur-sm">
+          <div className="rounded-md bg-zinc-900 p-4 border border-white/5 shadow-xl">
              <Key className="h-8 w-8 text-zinc-500" />
           </div>
           <div>
@@ -169,19 +169,19 @@ export default function PositionsPage() {
           <button
             onClick={handleConnect}
             disabled={connecting}
-            className="bg-gradient-to-r from-primary to-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 rounded-xl mt-2"
+            className="bg-gradient-to-r from-primary to-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 rounded-md mt-2"
           >
             {connecting ? 'Connecting...' : `Authorize ${brokerLabel}`}
           </button>
         </div>
       ) : error ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3 border border-red-500/10 bg-red-500/5 p-8 text-center rounded-3xl">
+        <div className="flex h-64 flex-col items-center justify-center gap-3 border border-red-500/10 bg-red-500/5 p-8 text-center rounded">
           <AlertTriangle className="h-8 w-8 text-red-500 opacity-50" />
           <p className="text-base font-medium text-red-400">{error}</p>
         </div>
       ) : positions.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-dashed border-white/5 bg-white/5 text-zinc-500 rounded-3xl">
-          <div className="rounded-full bg-zinc-900 p-6 border border-white/5">
+        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-dashed border-white/5 bg-white/5 text-zinc-500 rounded">
+          <div className="rounded-md bg-zinc-900 p-6 border border-white/5">
             <BarChart3 className="h-10 w-10 opacity-20" />
           </div>
           <span className="text-sm font-medium">No active positions found</span>
@@ -190,26 +190,26 @@ export default function PositionsPage() {
         <>
           {/* Summary Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl backdrop-blur-sm shadow-sm">
+            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-md backdrop-blur-sm shadow-sm">
               <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Net Liquidity</div>
               <div className="text-2xl font-bold text-white mt-1.5">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
-            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl backdrop-blur-sm shadow-sm">
+            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-md backdrop-blur-sm shadow-sm">
               <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Day Profit / Loss</div>
               <div className={cn("text-2xl font-bold mt-1.5 flex items-center gap-2", getPnLColor(totalDayPnL))}>
                 {totalDayPnL >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
                 ${Math.abs(totalDayPnL).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl backdrop-blur-sm shadow-sm">
+            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-md backdrop-blur-sm shadow-sm">
               <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Active Assets</div>
               <div className="text-2xl font-bold text-zinc-100 mt-1.5">{positions.length}</div>
             </div>
-            <div className="bg-white/5 border border-white/10 p-2 rounded-2xl flex items-center justify-center gap-1">
+            <div className="bg-white/5 border border-white/10 p-2 rounded-md flex items-center justify-center gap-1">
                 {(['All', 'Equity', 'Option'] as FilterType[]).map(f => (
                   <button key={f} onClick={() => setFilter(f)}
                     className={cn(
-                      "flex-1 h-full px-3 py-2 text-xs font-bold transition-all rounded-xl",
+                      "flex-1 h-full px-3 py-2 text-xs font-bold transition-all rounded-md",
                       filter === f ? "bg-white/10 text-white shadow-sm border border-white/10" : "text-zinc-500 hover:text-zinc-300"
                     )}>
                     {f}
@@ -219,7 +219,7 @@ export default function PositionsPage() {
           </div>
 
           {/* Positions Table */}
-          <div className="border border-white/5 rounded-2xl overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
+          <div className="border border-white/5 rounded-md overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead>
@@ -246,7 +246,7 @@ export default function PositionsPage() {
                         {pos.dayPnL >= 0 ? '+' : '-'}${Math.abs(pos.dayPnL).toFixed(2)}
                       </td>
                       <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnLPct))}>
-                        <span className="px-2 py-1 rounded-lg bg-current/5">
+                        <span className="px-2 py-1 rounded bg-current/5">
                           {pos.dayPnLPct >= 0 ? '▲' : '▼'} {Math.abs(pos.dayPnLPct).toFixed(2)}%
                         </span>
                       </td>

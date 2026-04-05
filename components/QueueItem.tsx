@@ -20,7 +20,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
 
   return (
     <div className={cn(
-      "group flex items-center gap-6 border bg-zinc-900/40 p-4 transition-all hover:bg-zinc-900/60 rounded-2xl backdrop-blur-sm",
+      "group flex items-center gap-6 border bg-zinc-900/40 p-4 transition-all hover:bg-zinc-900/60 rounded-md backdrop-blur-sm",
       priceAlert ? "border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]" : "border-white/5 shadow-sm"
     )}>
       {/* Symbol + Identity */}
@@ -76,7 +76,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* QTY Control */}
       <div className="flex items-center gap-4 border-l border-white/5 pl-6">
         <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Qty</span>
-        <div className="flex items-center border border-white/10 bg-black/40 rounded-xl overflow-hidden shadow-inner">
+        <div className="flex items-center border border-white/10 bg-black/40 rounded-md overflow-hidden shadow-inner">
           <button
             onClick={() => onQuantityChange(item.queue_id, Math.max(1, item.quantity - 1))}
             className="flex h-8 w-8 items-center justify-center text-zinc-500 hover:bg-white/5 hover:text-white transition-colors"
@@ -96,7 +96,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* REMOVE ACTION */}
       <button
         onClick={() => onRemove(item.queue_id)}
-        className="ml-auto flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-xl border border-transparent hover:border-red-500/20 group/trash"
+        className="ml-auto flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-md border border-transparent hover:border-red-500/20 group/trash"
         title="Remove order"
       >
         <Trash2 className="h-5 w-5 transition-transform group-hover/trash:scale-110" />

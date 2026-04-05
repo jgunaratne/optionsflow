@@ -9,8 +9,8 @@ import { ChevronDown, Check, Activity, LayoutGrid, BarChart2, Shield, MessageSqu
 import { cn } from '@/lib/utils';
 
 const BROKER_META: Record<string, { label: string; color: string; bg: string }> = {
-  schwab: { label: 'Schwab', color: 'text-blue-400', bg: 'border-blue-900/50 bg-blue-500/10' },
-  webull: { label: 'Webull', color: 'text-orange-400', bg: 'border-orange-900/50 bg-orange-500/10' },
+  schwab: { label: 'Schwab', color: 'text-blue-300', bg: 'border-blue-700/50 bg-blue-900/20' },
+  webull: { label: 'Webull', color: 'text-orange-300', bg: 'border-orange-700/50 bg-orange-900/20' },
 };
 
 function BrokerSwitcher() {
@@ -35,20 +35,22 @@ function BrokerSwitcher() {
       <button
         onClick={() => setOpen(!open)}
         disabled={switching}
+        aria-label="Switch Broker"
+        aria-expanded={open}
         className={cn(
-          "flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-all hover:brightness-110",
+          "flex items-center gap-2 rounded border px-3 py-1.5 text-sm font-semibold transition-all hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black",
           meta.bg,
           switching ? 'opacity-50 cursor-not-allowed' : ''
         )}
       >
         <span className={meta.color}>{meta.label}</span>
-        <ChevronDown className={cn("h-3.5 w-3.5", meta.color, open ? "rotate-180" : "")} />
+        <ChevronDown className={cn("h-4 w-4", meta.color, open ? "rotate-180" : "")} aria-hidden="true" />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-40 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/90 backdrop-blur-xl shadow-2xl p-1">
+        <div className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-md border border-white/20 bg-zinc-900 backdrop-blur-xl shadow-2xl p-1">
           {supported.map(broker => {
-            const m = BROKER_META[broker] || { label: broker, color: 'text-zinc-400', bg: '' };
+            const m = BROKER_META[broker] || { label: broker, color: 'text-zinc-200', bg: '' };
             const isActive = broker === active;
             return (
               <button
@@ -60,12 +62,12 @@ function BrokerSwitcher() {
                 }}
                 disabled={switching}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-medium transition-all",
-                  isActive ? "bg-white/10 text-white" : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+                  "flex w-full items-center justify-between rounded px-3 py-2.5 text-left text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white/10",
+                  isActive ? "bg-white/15 text-white" : "text-zinc-300 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <span>{m.label}</span>
-                {isActive && <Check className="h-3.5 w-3.5 text-primary" />}
+                {isActive && <Check className="h-4 w-4 text-emerald-400" aria-hidden="true" />}
               </button>
             );
           })}
@@ -90,36 +92,36 @@ export default function Nav() {
   ];
 
   const vixColor = vix < 20 ? 'text-emerald-400' : vix < 30 ? 'text-amber-400' : 'text-red-400';
-  const vixBg = vix < 20 ? 'bg-emerald-500/10 border-emerald-500/20' : vix < 30 ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20';
+  const vixBg = vix < 20 ? 'bg-emerald-900/30 border-emerald-500/30' : vix < 30 ? 'bg-amber-900/30 border-amber-500/30' : 'bg-red-900/30 border-red-500/30';
 
   const statusColor =
     marketStatus.status === 'OPEN' ? 'text-emerald-400' :
-    marketStatus.status === 'PRE_MARKET' ? 'text-blue-400' :
+    marketStatus.status === 'PRE_MARKET' ? 'text-blue-300' :
     marketStatus.status === 'AFTER_HOURS' ? 'text-amber-400' :
-    'text-zinc-500';
+    'text-zinc-400';
 
   const statusDot =
-    marketStatus.status === 'OPEN' ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.4)]' :
+    marketStatus.status === 'OPEN' ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]' :
     marketStatus.status === 'PRE_MARKET' ? 'bg-blue-400' :
     marketStatus.status === 'AFTER_HOURS' ? 'bg-amber-400' :
-    'bg-zinc-600';
+    'bg-zinc-500';
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
-      <div className="flex h-14 w-full items-center justify-between px-4 sm:px-8">
+    <nav className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/80 backdrop-blur-xl">
+      <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8">
         {/* Brand */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-indigo-600 shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
-              <Activity className="w-5 h-5 text-white" />
+          <Link href="/" className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black rounded p-1">
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-primary shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
+              <Activity className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
-            <span className="text-lg font-bold tracking-tight text-white sm:block">
-              Options<span className="text-primary">Flow</span>
+            <span className="text-xl font-bold tracking-tight text-white sm:block">
+              OptionsFlow
             </span>
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-2">
             {links.map(link => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
@@ -127,14 +129,15 @@ export default function Nav() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
+                    "flex items-center gap-2 rounded px-3 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary",
                     isActive
-                      ? "bg-white/10 text-white"
-                      : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+                      ? "bg-white/15 text-white shadow-sm"
+                      : "text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-zinc-500")} />
+                  <Icon className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-zinc-400")} aria-hidden="true" />
                   <span>{link.label}</span>
                 </Link>
               );
@@ -143,25 +146,25 @@ export default function Nav() {
         </div>
 
         {/* Right side controls */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           {/* Market Status */}
-          <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-xs">
-            <div className={cn("h-1.5 w-1.5 rounded-full", statusDot)} />
-            <span className={cn("font-medium", statusColor)}>
+          <div className="hidden sm:flex items-center gap-2 rounded border border-white/10 bg-white/10 px-4 py-1.5 text-sm" role="status">
+            <div className={cn("h-2 w-2 rounded-full", statusDot)} aria-hidden="true" />
+            <span className={cn("font-bold", statusColor)}>
               {marketStatus.status.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
             </span>
           </div>
 
           {/* VIX */}
-          <div className={cn("hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold", vixBg)}>
-            <span className="text-zinc-500 uppercase tracking-widest text-[9px]">Vix</span>
+          <div className={cn("hidden sm:flex items-center gap-2 rounded border px-4 py-1.5 text-sm font-bold", vixBg)} aria-label="Volatility Index">
+            <span className="text-zinc-300 tracking-wider">VIX</span>
             <span className={vixColor}>{vix > 0 ? vix.toFixed(2) : '—'}</span>
           </div>
 
           <BrokerSwitcher />
           
           {/* Mobile indicator */}
-          <div className={cn("md:hidden h-2 w-2 rounded-full", connected ? "bg-emerald-400" : "bg-red-400")} />
+          <div className={cn("md:hidden h-2.5 w-2.5 rounded-full", connected ? "bg-emerald-400" : "bg-red-400")} aria-label={connected ? "Connected" : "Disconnected"} />
         </div>
       </div>
     </nav>
