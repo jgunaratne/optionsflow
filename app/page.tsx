@@ -1,10 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import CandidateCard from '@/components/CandidateCard';
 import type { Candidate } from '@/lib/db';
 import { useCandidatesStore, useQueueStore } from '@/lib/store';
-import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2, Gauge } from 'lucide-react';
+import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2, Gauge, KeyRound, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScreenerLogEntry {
@@ -304,6 +305,33 @@ export default function ScreenerPage() {
                 <span className="truncate">{log.message}</span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {progress && !progress.running && progress.status.includes('Schwab not connected') && (
+        <div className="relative overflow-hidden rounded border border-amber-500/20 bg-amber-500/5 p-1 backdrop-blur-sm">
+          <div className="rounded bg-zinc-950/50 p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-amber-500/10 text-amber-400">
+                  <KeyRound className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-wider text-amber-400">Schwab connection required</p>
+                  <p className="mt-1 text-sm text-zinc-300">
+                    The options screener needs Schwab market data. Connect your Schwab account from the Positions page, then run the screener again.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/positions"
+                className="inline-flex items-center justify-center gap-2 rounded bg-gradient-to-r from-primary to-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40"
+              >
+                Connect Schwab
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </div>
       )}
