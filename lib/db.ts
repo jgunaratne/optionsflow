@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import type { RedditPost } from './reddit';
 
 const DB_PATH = process.env.DATABASE_PATH || path.join(process.cwd(), 'optionsflow.db');
 
@@ -108,6 +109,32 @@ function initializeSchema(db: Database.Database) {
       payload TEXT NOT NULL,
       updated_at INTEGER NOT NULL,
       PRIMARY KEY (broker, key)
+    );
+
+    CREATE TABLE IF NOT EXISTS reddit_posts (
+      id TEXT PRIMARY KEY,
+      subreddit TEXT NOT NULL,
+      title TEXT NOT NULL,
+      author TEXT,
+      score INTEGER DEFAULT 0,
+      num_comments INTEGER DEFAULT 0,
+      selftext TEXT,
+      url TEXT,
+      permalink TEXT,
+      created_utc INTEGER,
+      thumbnail TEXT,
+      is_self INTEGER DEFAULT 0,
+      domain TEXT,
+      link_flair_text TEXT,
+      fetched_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS reddit_analysis (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      subreddits TEXT NOT NULL,
+      analysis TEXT NOT NULL,
+      post_count INTEGER,
+      analyzed_at TEXT DEFAULT (datetime('now'))
     );
   `);
 
@@ -378,4 +405,89 @@ export function clearChatHistory(): void {
 export function getWatchlist(): { id: number; symbol: string; enabled: number; strategy: string; added_at: number }[] {
   const db = getDb();
   return db.prepare('SELECT * FROM watchlist WHERE enabled = 1').all() as { id: number; symbol: string; enabled: number; strategy: string; added_at: number }[];
+}
+
+// --- Reddit Cache Helpers ---
+
+export function cacheRedditPosts(posts: RedditPost[]): void {
+  const db = getDb();
+  const stmt = db.prepare(`
+    INSERT OR REPLACE INTO reddit_posts
+      (id, subreddit, title, author, score, num_comments, selftext, url, permalink, created_utc, thumbnail, is_self, domain, link_flair_text, fetched_at)
+    VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+  `);
+
+  const insertMany = db.transaction((items: RedditPost[]) => {
+    for (const p of items) {
+      stmt.run(
+        p.id, p.subreddit, p.title, p.author, p.score, p.numComments,
+        p.selftext, p.url, p.permalink, p.createdUtc, p.thumbnail,
+        p.isSelf ? 1 : 0, p.domain, p.linkFlairText,
+      );
+    }
+  });
+
+  insertMany(posts);
+}
+
+export function getCachedRedditPosts(subreddits: string[], maxAgeMinutes = 15): RedditPost[] {
+  const db = getDb();
+  const placeholders = subreddits.map(() => '?').join(',');
+  const rows = db.prepare(`
+    SELECT * FROM reddit_posts
+    WHERE subreddit IN (${placeholders})
+      AND fetched_at > datetime('now', '-${maxAgeMinutes} minutes')
+    ORDER BY score DESC
+  `).all(...subreddits) as any[];
+
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    author: r.author,
+    score: r.score,
+    numComments: r.num_comments,
+    selftext: r.selftext || '',
+    url: r.url,
+    permalink: r.permalink,
+    createdUtc: r.created_utc,
+    thumbnail: r.thumbnail,
+    isSelf: r.is_self === 1,
+    domain: r.domain,
+    linkFlairText: r.link_flair_text,
+    subreddit: r.subreddit,
+  }));
+}
+
+export function cacheRedditAnalysis(subreddits: string[], analysis: string, postCount: number): void {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO reddit_analysis (subreddits, analysis, post_count, analyzed_at)
+    VALUES (?, ?, ?, datetime('now'))
+  `).run(JSON.stringify(subreddits.sort()), analysis, postCount);
+}
+
+export function getCachedRedditAnalysis(subreddits: string[], maxAgeMinutes = 30): any | null {
+  const db = getDb();
+  const sortedKey = JSON.stringify(subreddits.sort());
+  const row = db.prepare(`
+    SELECT analysis, post_count, analyzed_at FROM reddit_analysis
+    WHERE subreddits = ?
+      AND analyzed_at > datetime('now', '-${maxAgeMinutes} minutes')
+    ORDER BY analyzed_at DESC
+    LIMIT 1
+  `).get(sortedKey) as { analysis: string; post_count: number; analyzed_at: string } | undefined;
+
+  if (!row) return null;
+
+  try {
+    return {
+      ...JSON.parse(row.analysis),
+      postCount: row.post_count,
+      analyzedAt: row.analyzed_at,
+      subreddits,
+    };
+  } catch {
+    return null;
+  }
 }

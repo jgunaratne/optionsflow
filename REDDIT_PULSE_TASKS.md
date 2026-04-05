@@ -43,7 +43,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ---
 
-- [ ] **1.2 — Database Schema (`lib/db.ts`)**
+- [x] **1.2 — Database Schema (`lib/db.ts`)**
 
   Modify `/Users/junius/git/optionsflow/lib/db.ts`:
 
