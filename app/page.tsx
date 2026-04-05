@@ -88,9 +88,26 @@ function CandidateListRow({
         <div className="text-[10px] uppercase tracking-wider text-zinc-400">Delta</div>
         <div className="font-semibold text-zinc-100">{candidate.delta.toFixed(3)}</div>
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 group relative cursor-help">
         <div className="text-[10px] uppercase tracking-wider text-zinc-500">AI</div>
         <div className="truncate text-xs text-zinc-400">{candidate.is_eligible === 0 ? (candidate.rejection_reason || candidate.ai_brief) : candidate.ai_brief}</div>
+        
+        {/* Tooltip Card */}
+        <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-72 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <div className="rounded border border-white/10 bg-zinc-900/95 p-4 shadow-xl backdrop-blur-md relative overflow-hidden">
+             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-blue-500" aria-hidden="true" />
+             <div className="mb-2 flex items-center justify-between">
+               <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">AI Insight</span>
+               <span className={cn(
+                 "text-sm font-black",
+                 candidate.ai_score > 80 ? "text-emerald-400" : candidate.ai_score > 60 ? "text-amber-400" : "text-red-400"
+               )}>{candidate.ai_score.toFixed(0)}/100</span>
+             </div>
+             <p className="text-sm leading-relaxed text-zinc-300 whitespace-normal">
+               &quot;{candidate.is_eligible === 0 ? (candidate.rejection_reason || candidate.ai_brief) : candidate.ai_brief}&quot;
+             </p>
+          </div>
+        </div>
       </div>
       <div className="flex justify-end">
         <button
