@@ -133,7 +133,18 @@ function initializeSchema(db: Database.Database) {
     min_open_interest: 500,
     exclude_earnings_in_dte: true,
     vix_defensive_threshold: 30,
-    watchlist_default: ["SPY", "QQQ", "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "JPM", "WMT"],
+    watchlist_default: [
+      "SPY", "QQQ", "IWM", "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "GOOG", "META", 
+      "TSLA", "BRK.B", "UNH", "JNJ", "XOM", "V", "PG", "MA", "AVGO", "HD", 
+      "CVX", "MRK", "ABBV", "PEP", "COST", "KO", "ADBE", "WMT", "MCD", "CSCO", 
+      "PFE", "BAC", "CRM", "TMO", "LIN", "ABT", "ORCL", "AMD", "DIS", "ACN", 
+      "TXN", "PM", "MS", "VZ", "NEE", "RTX", "NKE", "HON", "AMGN", "LOW", 
+      "SPGI", "IBM", "UNP", "CAT", "INTC", "GE", "COP", "GS", "ISRG", "DE", 
+      "QCOM", "BKNG", "AMAT", "MDT", "SBUX", "TJX", "BLK", "AMT", "SYK", "NOW", 
+      "ADP", "GILD", "MMC", "ADI", "C", "CVS", "MDLZ", "LLY", "MO", "LMT", 
+      "CB", "CI", "T", "ELV", "SCHW", "REGN", "ZTS", "PLD", "DUK", "SO", 
+      "PGR", "VRTX", "BSX", "MU", "ETN", "FISV", "ITW", "HUM", "MPC", "PYPL"
+    ],
   };
 
   const insertConfig = db.prepare('INSERT OR IGNORE INTO config (key, value) VALUES (?, ?)');
