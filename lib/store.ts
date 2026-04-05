@@ -304,3 +304,91 @@ export const useBrokerStore = create<BrokerState>((set) => ({
     }
   },
 }));
+
+// --- Reddit Store ---
+import type { RedditPost } from './reddit';
+
+export interface RedditTickerAnalysis {
+  symbol: string;
+  mentions: number;
+  sentiment: 'bullish' | 'bearish' | 'neutral';
+  avgScore: number;
+  tradeIdeas: string[];
+  strategies: string[];
+  topPosts: { title: string; permalink: string; score: number }[];
+}
+
+export interface RedditAnalysis {
+  tickers: RedditTickerAnalysis[];
+  summary: string;
+  analyzedAt: string;
+  postCount: number;
+  subreddits: string[];
+  source?: string;
+}
+
+interface RedditState {
+  posts: RedditPost[];
+  analysis: RedditAnalysis | null;
+  activeSubreddits: string[];
+  loading: boolean;
+  analyzing: boolean;
+  error: string | null;
+  lastRefreshed: string | null;
+  setActiveSubreddits: (subs: string[]) => void;
+  toggleSubreddit: (sub: string) => void;
+  fetchPosts: () => Promise<void>;
+  runAnalysis: () => Promise<void>;
+  refresh: () => Promise<void>;
+}
+
+export const useRedditStore = create<RedditState>((set, get) => ({
+  posts: [],
+  analysis: null,
+  activeSubreddits: ['options', 'thetagang', 'wallstreetbets', 'stocks', 'options_trading'],
+  loading: false,
+  analyzing: false,
+  error: null,
+  lastRefreshed: null,
+  setActiveSubreddits: (subs) => set({ activeSubreddits: subs }),
+  toggleSubreddit: (sub) => set((state) => {
+    const current = state.activeSubreddits;
+    const next = current.includes(sub)
+      ? current.filter((s) => s !== sub)
+      : [...current, sub];
+    return { activeSubreddits: next.length > 0 ? next : current }; // Prevent empty
+  }),
+  fetchPosts: async () => {
+    set({ loading: true, error: null });
+    try {
+      const { activeSubreddits } = get();
+      const res = await fetch(`/api/reddit/posts?subreddits=${activeSubreddits.join(',')}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      set({ posts: data.posts || [], lastRefreshed: data.cachedAt, loading: false });
+    } catch (e: any) {
+      set({ error: e.message, loading: false });
+    }
+  },
+  runAnalysis: async () => {
+    set({ analyzing: true, error: null });
+    try {
+      const { activeSubreddits } = get();
+      const res = await fetch('/api/reddit/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subreddits: activeSubreddits }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      set({ analysis: data, analyzing: false });
+    } catch (e: any) {
+      set({ error: e.message, analyzing: false });
+    }
+  },
+  refresh: async () => {
+    const { fetchPosts, runAnalysis } = get();
+    await fetchPosts();
+    await runAnalysis();
+  },
+}));

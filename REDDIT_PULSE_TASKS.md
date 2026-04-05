@@ -161,7 +161,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ## Phase 3 — State Management (depends on Phase 2)
 
-- [ ] **3.1 — Zustand Store (`lib/store.ts`)**
+- [x] **3.1 — Zustand Store (`lib/store.ts`)**
 
   Modify `/Users/junius/git/optionsflow/lib/store.ts` — add a new store at the bottom:
 
