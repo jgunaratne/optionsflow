@@ -101,6 +101,14 @@ function initializeSchema(db: Database.Database) {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS broker_snapshots (
+      broker TEXT NOT NULL,
+      key TEXT NOT NULL,
+      payload TEXT NOT NULL,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (broker, key)
+    );
   `);
 
   const candidateColumns = db.prepare("PRAGMA table_info(candidates)").all() as Array<{ name: string }>;
@@ -210,6 +218,13 @@ export interface ChatMessage {
   created_at: number;
 }
 
+export interface BrokerSnapshot<T> {
+  broker: string;
+  key: string;
+  payload: T;
+  updated_at: number;
+}
+
 // --- Query Helpers ---
 
 export function getConfig(key: string): unknown {
@@ -221,6 +236,31 @@ export function getConfig(key: string): unknown {
 export function setConfig(key: string, value: unknown): void {
   const db = getDb();
   db.prepare('INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)').run(key, JSON.stringify(value));
+}
+
+export function getBrokerSnapshot<T>(broker: string, key: string): BrokerSnapshot<T> | null {
+  const db = getDb();
+  const row = db.prepare(
+    'SELECT broker, key, payload, updated_at FROM broker_snapshots WHERE broker = ? AND key = ?'
+  ).get(broker, key) as { broker: string; key: string; payload: string; updated_at: number } | undefined;
+
+  if (!row) return null;
+
+  return {
+    broker: row.broker,
+    key: row.key,
+    payload: JSON.parse(row.payload) as T,
+    updated_at: row.updated_at,
+  };
+}
+
+export function setBrokerSnapshot(broker: string, key: string, payload: unknown): number {
+  const db = getDb();
+  const updatedAt = Math.floor(Date.now() / 1000);
+  db.prepare(
+    'INSERT OR REPLACE INTO broker_snapshots (broker, key, payload, updated_at) VALUES (?, ?, ?, ?)'
+  ).run(broker, key, JSON.stringify(payload), updatedAt);
+  return updatedAt;
 }
 
 export function getCandidates(filters?: { flag?: string; strategy?: string; min_pop?: number }): Candidate[] {

@@ -24,10 +24,13 @@ type FilterType = 'All' | 'Equity' | 'Option';
 export default function PositionsPage() {
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsAuth, setNeedsAuth] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [filter, setFilter] = useState<FilterType>('All');
+  const [cachedAt, setCachedAt] = useState<number | null>(null);
+  const [dataSource, setDataSource] = useState<'cache' | 'live' | null>(null);
   const { active } = useBrokerStore();
 
   const brokerLabel = active.charAt(0).toUpperCase() + active.slice(1);
@@ -38,7 +41,7 @@ export default function PositionsPage() {
       if (event.data?.type === 'schwab-connected') {
         setNeedsAuth(false);
         setError(null);
-        fetchPositions();
+        fetchPositions(true);
       }
       if (event.data?.type === 'schwab-auth-error') {
         setError(event.data?.message || 'Authorization failed');
@@ -64,7 +67,7 @@ export default function PositionsPage() {
       if (data.success) {
         setNeedsAuth(false);
         setError(null);
-        fetchPositions();
+        fetchPositions(true);
       } else {
         setError(data.error || 'Connection failed');
       }
@@ -75,34 +78,44 @@ export default function PositionsPage() {
     }
   };
 
-  const fetchPositions = async () => {
+  const fetchPositions = async (refresh = false) => {
+    if (refresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
     setError(null);
     setNeedsAuth(false);
     try {
-      const res = await fetch('/api/positions');
+      const res = await fetch('/api/positions', { method: refresh ? 'POST' : 'GET' });
       const data = await res.json();
       if (data.error === 'not_authenticated') {
         setNeedsAuth(true);
         setPositions([]);
+        setCachedAt(data.cachedAt ?? null);
+        setDataSource(data.source ?? null);
         return;
       }
       if (!res.ok) {
         setError(data.message || 'Fetch failed');
         setPositions([]);
+        setCachedAt(data.cachedAt ?? null);
+        setDataSource(data.source ?? null);
         return;
       }
       setPositions(data.positions || []);
+      setCachedAt(data.cachedAt ?? null);
+      setDataSource(data.source ?? null);
     } catch {
       setError('Server error');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchPositions();
-    const interval = setInterval(fetchPositions, 60000);
-    return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
@@ -137,20 +150,27 @@ export default function PositionsPage() {
 
   const totalValue = positions.reduce((s, p) => s + p.marketValue, 0);
   const totalDayPnL = positions.reduce((s, p) => s + p.dayPnL, 0);
+  const cacheLabel = cachedAt
+    ? `Cached ${new Date(cachedAt * 1000).toLocaleString()}`
+    : 'No cached data yet';
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between border-b border-white/10 pb-6 mt-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Positions</h1>
-          <p className="text-sm text-zinc-400 mt-1">Real-time data feed from <span className="text-zinc-300 font-medium">{brokerLabel}</span></p>
+          <p className="text-sm text-zinc-400 mt-1">
+            Cached portfolio data from <span className="text-zinc-300 font-medium">{brokerLabel}</span>
+            {dataSource === 'live' ? ' updated just now' : ` · ${cacheLabel}`}
+          </p>
         </div>
         <button 
-          onClick={fetchPositions} 
-          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded"
+          onClick={() => fetchPositions(true)}
+          disabled={refreshing}
+          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <RefreshCw className="h-4 w-4" />
-          Refresh Feed
+          <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+          {refreshing ? `Refreshing ${brokerLabel}` : `Refresh from ${brokerLabel}`}
         </button>
       </div>
 
@@ -165,7 +185,7 @@ export default function PositionsPage() {
           </div>
           <div>
             <p className="text-lg font-bold text-white">Authentication required</p>
-            <p className="text-sm text-zinc-400 mt-1">Link your {brokerLabel} account to view live portfolio data</p>
+            <p className="text-sm text-zinc-400 mt-1">Link your {brokerLabel} account to refresh and cache portfolio data</p>
           </div>
           <button
             onClick={handleConnect}
@@ -179,6 +199,16 @@ export default function PositionsPage() {
         <div className="flex h-64 flex-col items-center justify-center gap-3 border border-red-500/10 bg-red-500/5 p-8 text-center rounded">
           <AlertTriangle className="h-8 w-8 text-red-500 opacity-50" />
           <p className="text-base font-medium text-red-400">{error}</p>
+          {!needsAuth && (
+            <button
+              onClick={() => fetchPositions(true)}
+              disabled={refreshing}
+              className="mt-2 flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+              {refreshing ? `Refreshing ${brokerLabel}` : `Refresh from ${brokerLabel}`}
+            </button>
+          )}
         </div>
       ) : positions.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center gap-4 border border-dashed border-white/10 bg-white/5 text-zinc-400 rounded">

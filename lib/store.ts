@@ -158,25 +158,31 @@ interface AccountState {
   account: AccountData | null;
   loading: boolean;
   error: AccountErrorState | null;
+  cachedAt: number | null;
+  source: 'cache' | 'live' | null;
   setAccount: (account: AccountData) => void;
   clearError: () => void;
-  fetchAccount: () => Promise<void>;
+  fetchAccount: (refresh?: boolean) => Promise<void>;
 }
 
 export const useAccountStore = create<AccountState>((set) => ({
   account: null,
   loading: false,
   error: null,
+  cachedAt: null,
+  source: null,
   setAccount: (account) => set({ account }),
   clearError: () => set({ error: null }),
-  fetchAccount: async () => {
+  fetchAccount: async (refresh = false) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetch('/api/account');
+      const res = await fetch('/api/account', { method: refresh ? 'POST' : 'GET' });
       const data = await res.json();
       if (!res.ok) {
         set({
           account: null,
+          cachedAt: data.cachedAt ?? null,
+          source: data.source ?? null,
           error: {
             message: data.message || data.error || 'Failed to fetch account data',
             needsAuth: data.error === 'not_authenticated',
@@ -184,11 +190,18 @@ export const useAccountStore = create<AccountState>((set) => ({
         });
         return;
       }
-      set({ account: data.account || null, error: null });
+      set({
+        account: data.account || null,
+        cachedAt: data.cachedAt ?? null,
+        source: data.source ?? null,
+        error: null,
+      });
     } catch (error) {
       console.error('Failed to fetch account:', error);
       set({
         account: null,
+        cachedAt: null,
+        source: null,
         error: {
           message: 'Failed to fetch account data',
           needsAuth: false,

@@ -7,13 +7,13 @@ import SectorChart from '@/components/SectorChart';
 import RiskGauge from '@/components/RiskGauge';
 import { useStreamStore, useAccountStore, useBrokerStore } from '@/lib/store';
 import { calculateCapitalAllocation, type CrashScenario, type SectorExposure } from '@/lib/risk';
-import { Activity, ShieldAlert, BarChart, PieChart, Wallet, CreditCard, Layers } from 'lucide-react';
+import { Activity, ShieldAlert, BarChart, PieChart, Wallet, CreditCard, Layers, RefreshCw } from 'lucide-react';
 import { AlertTriangle, KeyRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PortfolioPage() {
   const { vix } = useStreamStore();
-  const { account, error, fetchAccount } = useAccountStore();
+  const { account, error, loading, cachedAt, source, fetchAccount } = useAccountStore();
   const { active } = useBrokerStore();
   const greeks = { totalDelta: 0, totalTheta: 0, totalVega: 0 };
   const scenarios: CrashScenario[] = [];
@@ -24,14 +24,29 @@ export default function PortfolioPage() {
   const allocation = account
     ? calculateCapitalAllocation(account.totalValue, account.deployedCapital)
     : null;
+  const brokerLabel = active.charAt(0).toUpperCase() + active.slice(1);
+  const cacheLabel = cachedAt
+    ? `Cached ${new Date(cachedAt * 1000).toLocaleString()}`
+    : 'No cached account data yet';
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between border-b border-white/10 pb-6 mt-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Portfolio Risk</h1>
-          <p className="text-sm text-zinc-400 mt-1">Stress tests, Greeks, and Capital Allocation</p>
+          <p className="text-sm text-zinc-400 mt-1">
+            Stress tests, Greeks, and Capital Allocation
+            {source === 'live' ? ` · refreshed from ${brokerLabel} just now` : ` · ${cacheLabel}`}
+          </p>
         </div>
+        <button
+          onClick={() => fetchAccount(true)}
+          disabled={loading}
+          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+          {loading ? `Refreshing ${brokerLabel}` : `Refresh from ${brokerLabel}`}
+        </button>
       </div>
 
       {error && (
