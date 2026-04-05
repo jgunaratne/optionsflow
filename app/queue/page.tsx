@@ -21,7 +21,7 @@ export default function QueuePage() {
 
   useEffect(() => { fetchQueue(); fetchAccount(); }, [fetchQueue, fetchAccount]);
 
-  const totalPremium = queue.reduce((sum, item) => sum + item.premium * 100 * item.quantity, 0);
+  const totalCashEarned = queue.reduce((sum, item) => sum + item.premium * 100 * item.quantity, 0);
   const totalMaxLoss = queue.reduce((sum, item) => sum + item.max_loss * item.quantity, 0);
   const deployedPct = account ? ((totalMaxLoss / account.totalValue) * 100) : 0;
 
@@ -51,7 +51,7 @@ export default function QueuePage() {
   const handleQuantityChange = async () => {};
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* Header Area */}
       <div className="flex items-center justify-between border-b border-white/10 pb-6 mt-2">
         <div>
@@ -61,17 +61,17 @@ export default function QueuePage() {
       </div>
 
       {accountError && (
-        <div className={cn("rounded border p-4 backdrop-blur-md shadow-xl", accountError.needsAuth ? "border-amber-900/30 bg-amber-950/20" : "border-red-900/30 bg-red-950/20")}>
-          <div className="flex items-start gap-3">
+        <div className={cn("rounded-2xl border p-6 backdrop-blur-md shadow-xl", accountError.needsAuth ? "border-amber-900/30 bg-amber-950/20" : "border-red-900/30 bg-red-950/20")}>
+          <div className="flex items-start gap-5">
             {accountError.needsAuth ? <KeyRound className="mt-0.5 h-4 w-4 text-amber-500" /> : <AlertTriangle className="mt-0.5 h-4 w-4 text-red-500" />}
             <div className="min-w-0 flex-1">
               <p className={cn("text-sm font-medium", accountError.needsAuth ? "text-amber-400" : "text-red-400")}>
                 {accountError.needsAuth ? `${active.charAt(0).toUpperCase() + active.slice(1)} connection required` : 'Account data unavailable'}
               </p>
-              <p className="mt-1 text-xs text-zinc-300 break-words">{accountError.message}</p>
+              <p className="mt-1 text-sm text-zinc-300 break-words">{accountError.message}</p>
               {accountError.needsAuth && (
                 <div className="mt-3">
-                  <Link href="/positions" className="text-xs font-medium text-primary hover:text-primary/80">
+                  <Link href="/positions" className="text-sm font-medium text-primary hover:text-primary/80">
                     Go to Positions to reconnect {active}
                   </Link>
                 </div>
@@ -82,20 +82,20 @@ export default function QueuePage() {
       )}
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
           <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Total Orders</div>
           <div className="text-2xl font-bold text-white">{queue.length}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Est. Premium</div>
-          <div className="text-2xl font-bold terminal-green">${totalPremium.toFixed(0)}</div>
+        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
+          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Est. Cash Earned</div>
+          <div className="text-2xl font-bold terminal-green">${totalCashEarned.toFixed(0)}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
+        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
           <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Max Risk</div>
           <div className="text-2xl font-bold text-zinc-200">${totalMaxLoss.toLocaleString()}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
+        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
           <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Cap. Impact</div>
           <div className={cn(
             "text-2xl font-bold",
@@ -106,11 +106,11 @@ export default function QueuePage() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Order Review List */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
-          <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl">
-            <div className="flex items-center gap-3 mb-6 px-1">
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl">
+            <div className="flex items-center gap-5 mb-6 px-1">
                <ListChecks className="h-5 w-5 text-primary" />
                <span className="text-base font-bold text-zinc-100 tracking-tight">Order Review</span>
             </div>
@@ -118,12 +118,12 @@ export default function QueuePage() {
             {loading ? (
               <div className="flex h-32 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-zinc-700" /></div>
             ) : queue.length === 0 ? (
-              <div className="flex h-48 flex-col items-center justify-center border border-dashed border-white/10 bg-white/5 rounded">
+              <div className="flex h-48 flex-col items-center justify-center border border-dashed border-white/10 bg-white/5 rounded-2xl">
                 <ShieldCheck className="h-10 w-10 text-zinc-800 mb-2" />
                 <span className="text-sm font-medium text-zinc-400">The execution queue is currently empty</span>
               </div>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-5">
                 {queue.map(item => (
                   <QueueItem key={item.queue_id} item={item} onRemove={removeFromQueue} onQuantityChange={handleQuantityChange} />
                 ))}
@@ -133,18 +133,18 @@ export default function QueuePage() {
 
           {/* Execution History / Result */}
           {executionResult && (
-            <div className="bg-emerald-500/5 border border-emerald-500/20 p-4 rounded">
+            <div className="bg-emerald-500/5 border border-emerald-500/20 p-6 rounded-2xl">
               <div className="flex items-center gap-2 mb-4">
                  <CheckCircle2 className="h-5 w-5 terminal-green" />
                  <span className="text-base font-bold terminal-green tracking-tight">Batch Execution Complete</span>
               </div>
-              <div className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6 px-1">
+              <div className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-6 px-1">
                 {executionResult.summary.filled} Filled • {executionResult.summary.failed} Failed
               </div>
               <div className="space-y-2">
                 {executionResult.results.map((r, i) => (
                   <div key={i} className={cn(
-                    "flex items-center justify-between border border-white/10 px-4 py-3 text-sm rounded shadow-sm",
+                    "flex items-center justify-between border border-white/10 px-4 py-3 text-sm rounded-2xl shadow-sm",
                     r.status === 'FILLED' ? "bg-emerald-500/10 terminal-green" : "bg-red-500/10 terminal-red"
                   )}>
                     <span className="font-bold">{r.symbol}</span>
@@ -157,14 +157,14 @@ export default function QueuePage() {
 
           {/* Blockers / Errors */}
           {reviewResult && reviewResult.blockers.length > 0 && (
-            <div className="bg-red-500/5 border border-red-500/20 p-4 rounded">
+            <div className="bg-red-500/5 border border-red-500/20 p-6 rounded-2xl">
               <div className="flex items-center gap-2 mb-4">
                  <XCircle className="h-5 w-5 terminal-red" />
                  <span className="text-base font-bold terminal-red tracking-tight">Execution Blocked</span>
               </div>
               <div className="space-y-2">
                 {reviewResult.blockers.map((b, i) => (
-                  <div key={i} className="flex items-start gap-3 bg-red-500/5 p-3 rounded border border-red-500/10">
+                  <div key={i} className="flex items-start gap-5 bg-red-500/5 p-3 rounded-2xl border border-red-500/10">
                      <AlertCircle className="h-4 w-4 terminal-red mt-0.5" />
                      <p className="text-sm font-medium text-red-300">{b}</p>
                   </div>
@@ -181,26 +181,26 @@ export default function QueuePage() {
                   onClick={() => setShowConfirm(true)}
  
                   disabled={executing || !!accountError || (reviewResult?.blockers && reviewResult.blockers.length > 0)}
-                  className="group relative flex w-full items-center justify-center gap-2 rounded bg-gradient-to-r from-zinc-200 to-zinc-400 py-4 text-sm font-bold text-zinc-950 shadow-lg shadow-white/10 transition-all hover:-translate-y-0.5 hover:shadow-white/20 active:translate-y-0 disabled:opacity-50 disabled:grayscale"
+                  className="group relative flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-zinc-200 to-zinc-400 py-4 text-sm font-bold text-zinc-950 shadow-lg shadow-white/10 transition-all hover:-translate-y-0.5 hover:shadow-white/20 active:translate-y-0 disabled:opacity-50 disabled:grayscale"
 
                 >
                   <Zap className="h-4 w-4" />
                   <span>Execute Order Batch ({queue.length})</span>
                 </button>
               ) : (
-                <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded shadow-xl backdrop-blur-md shadow-xl">
+                <div className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-2xl shadow-xl backdrop-blur-md shadow-xl">
                   <div className="flex items-center gap-2 mb-3">
                      <AlertCircle className="h-5 w-5 text-amber-500" />
                      <span className="text-lg font-bold text-amber-500 tracking-tight">Authorize Transaction</span>
                   </div>
-                  <p className="mb-6 text-sm text-zinc-400 font-medium">Are you sure you want to submit {queue.length} orders to market? Total credit expected: <span className="text-white font-bold">${totalPremium.toFixed(0)}</span></p>
-                  <div className="flex gap-3">
+                  <p className="mb-6 text-sm text-zinc-400 font-medium">Are you sure you want to submit {queue.length} orders to market? Total credit expected: <span className="text-white font-bold">${totalCashEarned.toFixed(0)}</span></p>
+                  <div className="flex gap-5">
                     <button onClick={handleExecute} disabled={executing}
-                      className="flex-1 bg-emerald-600 px-6 py-3 text-sm font-bold text-white hover:bg-emerald-500 shadow-lg shadow-emerald-600/20 transition-all rounded">
+                      className="flex-1 bg-emerald-600 px-6 py-3 text-sm font-bold text-white hover:bg-emerald-500 shadow-lg shadow-emerald-600/20 transition-all rounded-2xl">
                       {executing ? 'Processing...' : 'Confirm Submission'}
                     </button>
                     <button onClick={() => setShowConfirm(false)}
-                      className="flex-1 border border-zinc-800 bg-zinc-900 px-6 py-3 text-sm font-bold text-zinc-400 hover:text-white transition-all rounded">
+                      className="flex-1 border border-zinc-800 bg-zinc-900 px-6 py-3 text-sm font-bold text-zinc-400 hover:text-white transition-all rounded-2xl">
                       Abort Request
                     </button>
                   </div>
@@ -211,9 +211,9 @@ export default function QueuePage() {
         </div>
 
         {/* Sector Exposure Sidebar */}
-        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl self-start">
+        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl self-start">
            <div className="flex items-center gap-2 mb-6">
-              <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Queue Composition</span>
+              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Queue Composition</span>
            </div>
            <SectorChart data={sectorData} />
         </div>

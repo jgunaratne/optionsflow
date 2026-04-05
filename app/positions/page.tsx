@@ -129,7 +129,7 @@ export default function PositionsPage() {
     if (pos.assetType === 'OPTION' && pos.putCall) {
       return (
         <span className={cn(
-          "px-2 py-0.5 text-[10px] rounded border font-bold uppercase tracking-tight",
+          "px-2 py-0.5 text-[10px] rounded-2xl border font-bold uppercase tracking-tight",
           pos.putCall === 'PUT' ? "border-blue-900/50 bg-blue-950/30 text-blue-400" : "border-emerald-900/50 bg-emerald-950/30 text-emerald-400"
         )}>
           {pos.putCall}
@@ -137,9 +137,9 @@ export default function PositionsPage() {
       );
     }
     if (pos.assetType === 'OPTION') {
-      return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded font-bold uppercase tracking-tight">Option</span>;
+      return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded-2xl font-bold uppercase tracking-tight">Option</span>;
     }
-    return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded font-bold uppercase tracking-tight">Equity</span>;
+    return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded-2xl font-bold uppercase tracking-tight">Equity</span>;
   };
 
   const filtered = positions.filter(p => {
@@ -155,7 +155,7 @@ export default function PositionsPage() {
     : 'No cached data yet';
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between border-b border-white/10 pb-6 mt-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Positions</h1>
@@ -167,7 +167,7 @@ export default function PositionsPage() {
         <button 
           onClick={() => fetchPositions(true)}
           disabled={refreshing}
-          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded-2xl disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
           {refreshing ? `Refreshing ${brokerLabel}` : `Refresh from ${brokerLabel}`}
@@ -175,12 +175,12 @@ export default function PositionsPage() {
       </div>
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center border border-dashed border-white/10 rounded">
+        <div className="flex h-64 items-center justify-center border border-dashed border-white/10 rounded-2xl">
           <Loader2 className="h-8 w-8 animate-spin text-zinc-700" />
         </div>
       ) : needsAuth ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/10 bg-white/5 p-8 text-center rounded backdrop-blur-md shadow-xl">
-          <div className="rounded bg-zinc-900 p-4 border border-white/10 shadow-xl">
+        <div className="flex h-64 flex-col items-center justify-center gap-6 border border-white/10 bg-white/5 p-8 text-center rounded-2xl backdrop-blur-md shadow-xl">
+          <div className="rounded-2xl bg-zinc-900 p-6 border border-white/10 shadow-xl">
              <Key className="h-8 w-8 text-zinc-400" />
           </div>
           <div>
@@ -190,20 +190,20 @@ export default function PositionsPage() {
           <button
             onClick={handleConnect}
             disabled={connecting}
-            className="bg-gradient-to-r from-zinc-600 to-zinc-800 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-black/40 transition-all hover:shadow-black/60 hover:-translate-y-0.5 active:translate-y-0 rounded mt-2"
+            className="bg-gradient-to-r from-zinc-600 to-zinc-800 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-black/40 transition-all hover:shadow-black/60 hover:-translate-y-0.5 active:translate-y-0 rounded-2xl mt-2"
           >
             {connecting ? 'Connecting...' : `Authorize ${brokerLabel}`}
           </button>
         </div>
       ) : error ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3 border border-red-500/10 bg-red-500/5 p-8 text-center rounded">
+        <div className="flex h-64 flex-col items-center justify-center gap-5 border border-red-500/10 bg-red-500/5 p-8 text-center rounded-2xl">
           <AlertTriangle className="h-8 w-8 text-red-500 opacity-50" />
           <p className="text-base font-medium text-red-400">{error}</p>
           {!needsAuth && (
             <button
               onClick={() => fetchPositions(true)}
               disabled={refreshing}
-              className="mt-2 flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded-2xl disabled:cursor-not-allowed disabled:opacity-60"
             >
               <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
               {refreshing ? `Refreshing ${brokerLabel}` : `Refresh from ${brokerLabel}`}
@@ -211,8 +211,8 @@ export default function PositionsPage() {
           )}
         </div>
       ) : positions.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-dashed border-white/10 bg-white/5 text-zinc-400 rounded">
-          <div className="rounded bg-zinc-900 p-4 border border-white/10">
+        <div className="flex h-64 flex-col items-center justify-center gap-6 border border-dashed border-white/10 bg-white/5 text-zinc-400 rounded-2xl">
+          <div className="rounded-2xl bg-zinc-900 p-6 border border-white/10">
             <BarChart3 className="h-10 w-10 opacity-40" />
           </div>
           <span className="text-sm font-medium">No active positions found</span>
@@ -220,27 +220,27 @@ export default function PositionsPage() {
       ) : (
         <>
           {/* Summary Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
-              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Net Liquidity</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
+              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Total Cash Value</div>
               <div className="text-2xl font-bold text-white mt-1.5">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
-            <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
+            <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
               <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Day Profit / Loss</div>
               <div className={cn("text-2xl font-bold mt-1.5 flex items-center gap-2", getPnLColor(totalDayPnL))}>
                 {totalDayPnL >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
                 ${Math.abs(totalDayPnL).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
+            <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
               <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Active Assets</div>
               <div className="text-2xl font-bold text-zinc-100 mt-1.5">{positions.length}</div>
             </div>
-            <div className="bg-white/5 border border-white/10 p-2 rounded flex items-center justify-center gap-1">
+            <div className="bg-white/5 border border-white/10 p-2 rounded-2xl flex items-center justify-center gap-1">
                 {(['All', 'Equity', 'Option'] as FilterType[]).map(f => (
                   <button key={f} onClick={() => setFilter(f)}
                     className={cn(
-                      "flex-1 h-full px-3 py-2 text-xs font-bold transition-all rounded",
+                      "flex-1 h-full px-3 py-2 text-sm font-bold transition-all rounded-2xl",
                       filter === f ? "bg-white/10 text-white shadow-sm border border-white/10" : "text-zinc-400 hover:text-zinc-300"
                     )}>
                     {f}
@@ -252,7 +252,7 @@ export default function PositionsPage() {
           {/* PnL Chart */}
           <PositionsChart positions={filtered} />
 
-          {/* Positions Table */}          <div className="border border-white/10 rounded overflow-hidden bg-zinc-900/20 backdrop-blur-md shadow-xl">
+          {/* Positions Table */}          <div className="border border-white/10 rounded-2xl overflow-hidden bg-zinc-900/20 backdrop-blur-md shadow-xl">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead>
@@ -279,11 +279,11 @@ export default function PositionsPage() {
                         {pos.dayPnL >= 0 ? '+' : '-'}${Math.abs(pos.dayPnL).toFixed(2)}
                       </td>
                       <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnLPct))}>
-                        <span className="px-2 py-1 rounded bg-current/5">
+                        <span className="px-2 py-1 rounded-2xl bg-current/5">
                           {pos.dayPnLPct >= 0 ? '▲' : '▼'} {Math.abs(pos.dayPnLPct).toFixed(2)}%
                         </span>
                       </td>
-                      <td className="px-6 py-4 hidden lg:table-cell text-xs text-zinc-400 font-medium truncate max-w-[200px]">
+                      <td className="px-6 py-4 hidden lg:table-cell text-sm text-zinc-400 font-medium truncate max-w-[200px]">
                         {pos.description}
                       </td>
                     </tr>

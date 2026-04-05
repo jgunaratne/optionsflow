@@ -34,9 +34,9 @@ export default function PositionsChart({ positions }: PositionsChartProps) {
       const pnl = payload[0].value;
       const isPositive = pnl >= 0;
       return (
-        <div className="rounded border border-zinc-800 bg-zinc-900/90 p-3 shadow-xl backdrop-blur-md shadow-xl">
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/90 p-3 shadow-xl backdrop-blur-md shadow-xl">
           <p className="mb-1 text-sm font-bold text-white">{label}</p>
-          <p className="text-xs text-zinc-300">
+          <p className="text-sm text-zinc-300">
             Day P&L: <span className={`font-semibold ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>${pnl.toFixed(2)}</span>
           </p>
         </div>
@@ -46,11 +46,11 @@ export default function PositionsChart({ positions }: PositionsChartProps) {
   };
 
   return (
-    <div className="rounded border border-white/10 bg-zinc-900/20 p-4 backdrop-blur-md shadow-xl shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-zinc-900/20 p-6 backdrop-blur-md shadow-xl shadow-sm">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Day P&L by Symbol</h3>
-          <p className="text-xs text-zinc-400 mt-0.5">Aggregated performance across equities and options</p>
+          <p className="text-sm text-zinc-400 mt-0.5">Aggregated performance across equities and options</p>
         </div>
       </div>
       <div className="h-64 w-full">

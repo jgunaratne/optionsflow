@@ -38,7 +38,7 @@ function BrokerSwitcher() {
         aria-label="Switch Broker"
         aria-expanded={open}
         className={cn(
-          "flex items-center gap-2 rounded border px-3 py-1.5 text-sm font-semibold transition-all hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black",
+          "flex items-center gap-2 rounded-2xl border px-3 py-1.5 text-sm font-semibold transition-all hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black",
           meta.bg,
           switching ? 'opacity-50 cursor-not-allowed' : ''
         )}
@@ -48,7 +48,7 @@ function BrokerSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded border border-white/20 bg-zinc-900 backdrop-blur-xl shadow-2xl p-1">
+        <div className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-2xl border border-white/20 bg-zinc-900 backdrop-blur-xl shadow-2xl p-1">
           {supported.map(broker => {
             const m = BROKER_META[broker] || { label: broker, color: 'text-zinc-200', bg: '' };
             const isActive = broker === active;
@@ -62,7 +62,7 @@ function BrokerSwitcher() {
                 }}
                 disabled={switching}
                 className={cn(
-                  "flex w-full items-center justify-between rounded px-3 py-2.5 text-left text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white/10",
+                  "flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white/10",
                   isActive ? "bg-white/15 text-white" : "text-zinc-300 hover:bg-white/10 hover:text-white"
                 )}
               >
@@ -112,8 +112,8 @@ export default function Nav() {
       <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8">
         {/* Brand */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black rounded p-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-primary shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
+          <Link href="/" className="flex items-center gap-5 group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black rounded-2xl p-1">
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
               <Activity className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
             <span className="text-xl font-bold tracking-tight text-white sm:block">
@@ -132,7 +132,7 @@ export default function Nav() {
                   href={link.href}
                   aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    "flex items-center gap-2 rounded px-3 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary",
+                    "flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary",
                     isActive
                       ? "bg-white/15 text-white shadow-sm"
                       : "text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
@@ -147,17 +147,17 @@ export default function Nav() {
         </div>
 
         {/* Right side controls */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           {/* Market Status */}
-          <div className="hidden sm:flex items-center gap-2 rounded border border-white/10 bg-white/10 px-4 py-1.5 text-sm" role="status">
-            <div className={cn("h-2 w-2 rounded-full", statusDot)} aria-hidden="true" />
+          <div className="hidden sm:flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-1.5 text-sm" role="status">
+            <div className={cn("h-2 w-2 rounded-2xl-full", statusDot)} aria-hidden="true" />
             <span className={cn("font-bold", statusColor)}>
               {marketStatus.status.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
             </span>
           </div>
 
           {/* VIX */}
-          <div className={cn("hidden sm:flex items-center gap-2 rounded border px-4 py-1.5 text-sm font-bold", vixBg)} aria-label="Volatility Index">
+          <div className={cn("hidden sm:flex items-center gap-2 rounded-2xl border px-4 py-1.5 text-sm font-bold", vixBg)} aria-label="Volatility Index">
             <span className="text-zinc-300 tracking-wider">VIX</span>
             <span className={vixColor}>{vix > 0 ? vix.toFixed(2) : '—'}</span>
           </div>
@@ -165,7 +165,7 @@ export default function Nav() {
           <BrokerSwitcher />
           
           {/* Mobile indicator */}
-          <div className={cn("md:hidden h-2.5 w-2.5 rounded-full", connected ? "bg-emerald-400" : "bg-red-400")} aria-label={connected ? "Connected" : "Disconnected"} />
+          <div className={cn("md:hidden h-2.5 w-2.5 rounded-2xl-full", connected ? "bg-emerald-400" : "bg-red-400")} aria-label={connected ? "Connected" : "Disconnected"} />
         </div>
       </div>
     </nav>

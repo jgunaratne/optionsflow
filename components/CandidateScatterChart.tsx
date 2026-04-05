@@ -10,7 +10,7 @@ interface CandidateScatterChartProps {
 export default function CandidateScatterChart({ candidates }: CandidateScatterChartProps) {
   if (candidates.length === 0) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center rounded border border-dashed border-white/10 bg-white/5 text-zinc-500">
+      <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 text-zinc-500">
         <p className="text-sm">No data to display</p>
       </div>
     );
@@ -30,11 +30,11 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="rounded border border-zinc-800 bg-zinc-900/90 p-3 shadow-xl backdrop-blur-md shadow-xl">
-          <p className="mb-1 text-sm font-bold text-white">{data.symbol} <span className="text-xs font-normal text-zinc-400">({data.strategy})</span></p>
-          <p className="text-xs text-zinc-300">POP: <span className="font-semibold text-emerald-400">{data.pop.toFixed(1)}%</span></p>
-          <p className="text-xs text-zinc-300">Premium: <span className="font-semibold text-white">${data.premium.toFixed(2)}</span></p>
-          <p className="text-xs text-zinc-300">AI Score: <span className="font-semibold text-blue-400">{data.ai_score}/100</span></p>
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/90 p-3 shadow-xl backdrop-blur-md shadow-xl">
+          <p className="mb-1 text-sm font-bold text-white">{data.symbol} <span className="text-sm font-normal text-zinc-400">({data.strategy})</span></p>
+          <p className="text-sm text-zinc-300">Win Chance: <span className="font-semibold text-emerald-400">{data.pop.toFixed(1)}%</span></p>
+          <p className="text-sm text-zinc-300">Cash Earned: <span className="font-semibold text-white">${data.premium.toFixed(2)}</span></p>
+          <p className="text-sm text-zinc-300">AI Score: <span className="font-semibold text-blue-400">{data.ai_score}/100</span></p>
         </div>
       );
     }
@@ -42,16 +42,16 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
   };
 
   return (
-    <div className="rounded border border-white/10 bg-zinc-900/20 p-4 backdrop-blur-md shadow-xl shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-zinc-900/20 p-6 backdrop-blur-md shadow-xl shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Risk / Reward Distribution</h3>
-          <p className="text-xs text-zinc-400 mt-0.5">Probability of Profit vs. Premium Collected</p>
+          <p className="text-sm text-zinc-400 mt-0.5">Win Chance vs. Cash Earned</p>
         </div>
-        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-emerald-400" /> High AI</div>
-          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-amber-400" /> Med AI</div>
-          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-red-400" /> Low AI</div>
+        <div className="flex items-center gap-5 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-2xl-full bg-emerald-400" /> High AI</div>
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-2xl-full bg-amber-400" /> Med AI</div>
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-2xl-full bg-red-400" /> Low AI</div>
         </div>
       </div>
       <div className="h-64 w-full">
@@ -61,7 +61,7 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
             <XAxis 
               type="number" 
               dataKey="pop" 
-              name="POP" 
+              name="Win Chance" 
               domain={['auto', 'auto']} 
               tickFormatter={(val) => `${val}%`}
               stroke="#52525b"
@@ -71,7 +71,7 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
             <YAxis 
               type="number" 
               dataKey="premium" 
-              name="Premium" 
+              name="Cash Earned" 
               tickFormatter={(val) => `$${val}`}
               stroke="#52525b"
               tick={{ fill: '#a1a1aa', fontSize: 11 }}

@@ -34,7 +34,7 @@ export default function RiskGauge({ value, label, max = 100, thresholds = { gree
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className={`relative inline-flex shadow-lg ${glowColor} rounded-full`}>
+      <div className={`relative inline-flex shadow-lg ${glowColor} rounded-2xl-full`}>
         <svg width="140" height="80" viewBox="0 0 140 80">
           {/* Background arc */}
           <path
@@ -66,7 +66,7 @@ export default function RiskGauge({ value, label, max = 100, thresholds = { gree
           <span className={`text-2xl font-bold ${textColor}`}>{value.toFixed(1)}</span>
         </div>
       </div>
-      <span className="text-xs font-medium text-zinc-400">{label}</span>
+      <span className="text-sm font-medium text-zinc-400">{label}</span>
     </div>
   );
 }

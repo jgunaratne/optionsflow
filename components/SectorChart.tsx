@@ -15,16 +15,16 @@ const COLORS = [
 export default function SectorChart({ data }: SectorChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded border border-zinc-800 bg-zinc-900/50">
+      <div className="flex h-64 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/50">
         <p className="text-sm text-zinc-400">No sector data available</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded border border-zinc-800 bg-zinc-900/50 p-4">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
       <h3 className="mb-3 text-sm font-semibold text-zinc-300">Sector Exposure</h3>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         <div className="h-52 w-52">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -52,8 +52,8 @@ export default function SectorChart({ data }: SectorChartProps) {
         </div>
         <div className="flex flex-col gap-2">
           {data.map((item, i) => (
-            <div key={item.sector} className="flex items-center gap-2 text-xs">
-              <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+            <div key={item.sector} className="flex items-center gap-2 text-sm">
+              <div className="h-3 w-3 rounded-2xl-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
               <span className="text-zinc-400">{item.sector}</span>
               <span className="ml-auto font-semibold text-zinc-200">{(item.pct * 100).toFixed(1)}%</span>
             </div>
