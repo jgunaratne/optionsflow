@@ -27,7 +27,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ## Phase 1 — Foundation (parallel-safe, all new files)
 
-- [ ] **1.1 — Reddit API Client (`lib/reddit.ts`)**
+- [x] **1.1 — Reddit API Client (`lib/reddit.ts`)**
 
   Create `/Users/junius/git/optionsflow/lib/reddit.ts`:
 
