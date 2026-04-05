@@ -1,7 +1,7 @@
 import { getWatchlist, getConfig, setConfig, insertCandidate, cleanOldCandidates } from './db';
-import { analyzeCandidate } from './ai';
+import { analyzeCandidatesBatch } from './ai';
 import { fetchTickerNews } from './news';
-import type { Broker } from './broker';
+import type { Broker, OptionContract } from './broker';
 import { SchwabBroker, hasSchwabTokens } from './schwab';
 import { WebullBroker } from './webull';
 
@@ -155,6 +155,14 @@ export async function runScreener(): Promise<void> {
         logActivity(item.symbol, `Chain loaded ($${underlyingPrice.toFixed(2)}) — analyzing contracts...`, 'info');
         const news = await fetchTickerNews(item.symbol);
         let symbolCandidates = 0;
+        const eligibleContracts: Array<{
+          contract: OptionContract;
+          expiry: string;
+          dte: number;
+          mid: number;
+          maxLoss: number;
+          pop: number;
+        }> = [];
 
         for (const [expiryKey, strikes] of Object.entries(chain.putExpDateMap)) {
           const expiry = expiryKey.split(':')[0];
@@ -175,24 +183,14 @@ export async function runScreener(): Promise<void> {
               if (mid < minPremium) rejectionReasons.push(`Premium ${mid.toFixed(2)} below ${minPremium.toFixed(2)}`);
 
               const isEligible = rejectionReasons.length === 0;
-              let aiScore = 0;
-              let aiFlag = 'GRAY';
-              let aiBrief = rejectionReasons.join(' • ') || 'Passed screening';
-              let aiRisks: string | null = null;
-              let compositeScore = -1;
+              const aiScore = 0;
+              const aiFlag = 'GRAY';
+              const aiBrief = rejectionReasons.join(' • ') || 'Passed screening';
+              const aiRisks: string | null = null;
+              const compositeScore = -1;
 
               if (isEligible) {
-                const analysis = await analyzeCandidate(
-                  { symbol: item.symbol, underlying_price: underlyingPrice, strategy: 'CSP', strike: contract.strikePrice, expiry, dte, premium: mid, max_loss: maxLoss, pop, iv_rank: ivRank, delta: contract.delta },
-                  news
-                );
-                const premiumYield = Math.min(1, mid / (contract.strikePrice * 0.01));
-                compositeScore = pop * 0.4 + (ivRank / 100) * 0.2 + premiumYield * 0.2 + (analysis.score / 100) * 0.2;
-                aiScore = analysis.score;
-                aiFlag = analysis.flag;
-                aiBrief = analysis.brief;
-                aiRisks = JSON.stringify(analysis.risks);
-                symbolCandidates++;
+                eligibleContracts.push({ contract, expiry, dte, mid, maxLoss, pop });
               }
 
               allCandidates.push({
@@ -209,6 +207,40 @@ export async function runScreener(): Promise<void> {
             }
           }
         }
+
+        if (eligibleContracts.length > 0) {
+          logActivity(item.symbol, `Submitting ${eligibleContracts.length} contract${eligibleContracts.length > 1 ? 's' : ''} for AI review...`, 'info');
+          const analyses = await analyzeCandidatesBatch(
+            eligibleContracts.map(({ contract, expiry, dte, mid, maxLoss, pop }) => ({
+              symbol: item.symbol,
+              underlying_price: underlyingPrice,
+              strategy: 'CSP',
+              strike: contract.strikePrice,
+              expiry,
+              dte,
+              premium: mid,
+              max_loss: maxLoss,
+              pop,
+              iv_rank: ivRank,
+              delta: contract.delta,
+            })),
+            news
+          );
+
+          let analysisIndex = 0;
+          for (const candidate of allCandidates) {
+            if (candidate.symbol !== item.symbol || candidate.is_eligible !== 1 || candidate.ai_flag !== 'GRAY') continue;
+            const analysis = analyses[analysisIndex++];
+            const premiumYield = Math.min(1, candidate.premium / (candidate.strike * 0.01));
+            candidate.ai_score = analysis.score;
+            candidate.ai_flag = analysis.flag;
+            candidate.ai_brief = analysis.brief;
+            candidate.ai_risks = JSON.stringify(analysis.risks);
+            candidate.compositeScore = candidate.pop * 0.4 + (candidate.iv_rank / 100) * 0.2 + premiumYield * 0.2 + (analysis.score / 100) * 0.2;
+            symbolCandidates++;
+          }
+        }
+
         if (symbolCandidates > 0) {
           logActivity(item.symbol, `Found ${symbolCandidates} candidate${symbolCandidates > 1 ? 's' : ''}`, 'found');
         } else {

@@ -29,6 +29,30 @@ interface NewsItem {
   snippet: string;
 }
 
+function normalizeAnalysis(parsed: Partial<AIAnalysis> | null | undefined): AIAnalysis {
+  return {
+    score: Math.max(0, Math.min(100, parsed?.score || 50)),
+    flag: (['GREEN', 'YELLOW', 'RED'].includes(parsed?.flag || '') ? parsed?.flag : 'YELLOW') as AIAnalysis['flag'],
+    brief: parsed?.brief || 'Analysis generated but brief unavailable.',
+    risks: Array.isArray(parsed?.risks) ? parsed!.risks : [],
+  };
+}
+
+function fallbackAnalysis(message = 'AI analysis temporarily unavailable. Manual review recommended.'): AIAnalysis {
+  return {
+    score: 50,
+    flag: 'YELLOW',
+    brief: message,
+    risks: ['AI analysis error — review manually'],
+  };
+}
+
+function getNewsText(news: NewsItem[]): string {
+  return news.length > 0
+    ? news.map(n => `- ${n.title}: ${n.snippet}`).join('\n')
+    : '- No recent news found';
+}
+
 function stripJsonFences(text: string): string {
   let cleaned = text.trim();
   if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
@@ -38,9 +62,7 @@ function stripJsonFences(text: string): string {
 }
 
 export async function analyzeCandidate(candidate: CandidateInput, news: NewsItem[]): Promise<AIAnalysis> {
-  const newsText = news.length > 0
-    ? news.map(n => `- ${n.title}: ${n.snippet}`).join('\n')
-    : '- No recent news found';
+  const newsText = getNewsText(news);
 
   const prompt = `You are an options trading risk analyst. Analyze this options trade and return a JSON object only.
 
@@ -76,15 +98,64 @@ Score heavily penalizes: earnings in DTE window, negative news catalyst, VIX > 3
     const result = await model.generateContent(prompt);
     const text = result.response.text();
     const parsed = JSON.parse(stripJsonFences(text)) as AIAnalysis;
-    return {
-      score: Math.max(0, Math.min(100, parsed.score || 50)),
-      flag: (['GREEN', 'YELLOW', 'RED'].includes(parsed.flag) ? parsed.flag : 'YELLOW') as AIAnalysis['flag'],
-      brief: parsed.brief || 'Analysis generated but brief unavailable.',
-      risks: Array.isArray(parsed.risks) ? parsed.risks : [],
-    };
+    return normalizeAnalysis(parsed);
   } catch (error) {
     console.error('[AI] Analysis failed:', error);
-    return { score: 50, flag: 'YELLOW', brief: 'AI analysis temporarily unavailable. Manual review recommended.', risks: ['AI analysis error — review manually'] };
+    return fallbackAnalysis();
+  }
+}
+
+export async function analyzeCandidatesBatch(candidates: CandidateInput[], news: NewsItem[]): Promise<AIAnalysis[]> {
+  if (candidates.length === 0) return [];
+
+  const newsText = getNewsText(news);
+  const candidateBlock = candidates.map((candidate, index) => [
+    `Candidate ${index + 1}:`,
+    `- Symbol: ${candidate.symbol}`,
+    `- Current price: $${candidate.underlying_price}`,
+    `- Strategy: ${candidate.strategy} (sell ${candidate.strike} put expiring ${candidate.expiry}, ${candidate.dte} DTE)`,
+    `- Premium: $${candidate.premium}/share ($${(candidate.premium * 100).toFixed(0)}/contract)`,
+    `- Max loss: $${candidate.max_loss}/contract`,
+    `- Probability of profit: ${(candidate.pop * 100).toFixed(1)}%`,
+    `- IV Rank: ${candidate.iv_rank.toFixed(1)}`,
+    `- Delta: ${candidate.delta}`,
+  ].join('\n')).join('\n\n');
+
+  const prompt = `You are an options trading risk analyst. Analyze each options trade candidate and return a JSON array only.
+
+Candidates:
+${candidateBlock}
+
+Recent news headlines:
+${newsText}
+
+Return ONLY a valid JSON array with exactly ${candidates.length} objects in the same order as the candidates above.
+Each object must have these exact fields:
+{
+  "score": <number 0-100, higher = better trade>,
+  "flag": "<GREEN | YELLOW | RED>",
+  "brief": "<2-3 sentence plain English explanation of the trade and key risks>",
+  "risks": ["<risk factor 1>", "<risk factor 2>"]
+}
+
+Flag rules:
+- GREEN: Clean setup, no major risk factors
+- YELLOW: Tradeable but watch closely
+- RED: Avoid
+
+Score heavily penalizes: earnings in DTE window, negative news catalyst, VIX > 30, sector concentration risk.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const parsed = JSON.parse(stripJsonFences(text)) as unknown;
+    if (!Array.isArray(parsed)) {
+      throw new Error('Batch AI response was not an array');
+    }
+    return candidates.map((_, index) => normalizeAnalysis(parsed[index] as Partial<AIAnalysis> | undefined));
+  } catch (error) {
+    console.error('[AI] Batch analysis failed:', error);
+    return candidates.map(() => fallbackAnalysis());
   }
 }
 
