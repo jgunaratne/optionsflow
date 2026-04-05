@@ -87,9 +87,8 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
                   <Cell 
                     key={`cell-${index}`} 
                     fill={isGreen ? '#34d399' : isYellow ? '#fbbf24' : '#f87171'} 
-                    fillOpacity={0.7}
-                    stroke={isGreen ? '#059669' : isYellow ? '#b45309' : '#b91c1c'}
-                    strokeWidth={1}
+                    fillOpacity={1}
+                    stroke="none"
                   />
                 );
               })}
