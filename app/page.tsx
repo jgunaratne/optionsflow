@@ -94,7 +94,7 @@ function CandidateListRow({
             "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-all",
             inQueue
               ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-              : "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40"
+              : "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40"
           )}
         >
           {inQueue ? <CheckCircle2 className="h-3.5 w-3.5" /> : <PlusCircle className="h-3.5 w-3.5" />}
@@ -112,7 +112,6 @@ export default function ScreenerPage() {
   const [progress, setProgress] = useState<ScreenerProgress | null>(null);
   const [sortBy, setSortBy] = useState<string>('ai_score');
   const [ivRankMin, setIvRankMin] = useState<number>(50);
-  const logsEndRef = useRef<HTMLDivElement>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const logsEndRef = useRef<HTMLDivElement>(null);
 
@@ -211,7 +210,7 @@ export default function ScreenerPage() {
             "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded px-6 py-3 text-sm font-bold transition-all duration-300",
             screenerRunning
               ? "bg-zinc-900 text-zinc-500 border border-white/5"
-              : "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
+              : "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
           )}
         >
           {screenerRunning ? (
@@ -253,7 +252,7 @@ export default function ScreenerPage() {
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-indigo-400 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-primary to-blue-400 transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>

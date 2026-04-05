@@ -87,7 +87,7 @@ export default function ChatPage() {
               <div key={i} className={cn("flex gap-4", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}>
                 <div className={cn(
                   "flex h-10 w-10 shrink-0 items-center justify-center border text-xs shadow-lg rounded",
-                  msg.role === 'user' ? "border-zinc-700 bg-zinc-800 text-zinc-300" : "border-primary/30 bg-gradient-to-br from-primary/20 to-indigo-500/10 text-primary"
+                  msg.role === 'user' ? "border-zinc-700 bg-zinc-800 text-zinc-300" : "border-primary/30 bg-gradient-to-br from-primary/20 to-blue-500/10 text-primary"
                 )}>
                   {msg.role === 'user' ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
                 </div>
@@ -142,7 +142,7 @@ export default function ChatPage() {
         <button 
           onClick={handleSend} 
           disabled={loading || !input.trim()}
-          className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-indigo-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 disabled:grayscale rounded transition-all"
+          className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-blue-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 disabled:grayscale rounded transition-all"
         >
           <Send className="h-4 w-4" />
           <span>Execute</span>
