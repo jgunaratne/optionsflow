@@ -41,10 +41,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-mono antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
     min-height: 100vh;
-    font-size: 13px;
-    font-feature-settings: "tnum" 1, "zero" 1; /* Tabular numbers & slashed zero */
+    font-size: 14px;
+    font-feature-settings: "tnum" 1, "zero" 1, "rlig" 1, "calt" 1; 
   }
 }
 

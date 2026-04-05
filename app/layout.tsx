@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${plexMono.variable} bg-zinc-950 text-zinc-100 antialiased font-mono tracking-tight`}>
+      <body className={`${inter.variable} ${plexMono.variable} bg-zinc-950 text-zinc-100 antialiased font-sans tracking-tight`}>
         <Nav />
         <main className="w-full px-4 py-6 sm:px-6 lg:px-8">
           {children}
