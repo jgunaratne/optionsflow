@@ -286,7 +286,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ## Phase 5 — Main Page (depends on Phase 4)
 
-- [ ] **5.1 — Reddit Page (`app/reddit/page.tsx`)**
+- [x] **5.1 — Reddit Page (`app/reddit/page.tsx`)**
 
   Create `/Users/junius/git/optionsflow/app/reddit/page.tsx`:
 
