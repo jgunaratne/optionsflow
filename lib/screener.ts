@@ -95,6 +95,10 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+function isValidScreenerSymbol(symbol: string): boolean {
+  return /^[A-Z0-9]+(?:[./-][A-Z0-9]+)?$/.test(symbol) && symbol.length <= 10;
+}
+
 export async function runScreener(): Promise<void> {
   if (progress.running) { console.log('[Screener] Already running, skipping.'); return; }
   progress = { running: true, currentSymbol: '', currentIndex: 0, totalSymbols: 0, status: 'Starting...', candidatesFound: 0, logs: [] };
@@ -146,6 +150,12 @@ export async function runScreener(): Promise<void> {
         progress.currentIndex = idx + 1;
         progress.currentSymbol = item.symbol;
         progress.status = `Processing ${item.symbol} (${idx + 1}/${watchlist.length})`;
+        if (!isValidScreenerSymbol(item.symbol)) {
+          const message = `Invalid screener symbol "${item.symbol}"`;
+          logActivity(item.symbol, message, 'error');
+          console.warn(`[Screener] ${message}`);
+          continue;
+        }
         logActivity(item.symbol, `Calculating IV Rank...`, 'info');
         console.log(`[Screener] Processing ${item.symbol} (${idx + 1}/${watchlist.length})...`);
         const ivRank = await calculateIVRank(item.symbol, historyBroker);

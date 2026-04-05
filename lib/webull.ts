@@ -334,8 +334,13 @@ export class WebullBroker implements Broker {
     }
   }
 
+  private normalizeYahooSymbol(symbol: string): string {
+    return symbol.replace(/[/.]/g, '-').trim().toUpperCase();
+  }
+
   private async yahooQuote(symbol: string): Promise<unknown> {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
+    const yahooSymbol = this.normalizeYahooSymbol(symbol);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=1d&range=1d`;
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
     if (!res.ok) throw new Error(`Yahoo quote failed: ${res.status}`);
     const data = await res.json();
@@ -375,7 +380,8 @@ export class WebullBroker implements Broker {
   }
 
   private async yahooPriceHistory(symbol: string): Promise<PriceHistoryResponse> {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1y`;
+    const yahooSymbol = this.normalizeYahooSymbol(symbol);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=1d&range=1y`;
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
     if (!res.ok) throw new Error(`Yahoo history failed: ${res.status}`);
     const data = await res.json();

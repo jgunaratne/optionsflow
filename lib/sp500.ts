@@ -9,8 +9,12 @@ interface SymbolCache {
   cachedAt: number;
 }
 
+function isLikelyTickerSymbol(value: string): boolean {
+  return /^[A-Z0-9]+(?:[./-][A-Z0-9]+)?$/.test(value) && value.length <= 10;
+}
+
 function normalizeSymbol(symbol: string): string {
-  return symbol.replace(/\./g, '/').trim();
+  return symbol.replace(/\./g, '/').trim().toUpperCase();
 }
 
 function parseSymbolsFromHtml(html: string): string[] {
@@ -21,9 +25,10 @@ function parseSymbolsFromHtml(html: string): string[] {
   const symbols: string[] = [];
 
   for (const row of rows) {
-    const symbolMatch = row.match(/<td><a [^>]*>([^<]+)<\/a><\/td>/i);
-    if (!symbolMatch) continue;
-    const symbol = normalizeSymbol(symbolMatch[1]);
+    const cellMatch = row.match(/<td>\s*<a [^>]*>([^<]+)<\/a>\s*<\/td>/i);
+    if (!cellMatch) continue;
+    const symbol = normalizeSymbol(cellMatch[1]);
+    if (!isLikelyTickerSymbol(symbol)) continue;
     if (symbol) symbols.push(symbol);
   }
 
@@ -38,7 +43,13 @@ export async function getSP500Symbols(): Promise<string[]> {
   const now = Math.floor(Date.now() / 1000);
   const cached = getConfig(SP500_CACHE_KEY) as SymbolCache | undefined;
 
-  if (cached && Array.isArray(cached.symbols) && cached.symbols.length >= 450 && (now - cached.cachedAt) < SP500_CACHE_TTL_SECONDS) {
+  if (
+    cached &&
+    Array.isArray(cached.symbols) &&
+    cached.symbols.length >= 450 &&
+    cached.symbols.every((symbol) => isLikelyTickerSymbol(symbol)) &&
+    (now - cached.cachedAt) < SP500_CACHE_TTL_SECONDS
+  ) {
     return cached.symbols;
   }
 
