@@ -7,6 +7,13 @@ import { WebullBroker } from './webull';
 
 interface IVRankCache { ivRank: number; cachedAt: number; }
 
+interface ScreenerLogEntry {
+  time: number;
+  symbol: string;
+  message: string;
+  type: 'info' | 'skip' | 'found' | 'error';
+}
+
 interface ScreenerProgress {
   running: boolean;
   currentSymbol: string;
@@ -14,11 +21,12 @@ interface ScreenerProgress {
   totalSymbols: number;
   status: string;
   candidatesFound: number;
+  logs: ScreenerLogEntry[];
 }
 
 let progress: ScreenerProgress = {
   running: false, currentSymbol: '', currentIndex: 0,
-  totalSymbols: 0, status: 'idle', candidatesFound: 0,
+  totalSymbols: 0, status: 'idle', candidatesFound: 0, logs: [],
 };
 
 export function isScreenerRunning(): boolean {
@@ -26,7 +34,13 @@ export function isScreenerRunning(): boolean {
 }
 
 export function getScreenerProgress(): ScreenerProgress {
-  return { ...progress };
+  return { ...progress, logs: [...progress.logs] };
+}
+
+function logActivity(symbol: string, message: string, type: ScreenerLogEntry['type'] = 'info') {
+  progress.logs.push({ time: Date.now(), symbol, message, type });
+  // Keep only last 50 entries
+  if (progress.logs.length > 50) progress.logs = progress.logs.slice(-50);
 }
 
 async function calculateIVRank(symbol: string, broker: Broker): Promise<number> {
@@ -74,7 +88,8 @@ function getDateString(daysFromNow: number): string {
 
 export async function runScreener(): Promise<void> {
   if (progress.running) { console.log('[Screener] Already running, skipping.'); return; }
-  progress = { running: true, currentSymbol: '', currentIndex: 0, totalSymbols: 0, status: 'Starting...', candidatesFound: 0 };
+  progress = { running: true, currentSymbol: '', currentIndex: 0, totalSymbols: 0, status: 'Starting...', candidatesFound: 0, logs: [] };
+  logActivity('', 'Screener pipeline starting...', 'info');
   console.log('[Screener] Starting screening pipeline...');
 
   try {
@@ -91,8 +106,11 @@ export async function runScreener(): Promise<void> {
     const toDate = getDateString(dteMax);
     const historyBroker = new WebullBroker();
 
+    logActivity('', `Scanning ${watchlist.length} symbols (DTE ${dteMin}-${dteMax}, Δ ${deltaMin}-${deltaMax})`, 'info');
+
     if (!hasSchwabTokens()) {
       progress.status = 'Schwab not connected. Connect Schwab to run the options screener.';
+      logActivity('', 'Schwab not connected — cannot run screener', 'error');
       console.warn('[Screener] Schwab not connected. Connect Schwab before running the screener.');
       return;
     }
@@ -117,18 +135,26 @@ export async function runScreener(): Promise<void> {
         progress.currentIndex = idx + 1;
         progress.currentSymbol = item.symbol;
         progress.status = `Processing ${item.symbol} (${idx + 1}/${watchlist.length})`;
+        logActivity(item.symbol, `Calculating IV Rank...`, 'info');
         console.log(`[Screener] Processing ${item.symbol} (${idx + 1}/${watchlist.length})...`);
         const ivRank = await calculateIVRank(item.symbol, historyBroker);
         if (ivRank < ivRankMin) {
+          logActivity(item.symbol, `IV Rank ${ivRank.toFixed(1)}% — below ${ivRankMin}% threshold, skipped`, 'skip');
           console.log(`[Screener] ${item.symbol} IV Rank ${ivRank.toFixed(1)} below ${ivRankMin}, skip.`);
           continue;
         }
 
+        logActivity(item.symbol, `IV Rank ${ivRank.toFixed(1)}% ✓ — fetching options chain...`, 'info');
         const chain = await chainBroker.getOptionsChain(item.symbol, 'PUT', fromDate, toDate);
         const underlyingPrice = chain.underlyingPrice || 0;
-        if (!chain.putExpDateMap || underlyingPrice === 0) continue;
+        if (!chain.putExpDateMap || underlyingPrice === 0) {
+          logActivity(item.symbol, `No put options data available, skipped`, 'skip');
+          continue;
+        }
 
+        logActivity(item.symbol, `Chain loaded ($${underlyingPrice.toFixed(2)}) — analyzing contracts...`, 'info');
         const news = await fetchTickerNews(item.symbol);
+        let symbolCandidates = 0;
 
         for (const [expiryKey, strikes] of Object.entries(chain.putExpDateMap)) {
           const expiry = expiryKey.split(':')[0];
@@ -156,6 +182,7 @@ export async function runScreener(): Promise<void> {
               const premiumYield = Math.min(1, mid / (contract.strikePrice * 0.01));
               const compositeScore = pop * 0.4 + (ivRank / 100) * 0.2 + premiumYield * 0.2 + (analysis.score / 100) * 0.2;
 
+              symbolCandidates++;
               allCandidates.push({
                 symbol: item.symbol, strategy: 'CSP', strike: contract.strikePrice, expiry, dte,
                 premium: Math.round(mid * 100) / 100, max_loss: Math.round(maxLoss),
@@ -169,12 +196,19 @@ export async function runScreener(): Promise<void> {
             }
           }
         }
+        if (symbolCandidates > 0) {
+          logActivity(item.symbol, `Found ${symbolCandidates} candidate${symbolCandidates > 1 ? 's' : ''}`, 'found');
+        } else {
+          logActivity(item.symbol, `No contracts passed filters`, 'skip');
+        }
       } catch (error) {
+        logActivity(item.symbol, `Error: ${error instanceof Error ? error.message : 'Unknown'}`, 'error');
         console.error(`[Screener] Error processing ${item.symbol}:`, error);
       }
     }
 
     progress.status = 'Ranking and saving results...';
+    logActivity('', `Ranking ${allCandidates.length} total candidates...`, 'info');
     allCandidates.sort((a, b) => b.compositeScore - a.compositeScore);
     const topCandidates = allCandidates.slice(0, 20);
     cleanOldCandidates();
@@ -184,9 +218,11 @@ export async function runScreener(): Promise<void> {
     }
     progress.candidatesFound = topCandidates.length;
     progress.status = `Complete: ${topCandidates.length} candidates found`;
+    logActivity('', `✅ Complete — ${topCandidates.length} candidates saved`, 'found');
     console.log(`[Screener] Complete: ${topCandidates.length} candidates saved.`);
   } catch (error) {
     progress.status = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    logActivity('', `Pipeline error: ${error instanceof Error ? error.message : 'Unknown'}`, 'error');
     console.error('[Screener] Pipeline error:', error);
   } finally {
     progress.running = false;

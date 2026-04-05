@@ -1,10 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import CandidateCard from '@/components/CandidateCard';
 import { useCandidatesStore, useQueueStore } from '@/lib/store';
 import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+interface ScreenerLogEntry {
+  time: number;
+  symbol: string;
+  message: string;
+  type: 'info' | 'skip' | 'found' | 'error';
+}
 
 interface ScreenerProgress {
   running: boolean;
@@ -13,6 +20,7 @@ interface ScreenerProgress {
   totalSymbols: number;
   status: string;
   candidatesFound: number;
+  logs: ScreenerLogEntry[];
 }
 
 export default function ScreenerPage() {
@@ -21,8 +29,16 @@ export default function ScreenerPage() {
   const [screenerRunning, setScreenerRunning] = useState(false);
   const [progress, setProgress] = useState<ScreenerProgress | null>(null);
   const [sortBy, setSortBy] = useState<string>('ai_score');
+  const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { fetchCandidates(); fetchQueue(); }, [fetchCandidates, fetchQueue]);
+
+  // Auto-scroll activity feed to bottom
+  useEffect(() => {
+    if (logsEndRef.current) {
+      logsEndRef.current.scrollTop = logsEndRef.current.scrollHeight;
+    }
+  }, [progress?.logs?.length]);
 
   const queuedIds = new Set(queue.map(q => q.candidate_id));
 
@@ -149,6 +165,54 @@ export default function ScreenerPage() {
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Live Activity Feed */}
+      {progress && progress.logs && progress.logs.length > 0 && (
+        <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-950/60 backdrop-blur-sm">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+            <div className="flex items-center gap-2">
+              <div className={cn(
+                "h-2 w-2 rounded-full",
+                progress.running ? "bg-emerald-400 animate-pulse" : "bg-zinc-600"
+              )} />
+              <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Activity Log</span>
+            </div>
+            <span className="text-[10px] font-medium text-zinc-600">
+              {progress.logs.length} events
+            </span>
+          </div>
+          <div className="max-h-48 overflow-y-auto p-2 space-y-0.5 scroll-smooth" ref={logsEndRef}>
+            {progress.logs.map((log, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "flex items-start gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                  log.type === 'skip' && "text-zinc-500",
+                  log.type === 'info' && "text-zinc-300",
+                  log.type === 'found' && "text-emerald-400 bg-emerald-500/5",
+                  log.type === 'error' && "text-red-400 bg-red-500/5",
+                )}
+              >
+                <span className="shrink-0 mt-px">
+                  {log.type === 'skip' && '⏭'}
+                  {log.type === 'info' && '⚡'}
+                  {log.type === 'found' && '✅'}
+                  {log.type === 'error' && '❌'}
+                </span>
+                {log.symbol && (
+                  <span className={cn(
+                    "shrink-0 font-bold min-w-[4ch]",
+                    log.type === 'found' ? "text-emerald-300" : "text-zinc-400"
+                  )}>
+                    {log.symbol}
+                  </span>
+                )}
+                <span className="truncate">{log.message}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
