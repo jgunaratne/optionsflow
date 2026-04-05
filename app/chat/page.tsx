@@ -41,7 +41,7 @@ export default function ChatPage() {
       <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-4 mt-2">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+            <Sparkles className="h-5 w-5 text-zinc-200" />
             AI Intelligence Console
           </h1>
           <p className="text-sm text-zinc-400 mt-1 font-medium">Quant-driven insights and portfolio analysis</p>
@@ -61,7 +61,7 @@ export default function ChatPage() {
           <div className="flex h-full flex-col items-center justify-center gap-6">
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
-              <div className="relative flex h-16 w-16 items-center justify-center border border-primary/30 bg-zinc-900 text-primary rounded shadow-2xl">
+              <div className="relative flex h-16 w-16 items-center justify-center border border-zinc-600/30 bg-zinc-900 text-zinc-200 rounded shadow-2xl">
                 <MessageSquare className="h-8 w-8" />
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function ChatPage() {
                   className="group flex items-center justify-between border border-white/10 bg-white/5 px-5 py-4 text-left text-xs font-bold text-zinc-400 transition-all hover:border-primary/50 hover:bg-primary/5 hover:text-zinc-200 rounded">
                   <span>{prompt}</span>
                   <div className="h-5 w-5 rounded bg-zinc-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                     <Send className="h-3 w-3 text-primary" />
+                     <Send className="h-3 w-3 text-zinc-200" />
                   </div>
                 </button>
               ))}
@@ -87,7 +87,7 @@ export default function ChatPage() {
               <div key={i} className={cn("flex gap-4", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}>
                 <div className={cn(
                   "flex h-10 w-10 shrink-0 items-center justify-center border text-xs shadow-lg rounded",
-                  msg.role === 'user' ? "border-zinc-700 bg-zinc-800 text-zinc-300" : "border-primary/30 bg-gradient-to-br from-primary/20 to-blue-500/10 text-primary"
+                  msg.role === 'user' ? "border-zinc-700 bg-zinc-800 text-zinc-300" : "border-zinc-600/30 bg-gradient-to-br from-zinc-700/50 to-zinc-800/50 text-zinc-200"
                 )}>
                   {msg.role === 'user' ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
                 </div>
@@ -103,7 +103,7 @@ export default function ChatPage() {
             ))}
             {loading && (
               <div className="flex gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-primary/30 bg-zinc-900 text-primary rounded animate-pulse">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-zinc-600/30 bg-zinc-900 text-zinc-200 rounded animate-pulse">
                   <Loader2 className="h-5 w-5 animate-spin" />
                 </div>
                 <div className="bg-white/5 border border-white/10 px-5 py-4 rounded rounded-tl-none flex items-center gap-3">
@@ -112,7 +112,7 @@ export default function ChatPage() {
                     <div className="h-1.5 w-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
                     <div className="h-1.5 w-1.5 bg-primary rounded-full animate-bounce" />
                   </div>
-                  <span className="text-xs font-bold text-primary/70 uppercase tracking-widest">Analyzing Data...</span>
+                  <span className="text-xs font-bold text-zinc-200/70 uppercase tracking-widest">Analyzing Data...</span>
                 </div>
               </div>
             )}
@@ -142,7 +142,7 @@ export default function ChatPage() {
         <button 
           onClick={handleSend} 
           disabled={loading || !input.trim()}
-          className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-blue-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:grayscale rounded transition-all"
+          className="flex items-center justify-center gap-2 bg-gradient-to-r from-zinc-600 to-zinc-800 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-black/40 hover:shadow-black/60 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:grayscale rounded transition-all"
         >
           <Send className="h-4 w-4" />
           <span>Execute</span>

@@ -94,7 +94,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
 
         {/* AI Analysis */}
         <div className="mb-6 rounded border border-white/10 bg-zinc-950/50 p-4 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-blue-500" aria-hidden="true" />
+          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-zinc-500 to-zinc-700" aria-hidden="true" />
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">AI Insight</span>
             <span className={cn(

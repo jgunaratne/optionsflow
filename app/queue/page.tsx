@@ -181,7 +181,7 @@ export default function QueuePage() {
                   onClick={() => setShowConfirm(true)}
  
                   disabled={executing || !!accountError || (reviewResult?.blockers && reviewResult.blockers.length > 0)}
-                  className="group relative flex w-full items-center justify-center gap-2 rounded bg-gradient-to-r from-emerald-600 to-teal-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:shadow-emerald-600/40 active:translate-y-0 disabled:opacity-50 disabled:grayscale"
+                  className="group relative flex w-full items-center justify-center gap-2 rounded bg-gradient-to-r from-zinc-200 to-zinc-400 py-4 text-sm font-bold text-zinc-950 shadow-lg shadow-white/10 transition-all hover:-translate-y-0.5 hover:shadow-white/20 active:translate-y-0 disabled:opacity-50 disabled:grayscale"
 
                 >
                   <Zap className="h-4 w-4" />

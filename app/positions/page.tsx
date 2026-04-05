@@ -190,7 +190,7 @@ export default function PositionsPage() {
           <button
             onClick={handleConnect}
             disabled={connecting}
-            className="bg-gradient-to-r from-primary to-blue-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 rounded mt-2"
+            className="bg-gradient-to-r from-zinc-600 to-zinc-800 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-black/40 transition-all hover:shadow-black/60 hover:-translate-y-0.5 active:translate-y-0 rounded mt-2"
           >
             {connecting ? 'Connecting...' : `Authorize ${brokerLabel}`}
           </button>

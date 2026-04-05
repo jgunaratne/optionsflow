@@ -41,7 +41,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased bg-[radial-gradient(ellipse_at_top,rgba(79,104,250,0.15),transparent),radial-gradient(ellipse_at_bottom,rgba(59,130,246,0.1),transparent)];
+    @apply bg-background text-foreground font-sans antialiased bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.03),transparent)];
     min-height: 100vh;
     font-size: 15px; /* Increased base font size for readability */
     font-feature-settings: "tnum" 1, "zero" 1, "rlig" 1, "calt" 1; 

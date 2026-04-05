@@ -95,7 +95,7 @@ function CandidateListRow({
         {/* Tooltip Card */}
         <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-72 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <div className="rounded border border-white/10 bg-zinc-900/95 p-4 shadow-xl backdrop-blur-md relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-blue-500" aria-hidden="true" />
+             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-zinc-500 to-zinc-700" aria-hidden="true" />
              <div className="mb-2 flex items-center justify-between">
                <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">AI Insight</span>
                <span className={cn(
@@ -119,7 +119,7 @@ function CandidateListRow({
               ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
               : candidate.is_eligible === 0
                 ? "border border-zinc-700 bg-zinc-800 text-zinc-500 cursor-not-allowed"
-              : "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40"
+              : "bg-gradient-to-r from-zinc-600 to-zinc-800 text-white shadow-lg shadow-black/40 hover:shadow-black/60"
           )}
         >
           {inQueue ? <CheckCircle2 className="h-3.5 w-3.5" /> : <PlusCircle className="h-3.5 w-3.5" />}
@@ -239,7 +239,7 @@ export default function ScreenerPage() {
             "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded px-6 py-3 text-sm font-bold transition-all duration-300",
             screenerRunning
               ? "bg-zinc-900 text-zinc-400 border border-white/10"
-              : "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
+              : "bg-gradient-to-r from-zinc-600 to-zinc-800 text-white shadow-lg shadow-black/40 hover:shadow-black/60 hover:-translate-y-0.5 active:translate-y-0"
           )}
         >
           {screenerRunning ? (
@@ -281,7 +281,7 @@ export default function ScreenerPage() {
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-blue-400 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-zinc-500 to-zinc-700 transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -354,7 +354,7 @@ export default function ScreenerPage() {
               </div>
               <Link
                 href="/positions"
-                className="inline-flex items-center justify-center gap-2 rounded bg-gradient-to-r from-primary to-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40"
+                className="inline-flex items-center justify-center gap-2 rounded bg-gradient-to-r from-zinc-600 to-zinc-800 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/40 transition-all hover:shadow-black/60"
               >
                 Connect Schwab
                 <ArrowRight className="h-4 w-4" />
