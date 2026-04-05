@@ -197,9 +197,9 @@ async function getAccountHash(): Promise<string> {
       ) {
         throw error;
       }
-      // Don't retry on 401 — it's a permissions issue (Trader API not enabled), not transient
+      // Preserve 401 permissions issues instead of wrapping them as account-hash failures.
       if (errMsg.includes('401') && errMsg.includes('Client not authorized')) {
-        break;
+        throw error;
       }
       if (attempt < 3) {
         await new Promise(resolve => setTimeout(resolve, attempt * 750));
