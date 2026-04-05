@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 import CandidateCard from '@/components/CandidateCard';
+import type { Candidate } from '@/lib/db';
 import { useCandidatesStore, useQueueStore } from '@/lib/store';
-import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers } from 'lucide-react';
+import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScreenerLogEntry {
@@ -23,12 +24,95 @@ interface ScreenerProgress {
   logs: ScreenerLogEntry[];
 }
 
+type ViewMode = 'grid' | 'list';
+
+function CandidateListRow({
+  candidate,
+  inQueue,
+  onAddToQueue,
+}: {
+  candidate: Candidate;
+  inQueue: boolean;
+  onAddToQueue: (id: number) => void;
+}) {
+  const flagTone = candidate.ai_flag === 'GREEN'
+    ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
+    : candidate.ai_flag === 'YELLOW'
+      ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
+      : 'text-red-400 border-red-500/20 bg-red-500/10';
+
+  return (
+    <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] items-center gap-3 border-b border-white/5 px-4 py-3 text-sm last:border-b-0">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="truncate text-sm font-bold text-white">{candidate.symbol}</span>
+          <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", flagTone)}>
+            {candidate.ai_flag}
+          </span>
+        </div>
+        <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-500">
+          <span>{candidate.strategy}</span>
+          <span>•</span>
+          <span>{candidate.expiry}</span>
+          <span>•</span>
+          <span>{candidate.dte}d</span>
+        </div>
+      </div>
+      <div className="text-right">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Strike</div>
+        <div className="font-semibold text-zinc-100">${candidate.strike.toFixed(2)}</div>
+      </div>
+      <div className="text-right">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Premium</div>
+        <div className="font-semibold text-emerald-400">${candidate.premium.toFixed(2)}</div>
+      </div>
+      <div className="text-right">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Max Loss</div>
+        <div className="font-semibold text-zinc-100">${candidate.max_loss.toLocaleString()}</div>
+      </div>
+      <div className="text-right">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">POP</div>
+        <div className="font-semibold text-zinc-100">{(candidate.pop * 100).toFixed(0)}%</div>
+      </div>
+      <div className="text-right">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">IV Rank</div>
+        <div className="font-semibold text-zinc-100">{candidate.iv_rank.toFixed(1)}</div>
+      </div>
+      <div className="text-right">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Delta</div>
+        <div className="font-semibold text-zinc-100">{candidate.delta.toFixed(3)}</div>
+      </div>
+      <div className="min-w-0">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">AI</div>
+        <div className="truncate text-xs text-zinc-400">{candidate.ai_brief}</div>
+      </div>
+      <div className="flex justify-end">
+        <button
+          onClick={() => onAddToQueue(candidate.id)}
+          disabled={inQueue}
+          className={cn(
+            "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-all",
+            inQueue
+              ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+              : "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40"
+          )}
+        >
+          {inQueue ? <CheckCircle2 className="h-3.5 w-3.5" /> : <PlusCircle className="h-3.5 w-3.5" />}
+          <span>{inQueue ? 'Queued' : 'Queue'}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ScreenerPage() {
   const { candidates, loading, lastScreenedAt, filters, fetchCandidates, setFilters } = useCandidatesStore();
   const { queue, addToQueue, fetchQueue } = useQueueStore();
   const [screenerRunning, setScreenerRunning] = useState(false);
   const [progress, setProgress] = useState<ScreenerProgress | null>(null);
   const [sortBy, setSortBy] = useState<string>('ai_score');
+  const logsEndRef = useRef<HTMLDivElement>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { fetchCandidates(); fetchQueue(); }, [fetchCandidates, fetchQueue]);
@@ -272,6 +356,29 @@ export default function ScreenerPage() {
             <option value="iv_rank" className="bg-zinc-900 text-zinc-200">IV Rank</option>
           </select>
         </div>
+
+        <div className="flex items-center gap-1 rounded-xl border border-white/5 bg-zinc-950/50 p-1">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
+              viewMode === 'grid' ? "bg-white text-zinc-950" : "text-zinc-500 hover:text-zinc-200"
+            )}
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+            Grid
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
+              viewMode === 'list' ? "bg-white text-zinc-950" : "text-zinc-500 hover:text-zinc-200"
+            )}
+          >
+            <Rows3 className="h-3.5 w-3.5" />
+            List
+          </button>
+        </div>
       </div>
 
       {/* Content Grid */}
@@ -290,7 +397,7 @@ export default function ScreenerPage() {
              <p className="text-sm max-w-xs mt-1">Adjust your filters or run the screener to find new opportunities.</p>
           </div>
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {sorted.map(candidate => (
             <CandidateCard
@@ -300,6 +407,30 @@ export default function ScreenerPage() {
               inQueue={queuedIds.has(candidate.id)}
             />
           ))}
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm">
+          <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] gap-3 border-b border-white/5 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
+            <div>Candidate</div>
+            <div className="text-right">Strike</div>
+            <div className="text-right">Premium</div>
+            <div className="text-right">Risk</div>
+            <div className="text-right">POP</div>
+            <div className="text-right">IV Rank</div>
+            <div className="text-right">Delta</div>
+            <div>AI Brief</div>
+            <div className="text-right">Action</div>
+          </div>
+          <div>
+            {sorted.map(candidate => (
+              <CandidateListRow
+                key={candidate.id}
+                candidate={candidate}
+                onAddToQueue={handleAddToQueue}
+                inQueue={queuedIds.has(candidate.id)}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
