@@ -265,7 +265,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ---
 
-- [ ] **4.2 — RedditPostItem Component (`components/RedditPostItem.tsx`)**
+- [x] **4.2 — RedditPostItem Component (`components/RedditPostItem.tsx`)**
 
   Create `/Users/junius/git/optionsflow/components/RedditPostItem.tsx`:
 
