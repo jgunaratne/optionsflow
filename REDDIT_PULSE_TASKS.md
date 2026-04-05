@@ -100,7 +100,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ---
 
-- [ ] **1.3 — Environment Config (`.env.example`)**
+- [x] **1.3 — Environment Config (`.env.example`)**
 
   Modify `/Users/junius/git/optionsflow/.env.example` — append:
 
