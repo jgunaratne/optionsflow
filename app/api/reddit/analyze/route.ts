@@ -116,10 +116,10 @@ export async function POST(request: Request) {
       subreddits,
       source: 'live',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[API] /api/reddit/analyze error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to analyze Reddit posts' },
+      { error: error instanceof Error ? error.message : 'Failed to analyze Reddit posts' },
       { status: 500 },
     );
   }

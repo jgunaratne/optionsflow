@@ -23,6 +23,30 @@ export interface RedditPost {
   subreddit: string;
 }
 
+interface RedditApiPostData {
+  name?: string;
+  title?: string;
+  author?: string;
+  score?: number;
+  num_comments?: number;
+  selftext?: string;
+  url?: string;
+  permalink?: string;
+  created_utc?: number;
+  thumbnail?: string;
+  is_self?: boolean;
+  domain?: string;
+  link_flair_text?: string | null;
+}
+
+interface RedditApiListingResponse {
+  data?: {
+    children?: Array<{
+      data?: RedditApiPostData;
+    }>;
+  };
+}
+
 export const DEFAULT_STOCK_SUBREDDITS = [
   'options',
   'thetagang',
@@ -87,8 +111,7 @@ export async function getAppOnlyToken(): Promise<string> {
 /**
  * Make an authenticated GET request to the Reddit OAuth API.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchReddit(endpoint: string, token: string): Promise<any> {
+async function fetchReddit(endpoint: string, token: string): Promise<RedditApiListingResponse> {
   const url = `https://oauth.reddit.com${endpoint}`;
 
   const response = await fetch(url, {
@@ -104,7 +127,7 @@ async function fetchReddit(endpoint: string, token: string): Promise<any> {
     throw new Error(`Reddit API error: ${response.status}`);
   }
 
-  return response.json();
+  return response.json() as Promise<RedditApiListingResponse>;
 }
 
 /**
@@ -118,29 +141,28 @@ export async function getHotPosts(
   try {
     const data = await fetchReddit(`/r/${subreddit}/hot?limit=${limit}`, token);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const posts: RedditPost[] = (data?.data?.children || []).map((child: any) => {
-      const p = child.data;
+    const posts: RedditPost[] = (data?.data?.children || []).map((child) => {
+      const p = child.data ?? {};
       return {
-        id: p.name,
-        title: p.title,
-        author: p.author,
-        score: p.score,
-        numComments: p.num_comments,
+        id: p.name ?? '',
+        title: p.title ?? '',
+        author: p.author ?? '[deleted]',
+        score: p.score ?? 0,
+        numComments: p.num_comments ?? 0,
         selftext: p.selftext || '',
-        url: p.url,
-        permalink: `https://www.reddit.com${p.permalink}`,
-        createdUtc: p.created_utc,
+        url: p.url ?? '',
+        permalink: p.permalink ? `https://www.reddit.com${p.permalink}` : '',
+        createdUtc: p.created_utc ?? 0,
         thumbnail:
           p.thumbnail && p.thumbnail.startsWith('http')
             ? p.thumbnail.replace(/&amp;/g, '&')
             : null,
-        isSelf: p.is_self,
-        domain: p.domain,
+        isSelf: Boolean(p.is_self),
+        domain: p.domain ?? '',
         linkFlairText: p.link_flair_text || null,
         subreddit: subreddit,
       };
-    });
+    }).filter((post) => Boolean(post.id && post.title));
 
     return posts;
   } catch (err) {

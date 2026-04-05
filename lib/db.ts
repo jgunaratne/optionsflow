@@ -266,6 +266,28 @@ export interface BrokerSnapshot<T> {
   updated_at: number;
 }
 
+interface RedditPostRow {
+  id: string;
+  title: string;
+  author: string | null;
+  score: number;
+  num_comments: number;
+  selftext: string | null;
+  url: string | null;
+  permalink: string | null;
+  created_utc: number;
+  thumbnail: string | null;
+  is_self: number;
+  domain: string | null;
+  link_flair_text: string | null;
+  subreddit: string;
+}
+
+interface CachedRedditAnalysisRecord {
+  tickers?: unknown;
+  summary?: unknown;
+}
+
 // --- Query Helpers ---
 
 export function getConfig(key: string): unknown {
@@ -439,28 +461,23 @@ export function getCachedRedditPosts(subreddits: string[], maxAgeMinutes = 15): 
     WHERE subreddit IN (${placeholders})
       AND fetched_at > datetime('now', '-${maxAgeMinutes} minutes')
     ORDER BY score DESC
-  `).all(...subreddits) as Array<{
-    id: string; subreddit: string; title: string; author: string;
-    score: number; num_comments: number; selftext: string; url: string;
-    permalink: string; created_utc: number; thumbnail: string | null;
-    is_self: number; domain: string; link_flair_text: string | null;
-  }>;
+  `).all(...subreddits) as RedditPostRow[];
 
-  return rows.map((r) => ({
-    id: r.id,
-    title: r.title,
-    author: r.author,
-    score: r.score,
-    numComments: r.num_comments,
-    selftext: r.selftext || '',
-    url: r.url,
-    permalink: r.permalink,
-    createdUtc: r.created_utc,
-    thumbnail: r.thumbnail,
-    isSelf: r.is_self === 1,
-    domain: r.domain,
-    linkFlairText: r.link_flair_text,
-    subreddit: r.subreddit,
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    author: row.author ?? '[deleted]',
+    score: row.score,
+    numComments: row.num_comments,
+    selftext: row.selftext || '',
+    url: row.url ?? '',
+    permalink: row.permalink ?? '',
+    createdUtc: row.created_utc,
+    thumbnail: row.thumbnail,
+    isSelf: row.is_self === 1,
+    domain: row.domain ?? '',
+    linkFlairText: row.link_flair_text,
+    subreddit: row.subreddit,
   }));
 }
 
@@ -472,8 +489,13 @@ export function cacheRedditAnalysis(subreddits: string[], analysis: string, post
   `).run(JSON.stringify(subreddits.sort()), analysis, postCount);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getCachedRedditAnalysis(subreddits: string[], maxAgeMinutes = 30): any | null {
+export function getCachedRedditAnalysis(subreddits: string[], maxAgeMinutes = 30): {
+  tickers: unknown[];
+  summary: string;
+  postCount: number;
+  analyzedAt: string;
+  subreddits: string[];
+} | null {
   const db = getDb();
   const sortedKey = JSON.stringify(subreddits.sort());
   const row = db.prepare(`
@@ -487,8 +509,10 @@ export function getCachedRedditAnalysis(subreddits: string[], maxAgeMinutes = 30
   if (!row) return null;
 
   try {
+    const parsed = JSON.parse(row.analysis) as CachedRedditAnalysisRecord;
     return {
-      ...JSON.parse(row.analysis),
+      tickers: Array.isArray(parsed.tickers) ? parsed.tickers : [],
+      summary: typeof parsed.summary === 'string' ? parsed.summary : 'Analysis complete.',
       postCount: row.post_count,
       analyzedAt: row.analyzed_at,
       subreddits,

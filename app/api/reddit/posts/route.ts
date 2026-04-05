@@ -34,10 +34,10 @@ export async function GET(request: Request) {
       cachedAt: new Date().toISOString(),
       source: 'live',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[API] /api/reddit/posts error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch Reddit posts' },
+      { error: error instanceof Error ? error.message : 'Failed to fetch Reddit posts' },
       { status: 500 },
     );
   }
