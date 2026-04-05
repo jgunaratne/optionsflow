@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import QueueItem from '@/components/QueueItem';
 import SectorChart from '@/components/SectorChart';
-import { useQueueStore, useAccountStore } from '@/lib/store';
+import { useQueueStore, useAccountStore, useBrokerStore } from '@/lib/store';
 import { calculateSectorExposure } from '@/lib/risk';
 import { ListChecks, AlertCircle, CheckCircle2, XCircle, Loader2, Zap, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, KeyRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function QueuePage() {
   const { queue, loading, fetchQueue, removeFromQueue } = useQueueStore();
-  const { account, fetchAccount } = useAccountStore();
+  const { account, error: accountError, fetchAccount } = useAccountStore();
+  const { active } = useBrokerStore();
   const [executing, setExecuting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [reviewResult, setReviewResult] = useState<{ warnings: string[]; blockers: string[] } | null>(null);
@@ -56,6 +59,27 @@ export default function QueuePage() {
           <p className="text-sm text-zinc-500 mt-1 font-medium">Order review and batch execution center</p>
         </div>
       </div>
+
+      {accountError && (
+        <div className={cn("rounded-2xl border p-4 backdrop-blur-sm", accountError.needsAuth ? "border-amber-900/30 bg-amber-950/20" : "border-red-900/30 bg-red-950/20")}>
+          <div className="flex items-start gap-3">
+            {accountError.needsAuth ? <KeyRound className="mt-0.5 h-4 w-4 text-amber-500" /> : <AlertTriangle className="mt-0.5 h-4 w-4 text-red-500" />}
+            <div className="min-w-0 flex-1">
+              <p className={cn("text-sm font-medium", accountError.needsAuth ? "text-amber-400" : "text-red-400")}>
+                {accountError.needsAuth ? `${active.charAt(0).toUpperCase() + active.slice(1)} connection required` : 'Account data unavailable'}
+              </p>
+              <p className="mt-1 text-xs text-zinc-300 break-words">{accountError.message}</p>
+              {accountError.needsAuth && (
+                <div className="mt-3">
+                  <Link href="/positions" className="text-xs font-medium text-primary hover:text-primary/80">
+                    Go to Positions to reconnect {active}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -155,8 +179,8 @@ export default function QueuePage() {
               {!showConfirm ? (
                 <button
                   onClick={() => setShowConfirm(true)}
-                  disabled={executing || (reviewResult?.blockers && reviewResult.blockers.length > 0)}
-                  className="group relative w-full bg-gradient-to-r from-emerald-600 to-teal-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 disabled:grayscale rounded-2xl transition-all flex items-center justify-center gap-2"
+                  disabled={executing || !!accountError || (reviewResult?.blockers && reviewResult.blockers.length > 0)}
+                  className="group relative flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:shadow-emerald-600/40 active:translate-y-0 disabled:opacity-30 disabled:grayscale"
                 >
                   <Zap className="h-4 w-4" />
                   <span>Execute Order Batch ({queue.length})</span>

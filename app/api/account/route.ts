@@ -18,7 +18,15 @@ export async function GET() {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    const needsAuth = message.includes('No tokens found') || message.includes('No Webull') || message.includes('auth-setup') || message.includes('must be set in .env') || message.includes('INVALID_TOKEN') || message.includes('access token');
+    const needsAuth = message.includes('No tokens found')
+      || message.includes('No Webull')
+      || message.includes('auth-setup')
+      || message.includes('must be set in .env')
+      || message.includes('INVALID_TOKEN')
+      || message.includes('access token')
+      || message.includes('Client not authorized')
+      || message.includes('Unauthorized')
+      || message.includes('Failed to resolve Schwab account hash');
     const noTraderApi = message.includes('Client not authorized') && message.includes('401');
     console.error('[API] GET /api/account error:', error);
     if (noTraderApi) {

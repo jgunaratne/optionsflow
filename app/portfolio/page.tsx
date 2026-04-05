@@ -1,17 +1,20 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import ScenarioTable from '@/components/ScenarioTable';
 import SectorChart from '@/components/SectorChart';
 import RiskGauge from '@/components/RiskGauge';
-import { useStreamStore, useAccountStore } from '@/lib/store';
+import { useStreamStore, useAccountStore, useBrokerStore } from '@/lib/store';
 import { calculateCapitalAllocation, type CrashScenario, type SectorExposure } from '@/lib/risk';
 import { Activity, ShieldAlert, BarChart, PieChart, Wallet, CreditCard, Layers } from 'lucide-react';
+import { AlertTriangle, KeyRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PortfolioPage() {
   const { vix } = useStreamStore();
-  const { account, fetchAccount } = useAccountStore();
+  const { account, error, fetchAccount } = useAccountStore();
+  const { active } = useBrokerStore();
   const greeks = { totalDelta: 0, totalTheta: 0, totalVega: 0 };
   const scenarios: CrashScenario[] = [];
   const sectorData: SectorExposure[] = [];
@@ -30,6 +33,27 @@ export default function PortfolioPage() {
           <p className="text-sm text-zinc-500 mt-1">Stress tests, Greeks, and Capital Allocation</p>
         </div>
       </div>
+
+      {error && (
+        <div className={cn("rounded-2xl border p-4 backdrop-blur-sm", error.needsAuth ? "border-amber-900/30 bg-amber-950/20" : "border-red-900/30 bg-red-950/20")}>
+          <div className="flex items-start gap-3">
+            {error.needsAuth ? <KeyRound className="mt-0.5 h-4 w-4 text-amber-500" /> : <AlertTriangle className="mt-0.5 h-4 w-4 text-red-500" />}
+            <div className="min-w-0 flex-1">
+              <p className={cn("text-sm font-medium", error.needsAuth ? "text-amber-400" : "text-red-400")}>
+                {error.needsAuth ? `${active.charAt(0).toUpperCase() + active.slice(1)} connection required` : 'Account data unavailable'}
+              </p>
+              <p className="mt-1 text-xs text-zinc-300 break-words">{error.message}</p>
+              {error.needsAuth && (
+                <div className="mt-3">
+                  <Link href="/positions" className="text-xs font-medium text-primary hover:text-primary/80">
+                    Go to Positions to reconnect {active}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -149,25 +149,51 @@ interface AccountData {
   availableFunds: number;
 }
 
+interface AccountErrorState {
+  message: string;
+  needsAuth: boolean;
+}
+
 interface AccountState {
   account: AccountData | null;
   loading: boolean;
+  error: AccountErrorState | null;
   setAccount: (account: AccountData) => void;
+  clearError: () => void;
   fetchAccount: () => Promise<void>;
 }
 
 export const useAccountStore = create<AccountState>((set) => ({
   account: null,
   loading: false,
+  error: null,
   setAccount: (account) => set({ account }),
+  clearError: () => set({ error: null }),
   fetchAccount: async () => {
-    set({ loading: true });
+    set({ loading: true, error: null });
     try {
       const res = await fetch('/api/account');
       const data = await res.json();
-      set({ account: data.account || null });
+      if (!res.ok) {
+        set({
+          account: null,
+          error: {
+            message: data.message || data.error || 'Failed to fetch account data',
+            needsAuth: data.error === 'not_authenticated',
+          },
+        });
+        return;
+      }
+      set({ account: data.account || null, error: null });
     } catch (error) {
       console.error('Failed to fetch account:', error);
+      set({
+        account: null,
+        error: {
+          message: 'Failed to fetch account data',
+          needsAuth: false,
+        },
+      });
     } finally {
       set({ loading: false });
     }
