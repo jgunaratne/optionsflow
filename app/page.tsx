@@ -40,15 +40,20 @@ function CandidateListRow({
     ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
     : candidate.ai_flag === 'YELLOW'
       ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
-      : 'text-red-400 border-red-500/20 bg-red-500/10';
+      : candidate.is_eligible === 0
+        ? 'text-zinc-400 border-zinc-600/40 bg-zinc-800/60'
+        : 'text-red-400 border-red-500/20 bg-red-500/10';
 
   return (
-    <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] items-center gap-3 border-b border-white/10 px-4 py-3 text-sm last:border-b-0">
+    <div className={cn(
+      "grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] items-center gap-3 border-b border-white/5 px-4 py-3 text-sm last:border-b-0",
+      candidate.is_eligible === 0 && "bg-white/[0.02] text-zinc-500"
+    )}>
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-bold text-white">{candidate.symbol}</span>
           <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", flagTone)}>
-            {candidate.ai_flag}
+            {candidate.is_eligible === 0 ? 'GRAY' : candidate.ai_flag}
           </span>
         </div>
         <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
@@ -84,22 +89,24 @@ function CandidateListRow({
         <div className="font-semibold text-zinc-100">{candidate.delta.toFixed(3)}</div>
       </div>
       <div className="min-w-0">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-400">AI</div>
-        <div className="truncate text-xs text-zinc-400">{candidate.ai_brief}</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-500">AI</div>
+        <div className="truncate text-xs text-zinc-400">{candidate.is_eligible === 0 ? (candidate.rejection_reason || candidate.ai_brief) : candidate.ai_brief}</div>
       </div>
       <div className="flex justify-end">
         <button
           onClick={() => onAddToQueue(candidate.id)}
-          disabled={inQueue}
+          disabled={inQueue || candidate.is_eligible === 0}
           className={cn(
             "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-all",
             inQueue
               ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+              : candidate.is_eligible === 0
+                ? "border border-zinc-700 bg-zinc-800 text-zinc-500 cursor-not-allowed"
               : "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40"
           )}
         >
           {inQueue ? <CheckCircle2 className="h-3.5 w-3.5" /> : <PlusCircle className="h-3.5 w-3.5" />}
-          <span>{inQueue ? 'Queued' : 'Queue'}</span>
+          <span>{inQueue ? 'Queued' : candidate.is_eligible === 0 ? 'Rejected' : 'Queue'}</span>
         </button>
       </div>
     </div>
@@ -135,6 +142,7 @@ export default function ScreenerPage() {
   const queuedIds = new Set(queue.map(q => q.candidate_id));
 
   const sorted = [...candidates].sort((a, b) => {
+    if (a.is_eligible !== b.is_eligible) return b.is_eligible - a.is_eligible;
     switch (sortBy) {
       case 'pop': return b.pop - a.pop;
       case 'premium': return b.premium - a.premium;
@@ -142,6 +150,7 @@ export default function ScreenerPage() {
       default: return b.ai_score - a.ai_score;
     }
   });
+  const eligibleCount = sorted.filter((candidate) => candidate.is_eligible === 1).length;
 
   const handleRunScreener = async () => {
     setScreenerRunning(true);
@@ -198,8 +207,10 @@ export default function ScreenerPage() {
                <span>Last run: {lastScreenedAt ? new Date(lastScreenedAt * 1000).toLocaleString() : 'Never'}</span>
              </div>
              <div className="flex items-center gap-1.5">
-               <Layers className="h-4 w-4 text-zinc-400" />
-               <span className="text-emerald-400">{candidates.length} candidates found</span>
+               <Layers className="h-4 w-4 text-zinc-600" />
+               <span className="text-emerald-400">{eligibleCount} eligible</span>
+               <span className="text-zinc-600">/</span>
+               <span>{candidates.length} screened</span>
              </div>
           </div>
         </div>

@@ -21,9 +21,12 @@ export async function POST(request: NextRequest) {
 
     const db = getDb();
     const fortyEightHoursAgo = Math.floor(Date.now() / 1000) - 48 * 60 * 60;
-    const candidate = db.prepare('SELECT * FROM candidates WHERE id = ? AND screened_at > ?').get(candidate_id, fortyEightHoursAgo) as { id: number } | undefined;
+    const candidate = db.prepare('SELECT * FROM candidates WHERE id = ? AND screened_at > ?').get(candidate_id, fortyEightHoursAgo) as { id: number; is_eligible?: number; rejection_reason?: string | null } | undefined;
     if (!candidate) {
       return NextResponse.json({ error: 'Candidate not found or is from an old screener run' }, { status: 400 });
+    }
+    if (candidate.is_eligible === 0) {
+      return NextResponse.json({ error: candidate.rejection_reason || 'This contract did not pass screener filters' }, { status: 400 });
     }
 
     const existing = db.prepare('SELECT id FROM queue WHERE candidate_id = ? AND status = ?').get(candidate_id, 'PENDING');

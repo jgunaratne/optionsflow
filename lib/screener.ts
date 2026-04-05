@@ -122,7 +122,8 @@ export async function runScreener(): Promise<void> {
       premium: number; max_loss: number; pop: number; iv_rank: number; delta: number;
       theta: number; vega: number; bid: number; ask: number; underlying_price: number;
       ai_score: number; ai_flag: string; ai_brief: string; ai_risks: string | null;
-      compositeScore: number; spread_long_strike: number | null; collar_put_strike: number | null;
+      compositeScore: number; is_eligible: number; rejection_reason: string | null;
+      spread_long_strike: number | null; collar_put_strike: number | null;
     }
 
     const allCandidates: ScoredCandidate[] = [];
@@ -138,13 +139,12 @@ export async function runScreener(): Promise<void> {
         logActivity(item.symbol, `Calculating IV Rank...`, 'info');
         console.log(`[Screener] Processing ${item.symbol} (${idx + 1}/${watchlist.length})...`);
         const ivRank = await calculateIVRank(item.symbol, historyBroker);
-        if (ivRank < ivRankMin) {
-          logActivity(item.symbol, `IV Rank ${ivRank.toFixed(1)}% — below ${ivRankMin}% threshold, skipped`, 'skip');
-          console.log(`[Screener] ${item.symbol} IV Rank ${ivRank.toFixed(1)} below ${ivRankMin}, skip.`);
-          continue;
+        const ivRankRejected = ivRank < ivRankMin;
+        if (ivRankRejected) {
+          logActivity(item.symbol, `IV Rank ${ivRank.toFixed(1)}% — below ${ivRankMin}% threshold`, 'skip');
         }
 
-        logActivity(item.symbol, `IV Rank ${ivRank.toFixed(1)}% ✓ — fetching options chain...`, 'info');
+        logActivity(item.symbol, `IV Rank ${ivRank.toFixed(1)}% — fetching options chain...`, 'info');
         const chain = await chainBroker.getOptionsChain(item.symbol, 'PUT', fromDate, toDate);
         const underlyingPrice = chain.underlyingPrice || 0;
         if (!chain.putExpDateMap || underlyingPrice === 0) {
@@ -164,33 +164,46 @@ export async function runScreener(): Promise<void> {
               const delta = Math.abs(contract.delta || 0);
               const mid = (contract.bid + contract.ask) / 2;
               const bidAskSpread = mid > 0 ? (contract.ask - contract.bid) / mid : 1;
-
-              if (dte < dteMin || dte > dteMax) continue;
-              if (delta < deltaMin || delta > deltaMax) continue;
-              if (bidAskSpread > maxBidAskSpreadPct) continue;
-              if (contract.openInterest < minOpenInterest) continue;
-              if (mid < minPremium) continue;
-
               const maxLoss = (contract.strikePrice - mid) * 100;
               const pop = 1 - delta;
+              const rejectionReasons: string[] = [];
+              if (ivRankRejected) rejectionReasons.push(`IV Rank ${ivRank.toFixed(1)} below ${ivRankMin}`);
+              if (dte < dteMin || dte > dteMax) rejectionReasons.push(`DTE ${dte} outside ${dteMin}-${dteMax}`);
+              if (delta < deltaMin || delta > deltaMax) rejectionReasons.push(`Delta ${delta.toFixed(3)} outside ${deltaMin}-${deltaMax}`);
+              if (bidAskSpread > maxBidAskSpreadPct) rejectionReasons.push(`Bid/ask spread ${(bidAskSpread * 100).toFixed(1)}% too wide`);
+              if (contract.openInterest < minOpenInterest) rejectionReasons.push(`Open interest ${contract.openInterest} below ${minOpenInterest}`);
+              if (mid < minPremium) rejectionReasons.push(`Premium ${mid.toFixed(2)} below ${minPremium.toFixed(2)}`);
 
-              const analysis = await analyzeCandidate(
-                { symbol: item.symbol, underlying_price: underlyingPrice, strategy: 'CSP', strike: contract.strikePrice, expiry, dte, premium: mid, max_loss: maxLoss, pop, iv_rank: ivRank, delta: contract.delta },
-                news
-              );
+              const isEligible = rejectionReasons.length === 0;
+              let aiScore = 0;
+              let aiFlag = 'GRAY';
+              let aiBrief = rejectionReasons.join(' • ') || 'Passed screening';
+              let aiRisks: string | null = null;
+              let compositeScore = -1;
 
-              const premiumYield = Math.min(1, mid / (contract.strikePrice * 0.01));
-              const compositeScore = pop * 0.4 + (ivRank / 100) * 0.2 + premiumYield * 0.2 + (analysis.score / 100) * 0.2;
+              if (isEligible) {
+                const analysis = await analyzeCandidate(
+                  { symbol: item.symbol, underlying_price: underlyingPrice, strategy: 'CSP', strike: contract.strikePrice, expiry, dte, premium: mid, max_loss: maxLoss, pop, iv_rank: ivRank, delta: contract.delta },
+                  news
+                );
+                const premiumYield = Math.min(1, mid / (contract.strikePrice * 0.01));
+                compositeScore = pop * 0.4 + (ivRank / 100) * 0.2 + premiumYield * 0.2 + (analysis.score / 100) * 0.2;
+                aiScore = analysis.score;
+                aiFlag = analysis.flag;
+                aiBrief = analysis.brief;
+                aiRisks = JSON.stringify(analysis.risks);
+                symbolCandidates++;
+              }
 
-              symbolCandidates++;
               allCandidates.push({
                 symbol: item.symbol, strategy: 'CSP', strike: contract.strikePrice, expiry, dte,
                 premium: Math.round(mid * 100) / 100, max_loss: Math.round(maxLoss),
                 pop: Math.round(pop * 1000) / 1000, iv_rank: Math.round(ivRank * 10) / 10,
                 delta: contract.delta, theta: contract.theta || 0, vega: contract.vega || 0,
                 bid: contract.bid, ask: contract.ask, underlying_price: underlyingPrice,
-                ai_score: analysis.score, ai_flag: analysis.flag, ai_brief: analysis.brief,
-                ai_risks: JSON.stringify(analysis.risks), compositeScore,
+                ai_score: aiScore, ai_flag: aiFlag, ai_brief: aiBrief,
+                ai_risks: aiRisks, compositeScore, is_eligible: isEligible ? 1 : 0,
+                rejection_reason: isEligible ? null : rejectionReasons.join(' • '),
                 spread_long_strike: null, collar_put_strike: null,
               });
             }
@@ -208,18 +221,21 @@ export async function runScreener(): Promise<void> {
     }
 
     progress.status = 'Ranking and saving results...';
-    logActivity('', `Ranking ${allCandidates.length} total candidates...`, 'info');
-    allCandidates.sort((a, b) => b.compositeScore - a.compositeScore);
-    const topCandidates = allCandidates.slice(0, 20);
+    logActivity('', `Saving ${allCandidates.length} screened contracts...`, 'info');
+    allCandidates.sort((a, b) => {
+      if (a.is_eligible !== b.is_eligible) return b.is_eligible - a.is_eligible;
+      return b.compositeScore - a.compositeScore;
+    });
     cleanOldCandidates();
     const now = Math.floor(Date.now() / 1000);
-    for (const candidate of topCandidates) {
+    for (const candidate of allCandidates) {
       insertCandidate({ ...candidate, screened_at: now });
     }
-    progress.candidatesFound = topCandidates.length;
-    progress.status = `Complete: ${topCandidates.length} candidates found`;
-    logActivity('', `✅ Complete — ${topCandidates.length} candidates saved`, 'found');
-    console.log(`[Screener] Complete: ${topCandidates.length} candidates saved.`);
+    const eligibleCount = allCandidates.filter((candidate) => candidate.is_eligible === 1).length;
+    progress.candidatesFound = eligibleCount;
+    progress.status = `Complete: ${eligibleCount} eligible of ${allCandidates.length} screened`;
+    logActivity('', `✅ Complete — ${eligibleCount} eligible, ${allCandidates.length - eligibleCount} rejected`, 'found');
+    console.log(`[Screener] Complete: ${eligibleCount} eligible, ${allCandidates.length - eligibleCount} rejected.`);
   } catch (error) {
     progress.status = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
     logActivity('', `Pipeline error: ${error instanceof Error ? error.message : 'Unknown'}`, 'error');

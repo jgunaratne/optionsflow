@@ -12,22 +12,24 @@ interface CandidateCardProps {
 }
 
 export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabled }: CandidateCardProps) {
+  const isRejected = candidate.is_eligible === 0;
   const isGreen = candidate.ai_flag === 'GREEN';
   const isYellow = candidate.ai_flag === 'YELLOW';
   
-  const flagColorClass = isGreen ? 'text-emerald-400' : isYellow ? 'text-amber-400' : 'text-red-400';
-  const flagBgClass = isGreen ? 'bg-emerald-900/30' : isYellow ? 'bg-amber-900/30' : 'bg-red-900/30';
-  const flagBorderClass = isGreen ? 'border-emerald-500/30' : isYellow ? 'border-amber-500/30' : 'border-red-500/30';
+  const flagColorClass = isRejected ? 'text-zinc-400' : isGreen ? 'text-emerald-400' : isYellow ? 'text-amber-400' : 'text-red-400';
+  const flagBgClass = isRejected ? 'bg-zinc-800/60' : isGreen ? 'bg-emerald-900/30' : isYellow ? 'bg-amber-900/30' : 'bg-red-900/30';
+  const flagBorderClass = isRejected ? 'border-zinc-700/60' : isGreen ? 'border-emerald-500/30' : isYellow ? 'border-amber-500/30' : 'border-red-500/30';
 
   return (
     <div className={cn(
-      "group relative flex flex-col justify-between overflow-hidden rounded border bg-zinc-900/60 p-4 backdrop-blur-sm transition-all duration-300 hover:bg-zinc-800/80 hover:shadow-xl hover:shadow-black/60 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-black",
+      "group relative flex flex-col justify-between overflow-hidden rounded border bg-zinc-900/60 p-4 backdrop-blur-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-black",
+      isRejected ? "opacity-75" : "hover:bg-zinc-800/80 hover:shadow-xl hover:shadow-black/60 hover:-translate-y-1",
       flagBorderClass
     )}>
       {/* Background Glow */}
       <div className={cn(
-        "absolute -right-8 -top-8 h-24 w-24 rounded-full blur-3xl opacity-40 transition-opacity group-hover:opacity-60",
-        isGreen ? 'bg-emerald-500' : isYellow ? 'bg-amber-500' : 'bg-red-500'
+        "absolute -right-8 -top-8 h-24 w-24 rounded-full blur-3xl opacity-20 transition-opacity group-hover:opacity-40",
+        isRejected ? 'bg-zinc-500' : isGreen ? 'bg-emerald-500' : isYellow ? 'bg-amber-500' : 'bg-red-500'
       )} aria-hidden="true" />
 
       <div>
@@ -45,7 +47,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
           <div className={cn("flex items-center gap-2 rounded px-3 py-1 backdrop-blur-md border", flagBgClass, flagBorderClass)}>
             <div className={cn("h-2 w-2 rounded-full", isGreen ? 'bg-emerald-400' : isYellow ? 'bg-amber-400' : 'bg-red-400')} aria-hidden="true" />
             <span className={cn("text-xs font-bold uppercase tracking-wider", flagColorClass)}>
-              {candidate.ai_flag}
+              {isRejected ? 'GRAY' : candidate.ai_flag}
             </span>
           </div>
         </div>
@@ -101,20 +103,23 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
             )}>{candidate.ai_score.toFixed(0)}/100</span>
           </div>
           <p className="text-sm leading-relaxed text-zinc-300">&quot;{candidate.ai_brief}&quot;</p>
+          {isRejected && candidate.rejection_reason && (
+            <p className="mt-2 text-xs font-medium text-zinc-500">{candidate.rejection_reason}</p>
+          )}
         </div>
       </div>
 
       {/* Action Button */}
       <button
         onClick={() => onAddToQueue(candidate.id)}
-        disabled={inQueue || disabled}
+        disabled={inQueue || disabled || isRejected}
         aria-label={inQueue ? `Remove ${candidate.symbol} from queue` : `Add ${candidate.symbol} to queue`}
         className={cn(
           "relative flex w-full items-center justify-center gap-2 rounded py-3 text-sm font-bold transition-all duration-300 overflow-hidden focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black",
           inQueue
             ? "bg-emerald-900/40 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-900/60"
-            : disabled
-            ? "bg-zinc-800 text-zinc-400 border border-zinc-700 cursor-not-allowed"
+            : disabled || isRejected
+            ? "bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed"
             : "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/50 hover:-translate-y-0.5 active:translate-y-0"
         )}
       >
@@ -126,7 +131,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
         ) : (
           <>
             <PlusCircle className="h-4 w-4" aria-hidden="true" />
-            <span>Add to Queue</span>
+            <span>{isRejected ? 'Rejected' : 'Add to Queue'}</span>
           </>
         )}
       </button>

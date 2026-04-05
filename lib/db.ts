@@ -56,6 +56,8 @@ function initializeSchema(db: Database.Database) {
       ai_brief TEXT NOT NULL,
       ai_risks TEXT,
       screened_at INTEGER NOT NULL,
+      is_eligible INTEGER NOT NULL DEFAULT 1,
+      rejection_reason TEXT,
       spread_long_strike REAL,
       collar_put_strike REAL
     );
@@ -100,6 +102,15 @@ function initializeSchema(db: Database.Database) {
       value TEXT NOT NULL
     );
   `);
+
+  const candidateColumns = db.prepare("PRAGMA table_info(candidates)").all() as Array<{ name: string }>;
+  const candidateColumnNames = new Set(candidateColumns.map((column) => column.name));
+  if (!candidateColumnNames.has('is_eligible')) {
+    db.exec('ALTER TABLE candidates ADD COLUMN is_eligible INTEGER NOT NULL DEFAULT 1');
+  }
+  if (!candidateColumnNames.has('rejection_reason')) {
+    db.exec('ALTER TABLE candidates ADD COLUMN rejection_reason TEXT');
+  }
 
   const defaultConfig: Record<string, unknown> = {
     dte_min: 21,
@@ -154,6 +165,8 @@ export interface Candidate {
   ai_brief: string;
   ai_risks: string | null;
   screened_at: number;
+  is_eligible: number;
+  rejection_reason: string | null;
   spread_long_strike: number | null;
   collar_put_strike: number | null;
 }
@@ -257,15 +270,16 @@ export function insertCandidate(candidate: Omit<Candidate, 'id'>): number {
   const result = db.prepare(`
     INSERT INTO candidates (symbol, strategy, strike, expiry, dte, premium, max_loss, pop,
       iv_rank, delta, theta, vega, bid, ask, underlying_price, ai_score, ai_flag, ai_brief,
-      ai_risks, screened_at, spread_long_strike, collar_put_strike)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ai_risks, screened_at, is_eligible, rejection_reason, spread_long_strike, collar_put_strike)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     candidate.symbol, candidate.strategy, candidate.strike, candidate.expiry,
     candidate.dte, candidate.premium, candidate.max_loss, candidate.pop,
     candidate.iv_rank, candidate.delta, candidate.theta, candidate.vega,
     candidate.bid, candidate.ask, candidate.underlying_price, candidate.ai_score,
     candidate.ai_flag, candidate.ai_brief, candidate.ai_risks,
-    candidate.screened_at, candidate.spread_long_strike, candidate.collar_put_strike
+    candidate.screened_at, candidate.is_eligible, candidate.rejection_reason,
+    candidate.spread_long_strike, candidate.collar_put_strike
   );
   return result.lastInsertRowid as number;
 }
