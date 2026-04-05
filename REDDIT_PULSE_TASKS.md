@@ -244,7 +244,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ## Phase 4 — UI Components (depends on Phase 3)
 
-- [ ] **4.1 — RedditTickerCard Component (`components/RedditTickerCard.tsx`)**
+- [x] **4.1 — RedditTickerCard Component (`components/RedditTickerCard.tsx`)**
 
   Create `/Users/junius/git/optionsflow/components/RedditTickerCard.tsx`:
 
