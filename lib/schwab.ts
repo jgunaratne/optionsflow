@@ -79,6 +79,14 @@ function getTokens(broker = 'schwab'): TokenData | null {
   };
 }
 
+export function hasSchwabTokens(): boolean {
+  try {
+    return getTokens('schwab') !== null;
+  } catch {
+    return false;
+  }
+}
+
 export function saveTokens(accessToken: string, refreshToken: string, expiresIn: number, broker = 'schwab'): void {
   const db = getDb();
   const now = Math.floor(Date.now() / 1000);

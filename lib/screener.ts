@@ -1,7 +1,9 @@
 import { getWatchlist, getConfig, setConfig, insertCandidate, cleanOldCandidates } from './db';
-import { getBroker } from './broker-factory';
 import { analyzeCandidate } from './ai';
 import { fetchTickerNews } from './news';
+import type { Broker } from './broker';
+import { SchwabBroker, hasSchwabTokens } from './schwab';
+import { WebullBroker } from './webull';
 
 interface IVRankCache { ivRank: number; cachedAt: number; }
 
@@ -27,7 +29,7 @@ export function getScreenerProgress(): ScreenerProgress {
   return { ...progress };
 }
 
-async function calculateIVRank(symbol: string): Promise<number> {
+async function calculateIVRank(symbol: string, broker: Broker): Promise<number> {
   const cacheKey = `iv_rank_cache_${symbol}`;
   const cached = getConfig(cacheKey) as IVRankCache | undefined;
   const now = Math.floor(Date.now() / 1000);
@@ -35,7 +37,6 @@ async function calculateIVRank(symbol: string): Promise<number> {
   if (cached && (now - cached.cachedAt) < 86400) return cached.ivRank;
 
   try {
-    const broker = getBroker();
     const history = await broker.getPriceHistory(symbol);
     if (!history?.candles || history.candles.length < 30) return 50;
 
@@ -88,6 +89,15 @@ export async function runScreener(): Promise<void> {
     const minPremium = (getConfig('min_premium') as number) || 0.50;
     const fromDate = getDateString(dteMin);
     const toDate = getDateString(dteMax);
+    const historyBroker = new WebullBroker();
+
+    if (!hasSchwabTokens()) {
+      progress.status = 'Schwab not connected. Connect Schwab to run the options screener.';
+      console.warn('[Screener] Schwab not connected. Connect Schwab before running the screener.');
+      return;
+    }
+
+    const chainBroker = new SchwabBroker();
 
     interface ScoredCandidate {
       symbol: string; strategy: string; strike: number; expiry: string; dte: number;
@@ -108,14 +118,13 @@ export async function runScreener(): Promise<void> {
         progress.currentSymbol = item.symbol;
         progress.status = `Processing ${item.symbol} (${idx + 1}/${watchlist.length})`;
         console.log(`[Screener] Processing ${item.symbol} (${idx + 1}/${watchlist.length})...`);
-        const ivRank = await calculateIVRank(item.symbol);
+        const ivRank = await calculateIVRank(item.symbol, historyBroker);
         if (ivRank < ivRankMin) {
           console.log(`[Screener] ${item.symbol} IV Rank ${ivRank.toFixed(1)} below ${ivRankMin}, skip.`);
           continue;
         }
 
-        const broker = getBroker();
-        const chain = await broker.getOptionsChain(item.symbol, 'PUT', fromDate, toDate);
+        const chain = await chainBroker.getOptionsChain(item.symbol, 'PUT', fromDate, toDate);
         const underlyingPrice = chain.underlyingPrice || 0;
         if (!chain.putExpDateMap || underlyingPrice === 0) continue;
 
