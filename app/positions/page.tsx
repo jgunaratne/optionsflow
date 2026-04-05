@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useBrokerStore } from '@/lib/store';
 import { RefreshCw, Key, AlertTriangle, BarChart3, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import PositionsChart from '@/components/PositionsChart';
 
 interface Position {
   symbol: string;
@@ -218,8 +219,10 @@ export default function PositionsPage() {
             </div>
           </div>
 
-          {/* Positions Table */}
-          <div className="border border-white/10 rounded overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
+          {/* PnL Chart */}
+          <PositionsChart positions={filtered} />
+
+          {/* Positions Table */}          <div className="border border-white/10 rounded overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead>

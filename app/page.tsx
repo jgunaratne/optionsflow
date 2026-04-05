@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import CandidateCard from '@/components/CandidateCard';
+import CandidateScatterChart from '@/components/CandidateScatterChart';
 import type { Candidate } from '@/lib/db';
 import { useCandidatesStore, useQueueStore } from '@/lib/store';
 import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2, Gauge, KeyRound, ArrowRight } from 'lucide-react';
@@ -464,42 +465,47 @@ export default function ScreenerPage() {
              <p className="text-sm max-w-xs mt-1">Adjust your filters or run the screener to find new opportunities.</p>
           </div>
         </div>
-      ) : viewMode === 'grid' ? (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-          {sorted.map(candidate => (
-            <CandidateCard
-              key={candidate.id}
-              candidate={candidate}
-              onAddToQueue={handleAddToQueue}
-              inQueue={queuedIds.has(candidate.id)}
-            />
-          ))}
-        </div>
       ) : (
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] gap-3 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">
-            <div>Candidate</div>
-            <div className="text-right">Strike</div>
-            <div className="text-right">Premium</div>
-            <div className="text-right">Risk</div>
-            <div className="text-right">POP</div>
-            <div className="text-right">IV Rank</div>
-            <div className="text-right">Delta</div>
-            <div>AI Brief</div>
-            <div className="text-right">Action</div>
-          </div>
-          <div>
-            {sorted.map(candidate => (
-              <CandidateListRow
-                key={candidate.id}
-                candidate={candidate}
-                onAddToQueue={handleAddToQueue}
-                inQueue={queuedIds.has(candidate.id)}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col gap-6">
+          <CandidateScatterChart candidates={sorted} />
+
+          {viewMode === 'grid' ? (
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+              {sorted.map(candidate => (
+                <CandidateCard
+                  key={candidate.id}
+                  candidate={candidate}
+                  onAddToQueue={handleAddToQueue}
+                  inQueue={queuedIds.has(candidate.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded border border-white/10 bg-white/5 backdrop-blur-sm">
+              <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] gap-3 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">
+                <div>Candidate</div>
+                <div className="text-right">Strike</div>
+                <div className="text-right">Premium</div>
+                <div className="text-right">Risk</div>
+                <div className="text-right">POP</div>
+                <div className="text-right">IV Rank</div>
+                <div className="text-right">Delta</div>
+                <div>AI Brief</div>
+                <div className="text-right">Action</div>
+              </div>
+              <div>
+                {sorted.map(candidate => (
+                  <CandidateListRow
+                    key={candidate.id}
+                    candidate={candidate}
+                    onAddToQueue={handleAddToQueue}
+                    inQueue={queuedIds.has(candidate.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      )}    </div>
   );
 }
