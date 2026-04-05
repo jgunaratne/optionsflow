@@ -11,12 +11,16 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "better-sqlite3": "^12.6.2",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.7.0",
     "next": "14.2.35",
     "node-cron": "^4.2.1",
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^3.8.0",
     "snaptrade-typescript-sdk": "^9.0.173",
+    "tailwind-merge": "^3.5.0",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
