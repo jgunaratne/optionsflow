@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useBrokerStore } from '@/lib/store';
+import { RefreshCw, Key, AlertTriangle, BarChart3, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Position {
   symbol: string;
@@ -27,7 +29,7 @@ export default function PositionsPage() {
   const [filter, setFilter] = useState<FilterType>('ALL');
   const { active } = useBrokerStore();
 
-  const brokerLabel = active.charAt(0).toUpperCase() + active.slice(1);
+  const brokerLabel = active.toUpperCase();
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -38,7 +40,7 @@ export default function PositionsPage() {
         fetchPositions();
       }
       if (event.data?.type === 'schwab-auth-error') {
-        setError(event.data?.message || 'Schwab authorization failed');
+        setError(event.data?.message || 'AUTHORIZATION_FAILED');
         setConnecting(false);
       }
     };
@@ -54,11 +56,7 @@ export default function PositionsPage() {
       const data = await res.json();
 
       if (data.redirectURI) {
-        const popup = window.open(data.redirectURI, 'optionsflow-broker-auth', 'width=640,height=800');
-        if (!popup) {
-          setError('Popup blocked. Allow popups for this site and try again.');
-          return;
-        }
+        window.open(data.redirectURI, 'optionsflow-broker-auth', 'width=640,height=800');
         return;
       }
 
@@ -67,10 +65,10 @@ export default function PositionsPage() {
         setError(null);
         fetchPositions();
       } else {
-        setError(data.error || 'Connection failed');
+        setError(data.error || 'CONNECTION_FAILED');
       }
     } catch {
-      setError('Failed to connect');
+      setError('FAILED_TO_CONNECT');
     } finally {
       setConnecting(false);
     }
@@ -88,14 +86,13 @@ export default function PositionsPage() {
         return;
       }
       if (!res.ok) {
-        setError(data.message || 'Failed to fetch positions');
+        setError(data.message || 'FETCH_FAILED');
         setPositions([]);
         return;
       }
       setPositions(data.positions || []);
     } catch (err) {
-      console.error('Failed to fetch positions:', err);
-      setError('Failed to connect to server');
+      setError('SERVER_ERROR');
     } finally {
       setLoading(false);
     }
@@ -109,26 +106,26 @@ export default function PositionsPage() {
   }, [active]);
 
   const getPnLColor = (pnl: number) => {
-    if (pnl > 0) return 'text-emerald-400';
-    if (pnl < 0) return 'text-red-400';
-    return 'text-zinc-400';
+    if (pnl > 0) return 'terminal-green';
+    if (pnl < 0) return 'terminal-red';
+    return 'text-zinc-500';
   };
 
   const getTypeBadge = (pos: Position) => {
     if (pos.assetType === 'OPTION' && pos.putCall) {
       return (
-        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${pos.putCall === 'PUT' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-purple-500/10 text-purple-400 border border-purple-500/30'}`}>
+        <span className={cn(
+          "px-1.5 py-0.5 text-[10px] font-bold border",
+          pos.putCall === 'PUT' ? "border-blue-900 bg-blue-950/20 text-blue-400" : "border-emerald-900 bg-emerald-950/20 terminal-green"
+        )}>
           {pos.putCall}
         </span>
       );
     }
     if (pos.assetType === 'OPTION') {
-      return <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-xs font-semibold text-violet-400">OPTION</span>;
+      return <span className="border border-zinc-800 bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400">OPTION</span>;
     }
-    if (pos.assetType === 'ETF') {
-      return <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-400">ETF</span>;
-    }
-    return <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-400">EQUITY</span>;
+    return <span className="border border-zinc-800 bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-zinc-500">EQUITY</span>;
   };
 
   const filtered = positions.filter(p => {
@@ -139,112 +136,116 @@ export default function PositionsPage() {
 
   const totalValue = positions.reduce((s, p) => s + p.marketValue, 0);
   const totalDayPnL = positions.reduce((s, p) => s + p.dayPnL, 0);
-  const equityCount = positions.filter(p => p.assetType !== 'OPTION').length;
-  const optionCount = positions.filter(p => p.assetType === 'OPTION').length;
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
+    <div className="flex flex-col gap-4 font-mono">
+      <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
         <div>
-          <h1 className="text-2xl font-bold text-white">Positions</h1>
-          <p className="text-sm text-zinc-500">Live positions from your broker</p>
+          <h1 className="text-xl font-black text-white tracking-tighter uppercase">Portfolio Positions</h1>
+          <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Live_Feed // Broker: {brokerLabel}</p>
         </div>
-        <button onClick={fetchPositions} className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700">
-          ↻ Refresh
+        <button 
+          onClick={fetchPositions} 
+          className="flex items-center gap-2 border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-black text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
+        >
+          <RefreshCw className="h-3 w-3" />
+          REFRESH
         </button>
       </div>
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <svg className="h-6 w-6 animate-spin text-violet-500" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+        <div className="flex h-40 items-center justify-center border border-dashed border-zinc-800">
+          <Loader2 className="h-4 w-4 animate-spin text-zinc-600" />
         </div>
       ) : needsAuth ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-amber-800/50 bg-amber-900/10">
-          <span className="text-4xl">🔑</span>
-          <p className="text-sm text-zinc-300">Not connected to <span className="font-semibold text-white">{brokerLabel}</span></p>
+        <div className="flex h-48 flex-col items-center justify-center gap-4 border border-zinc-800 bg-zinc-950 p-6 text-center">
+          <Key className="h-8 w-8 text-zinc-700" />
+          <div>
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Authentication Required</p>
+            <p className="text-[10px] text-zinc-600 mt-1 uppercase">Link your {brokerLabel} account to view live data</p>
+          </div>
           <button
             onClick={handleConnect}
             disabled={connecting}
-            className="rounded-lg bg-gradient-to-r from-orange-600 to-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-600/20 transition-all hover:shadow-orange-600/30 disabled:opacity-50"
+            className="border border-primary bg-primary/10 px-6 py-2 text-xs font-black text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-50"
           >
-            {connecting ? 'Connecting…' : `Connect ${brokerLabel}`}
+            {connecting ? 'CONNECTING...' : `CONNECT_${brokerLabel}`}
           </button>
-          {active === 'schwab' && (
-            <p className="text-center text-xs text-zinc-500">This opens Schwab OAuth in a popup and returns here automatically.</p>
-          )}
-          {error && <p className="text-xs text-red-400">{error}</p>}
         </div>
       ) : error ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-red-800/50 bg-red-900/10">
-          <span className="text-4xl">⚠️</span>
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="flex h-40 flex-col items-center justify-center gap-3 border border-terminal-red/30 bg-terminal-red/5 p-4 text-center">
+          <AlertTriangle className="h-6 w-6 terminal-red" />
+          <p className="text-xs font-bold terminal-red uppercase">{error}</p>
         </div>
       ) : positions.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/30">
-          <span className="text-4xl">📊</span>
-          <p className="text-sm text-zinc-500">No open positions found.</p>
+        <div className="flex h-40 flex-col items-center justify-center gap-3 border border-dashed border-zinc-800 text-zinc-700">
+          <BarChart3 className="h-6 w-6 opacity-20" />
+          <span className="text-[10px] font-black uppercase">No_Active_Positions</span>
         </div>
       ) : (
         <>
-          {/* Summary Cards */}
-          <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="text-xs text-zinc-500">Total Positions</div>
-              <div className="text-2xl font-bold text-white">{positions.length}</div>
-              <div className="mt-1 text-xs text-zinc-500">{equityCount} equities · {optionCount} options</div>
+          {/* High-Density Summary Row */}
+          <div className="grid grid-cols-2 gap-px border border-zinc-800 bg-zinc-800 sm:grid-cols-4">
+            <div className="bg-black p-3">
+              <div className="text-[9px] font-black text-zinc-600 uppercase">Market Value</div>
+              <div className="text-lg font-black text-white">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="text-xs text-zinc-500">Market Value</div>
-              <div className="text-2xl font-bold text-white">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-            </div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="text-xs text-zinc-500">Day P&L</div>
-              <div className={`text-2xl font-bold ${getPnLColor(totalDayPnL)}`}>
+            <div className="bg-black p-3">
+              <div className="text-[9px] font-black text-zinc-600 uppercase">Day P&L</div>
+              <div className={cn("text-lg font-black", getPnLColor(totalDayPnL))}>
                 {totalDayPnL >= 0 ? '+' : ''}${totalDayPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="text-xs text-zinc-500">Filter</div>
-              <div className="mt-1 flex gap-1">
+            <div className="bg-black p-3">
+              <div className="text-[9px] font-black text-zinc-600 uppercase">Positions</div>
+              <div className="text-lg font-black text-zinc-300">{positions.length} <span className="text-[10px] text-zinc-600 uppercase ml-1">Items</span></div>
+            </div>
+            <div className="bg-black p-3 flex flex-col justify-center">
+              <div className="flex gap-1">
                 {(['ALL', 'EQUITY', 'OPTION'] as FilterType[]).map(f => (
                   <button key={f} onClick={() => setFilter(f)}
-                    className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${filter === f ? 'bg-violet-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'}`}>
-                    {f === 'ALL' ? 'All' : f === 'EQUITY' ? 'Stocks' : 'Options'}
+                    className={cn(
+                      "px-2 py-0.5 text-[9px] font-black transition-colors border uppercase",
+                      filter === f ? "border-primary bg-primary text-black" : "border-zinc-800 text-zinc-600 hover:text-zinc-300"
+                    )}>
+                    {f === 'ALL' ? 'ALL' : f === 'EQUITY' ? 'EQU' : 'OPT'}
                   </button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Positions Table */}
-          <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
-            <table className="w-full text-sm">
+          {/* Positions Table - Dense Bloomberg Terminal Style */}
+          <div className="border border-zinc-800">
+            <table className="w-full text-[11px] leading-tight">
               <thead>
-                <tr className="border-b border-zinc-800 text-xs text-zinc-500">
-                  <th className="px-4 py-3 text-left font-medium">Symbol</th>
-                  <th className="px-4 py-3 text-left font-medium">Description</th>
-                  <th className="px-4 py-3 text-left font-medium">Type</th>
-                  <th className="px-4 py-3 text-right font-medium">Qty</th>
-                  <th className="px-4 py-3 text-right font-medium">Avg Price</th>
-                  <th className="px-4 py-3 text-right font-medium">Mkt Value</th>
-                  <th className="px-4 py-3 text-right font-medium">Day P&L ($)</th>
-                  <th className="px-4 py-3 text-right font-medium">Day P&L (%)</th>
+                <tr className="bg-zinc-900/50 text-left text-[9px] font-black text-zinc-500 border-b border-zinc-800 uppercase tracking-widest">
+                  <th className="px-3 py-2">Symbol</th>
+                  <th className="px-3 py-2">Type</th>
+                  <th className="px-3 py-2 text-right">Qty</th>
+                  <th className="px-3 py-2 text-right">Avg_Px</th>
+                  <th className="px-3 py-2 text-right">Mkt_Val</th>
+                  <th className="px-3 py-2 text-right">Day_P&L</th>
+                  <th className="px-3 py-2 text-right">Day_Chg%</th>
+                  <th className="px-3 py-2 hidden lg:table-cell">Description</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-zinc-900">
                 {filtered.map((pos, i) => (
-                  <tr key={i} className="border-b border-zinc-800/30 transition-colors hover:bg-zinc-800/20">
-                    <td className="px-4 py-3 font-semibold text-white">{pos.symbol}</td>
-                    <td className="max-w-[200px] truncate px-4 py-3 text-zinc-400">{pos.description}</td>
-                    <td className="px-4 py-3">{getTypeBadge(pos)}</td>
-                    <td className="px-4 py-3 text-right text-zinc-200">{pos.quantity}</td>
-                    <td className="px-4 py-3 text-right text-zinc-200">${pos.averagePrice.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-right text-zinc-200">${pos.marketValue.toFixed(2)}</td>
-                    <td className={`px-4 py-3 text-right font-semibold ${getPnLColor(pos.dayPnL)}`}>
+                  <tr key={i} className="bg-black transition-colors hover:bg-zinc-900/50">
+                    <td className="px-3 py-1.5 font-bold text-white">{pos.symbol}</td>
+                    <td className="px-3 py-1.5">{getTypeBadge(pos)}</td>
+                    <td className="px-3 py-1.5 text-right font-bold text-zinc-300">{pos.quantity}</td>
+                    <td className="px-3 py-1.5 text-right text-zinc-400">${pos.averagePrice.toFixed(2)}</td>
+                    <td className="px-3 py-1.5 text-right font-bold text-white">${pos.marketValue.toFixed(2)}</td>
+                    <td className={cn("px-3 py-1.5 text-right font-black", getPnLColor(pos.dayPnL))}>
                       {pos.dayPnL >= 0 ? '+' : ''}${pos.dayPnL.toFixed(2)}
                     </td>
-                    <td className={`px-4 py-3 text-right font-semibold ${getPnLColor(pos.dayPnLPct)}`}>
+                    <td className={cn("px-3 py-1.5 text-right font-black", getPnLColor(pos.dayPnLPct))}>
                       {pos.dayPnLPct >= 0 ? '+' : ''}{pos.dayPnLPct.toFixed(2)}%
+                    </td>
+                    <td className="px-3 py-1.5 hidden lg:table-cell text-[9px] text-zinc-600 truncate max-w-[200px] uppercase font-bold italic">
+                      {pos.description}
                     </td>
                   </tr>
                 ))}

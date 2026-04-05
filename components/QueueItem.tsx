@@ -2,7 +2,8 @@
 
 import type { QueueItemWithCandidate } from '@/lib/db';
 import { useStreamStore } from '@/lib/store';
-import LiveBadge from './LiveBadge';
+import { Minus, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface QueueItemProps {
   item: QueueItemWithCandidate;
@@ -18,69 +19,78 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
   const priceAlert = priceDiff !== null && Math.abs(priceDiff) > 2;
 
   return (
-    <div className={`group flex items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 transition-all hover:bg-zinc-900 ${priceAlert ? 'border-amber-500/40' : ''}`}>
-      {/* Symbol + Strategy */}
-      <div className="min-w-[120px]">
+    <div className={cn(
+      "group flex items-center gap-4 border bg-black p-3 font-mono transition-colors hover:bg-zinc-900/50",
+      priceAlert ? "border-terminal-amber/50 bg-terminal-amber/5" : "border-zinc-800"
+    )}>
+      {/* Symbol + Meta */}
+      <div className="min-w-[140px] border-r border-zinc-800 pr-4">
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-white">{item.symbol}</span>
-          <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-semibold text-blue-400 border border-blue-500/30">
-            {item.strategy}
-          </span>
+          <span className="text-sm font-black text-white">{item.symbol}</span>
+          <span className="bg-zinc-800 px-1 text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">{item.strategy}</span>
         </div>
-        <div className="mt-0.5 text-xs text-zinc-500">
-          ${item.strike.toFixed(2)} • {item.expiry}
+        <div className="mt-1 text-[10px] font-bold text-zinc-600 uppercase">
+          ${item.strike.toFixed(2)} | {item.expiry}
         </div>
       </div>
 
-      {/* Premium */}
-      <div className="text-center">
-        <div className="text-xs text-zinc-500">Premium</div>
-        <div className="text-sm font-semibold text-emerald-400">
-          ${(item.premium * 100 * item.quantity).toFixed(0)}
+      {/* Exposure Metrics */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-1 border-r border-zinc-800 pr-6">
+        <div className="flex flex-col">
+          <span className="text-[8px] font-black text-zinc-700 uppercase">Premium</span>
+          <span className="text-xs font-black terminal-green">${(item.premium * 100 * item.quantity).toFixed(0)}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[8px] font-black text-zinc-700 uppercase">Risk</span>
+          <span className="text-xs font-black terminal-red">${(item.max_loss * item.quantity).toLocaleString()}</span>
         </div>
       </div>
 
-      {/* Max Loss */}
-      <div className="text-center">
-        <div className="text-xs text-zinc-500">Max Loss</div>
-        <div className="text-sm font-semibold text-red-400">
-          ${(item.max_loss * item.quantity).toLocaleString()}
-        </div>
-      </div>
-
-      {/* Live Price */}
-      <div className="text-center">
-        <div className="text-xs text-zinc-500">Underlying</div>
+      {/* Live Data Feed */}
+      <div className="flex flex-col min-w-[100px]">
+        <span className="text-[8px] font-black text-zinc-700 uppercase">Underlying_Px</span>
         {livePrice ? (
-          <LiveBadge price={livePrice} change={priceDiff || 0} alert={priceAlert} />
+          <div className="flex items-center gap-1.5">
+            <span className={cn("text-xs font-black", priceAlert ? "terminal-amber" : "text-zinc-300")}>
+              ${livePrice.toFixed(2)}
+            </span>
+            {priceAlert && <AlertTriangle className="h-3 w-3 terminal-amber animate-pulse" />}
+            <span className={cn("text-[9px] font-bold", priceDiff! >= 0 ? "terminal-green" : "terminal-red")}>
+              {priceDiff! >= 0 ? '▲' : '▼'}{Math.abs(priceDiff!).toFixed(2)}%
+            </span>
+          </div>
         ) : (
-          <div className="text-sm text-zinc-600">—</div>
+          <span className="text-[10px] font-bold text-zinc-800 uppercase tracking-widest animate-pulse">NO_FEED</span>
         )}
       </div>
 
-      {/* Quantity Stepper */}
-      <div className="flex items-center gap-1.5">
-        <button
-          onClick={() => onQuantityChange(item.queue_id, Math.max(1, item.quantity - 1))}
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white transition-colors"
-        >
-          −
-        </button>
-        <span className="w-8 text-center text-sm font-semibold text-white">{item.quantity}</span>
-        <button
-          onClick={() => onQuantityChange(item.queue_id, item.quantity + 1)}
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white transition-colors"
-        >
-          +
-        </button>
+      {/* QTY Control */}
+      <div className="flex items-center gap-2 border-l border-zinc-800 pl-4">
+        <span className="text-[8px] font-black text-zinc-700 uppercase vertical-text -rotate-90">QTY</span>
+        <div className="flex items-center border border-zinc-800 bg-black">
+          <button
+            onClick={() => onQuantityChange(item.queue_id, Math.max(1, item.quantity - 1))}
+            className="flex h-6 w-6 items-center justify-center text-zinc-600 hover:bg-zinc-900 hover:text-white transition-colors"
+          >
+            <Minus className="h-3 w-3" />
+          </button>
+          <span className="w-8 text-center text-[11px] font-black text-white">{item.quantity}</span>
+          <button
+            onClick={() => onQuantityChange(item.queue_id, item.quantity + 1)}
+            className="flex h-6 w-6 items-center justify-center text-zinc-600 hover:bg-zinc-900 hover:text-white transition-colors"
+          >
+            <Plus className="h-3 w-3" />
+          </button>
+        </div>
       </div>
 
-      {/* Remove */}
+      {/* REMOVE ACTION */}
       <button
         onClick={() => onRemove(item.queue_id)}
-        className="ml-auto rounded-lg px-3 py-1.5 text-xs font-medium text-red-400 transition-all hover:bg-red-500/10 hover:text-red-300"
+        className="ml-auto flex h-8 w-8 items-center justify-center text-zinc-800 hover:bg-terminal-red/10 hover:text-terminal-red transition-all"
+        title="PURGE_ORDER"
       >
-        Remove
+        <Trash2 className="h-4 w-4" />
       </button>
     </div>
   );
