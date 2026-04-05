@@ -47,8 +47,7 @@ function CandidateListRow({
 
   return (
     <div className={cn(
-      "grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] items-center gap-3 border-b border-white/5 px-4 py-3 text-sm last:border-b-0",
-      candidate.is_eligible === 0 && "bg-white/[0.02] text-zinc-500"
+      "grid grid-cols-[1fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_2fr_100px] items-center gap-4 border-b border-white/5 px-4 py-3 text-sm last:border-b-0",      candidate.is_eligible === 0 && "bg-white/[0.02] text-zinc-500"
     )}>
       <div className="min-w-0">
         <div className="flex items-center gap-2">
@@ -481,9 +480,9 @@ export default function ScreenerPage() {
               ))}
             </div>
           ) : (
-            <div className="overflow-hidden rounded border border-white/10 bg-white/5 backdrop-blur-sm">
-              <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] gap-3 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">
-                <div>Candidate</div>
+            <div className="overflow-x-auto rounded border border-white/10 bg-white/5 backdrop-blur-sm">
+              <div className="min-w-[1000px]">
+                <div className="grid grid-cols-[1fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_2fr_100px] gap-4 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">                <div>Candidate</div>
                 <div className="text-right">Strike</div>
                 <div className="text-right">Premium</div>
                 <div className="text-right">Risk</div>
@@ -502,9 +501,9 @@ export default function ScreenerPage() {
                     inQueue={queuedIds.has(candidate.id)}
                   />
                 ))}
-              </div>
-            </div>
-          )}
+                </div>
+                </div>
+                </div>          )}
         </div>
       )}    </div>
   );
