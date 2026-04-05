@@ -134,7 +134,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ---
 
-- [ ] **2.2 — Analysis API Route (`app/api/reddit/analyze/route.ts`)**
+- [x] **2.2 — Analysis API Route (`app/api/reddit/analyze/route.ts`)**
 
   Create `/Users/junius/git/optionsflow/app/api/reddit/analyze/route.ts`:
 
