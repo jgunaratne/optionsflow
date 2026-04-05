@@ -16,7 +16,7 @@ export default function SectorChart({ data }: SectorChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center rounded border border-zinc-800 bg-zinc-900/50">
-        <p className="text-sm text-zinc-500">No sector data available</p>
+        <p className="text-sm text-zinc-400">No sector data available</p>
       </div>
     );
   }

@@ -43,7 +43,7 @@ function CandidateListRow({
       : 'text-red-400 border-red-500/20 bg-red-500/10';
 
   return (
-    <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] items-center gap-3 border-b border-white/5 px-4 py-3 text-sm last:border-b-0">
+    <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] items-center gap-3 border-b border-white/10 px-4 py-3 text-sm last:border-b-0">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-bold text-white">{candidate.symbol}</span>
@@ -51,7 +51,7 @@ function CandidateListRow({
             {candidate.ai_flag}
           </span>
         </div>
-        <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-500">
+        <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
           <span>{candidate.strategy}</span>
           <span>•</span>
           <span>{candidate.expiry}</span>
@@ -60,31 +60,31 @@ function CandidateListRow({
         </div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Strike</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400">Strike</div>
         <div className="font-semibold text-zinc-100">${candidate.strike.toFixed(2)}</div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Premium</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400">Premium</div>
         <div className="font-semibold text-emerald-400">${candidate.premium.toFixed(2)}</div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Max Loss</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400">Max Loss</div>
         <div className="font-semibold text-zinc-100">${candidate.max_loss.toLocaleString()}</div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">POP</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400">POP</div>
         <div className="font-semibold text-zinc-100">{(candidate.pop * 100).toFixed(0)}%</div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">IV Rank</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400">IV Rank</div>
         <div className="font-semibold text-zinc-100">{candidate.iv_rank.toFixed(1)}</div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">Delta</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400">Delta</div>
         <div className="font-semibold text-zinc-100">{candidate.delta.toFixed(3)}</div>
       </div>
       <div className="min-w-0">
-        <div className="text-[10px] uppercase tracking-wider text-zinc-500">AI</div>
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400">AI</div>
         <div className="truncate text-xs text-zinc-400">{candidate.ai_brief}</div>
       </div>
       <div className="flex justify-end">
@@ -189,16 +189,16 @@ export default function ScreenerPage() {
   return (
     <div className="flex flex-col gap-4">
       {/* Header Section */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/5 pb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Screener</h1>
-          <div className="mt-2 flex items-center gap-4 text-sm text-zinc-500 font-medium">
+          <div className="mt-2 flex items-center gap-4 text-sm text-zinc-400 font-medium">
              <div className="flex items-center gap-1.5">
-               <Calendar className="h-4 w-4 text-zinc-600" />
+               <Calendar className="h-4 w-4 text-zinc-400" />
                <span>Last run: {lastScreenedAt ? new Date(lastScreenedAt * 1000).toLocaleString() : 'Never'}</span>
              </div>
              <div className="flex items-center gap-1.5">
-               <Layers className="h-4 w-4 text-zinc-600" />
+               <Layers className="h-4 w-4 text-zinc-400" />
                <span className="text-emerald-400">{candidates.length} candidates found</span>
              </div>
           </div>
@@ -210,7 +210,7 @@ export default function ScreenerPage() {
           className={cn(
             "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded px-6 py-3 text-sm font-bold transition-all duration-300",
             screenerRunning
-              ? "bg-zinc-900 text-zinc-500 border border-white/5"
+              ? "bg-zinc-900 text-zinc-400 border border-white/10"
               : "bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
           )}
         >
@@ -239,14 +239,14 @@ export default function ScreenerPage() {
                 </div>
                 <div>
                   <div className="text-sm font-bold text-white uppercase tracking-wider">{progress.status}</div>
-                  <div className="text-xs font-medium text-zinc-500">
+                  <div className="text-xs font-medium text-zinc-400">
                     {progress.currentSymbol ? `Analyzing ${progress.currentSymbol}...` : 'Initializing scan...'}
                   </div>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-lg font-bold text-white">{progressPercent}%</div>
-                <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
                   {progress.candidatesFound} found
                 </div>
               </div>
@@ -263,8 +263,8 @@ export default function ScreenerPage() {
 
       {/* Live Activity Feed */}
       {progress && progress.logs && progress.logs.length > 0 && (
-        <div className="relative overflow-hidden rounded border border-white/5 bg-zinc-950/60 backdrop-blur-sm">
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+        <div className="relative overflow-hidden rounded border border-white/10 bg-zinc-950/60 backdrop-blur-sm">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-white/[0.02]">
             <div className="flex items-center gap-2">
               <div className={cn(
                 "h-2 w-2 rounded-full",
@@ -272,7 +272,7 @@ export default function ScreenerPage() {
               )} />
               <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Activity Log</span>
             </div>
-            <span className="text-[10px] font-medium text-zinc-600">
+            <span className="text-[10px] font-medium text-zinc-400">
               {progress.logs.length} events
             </span>
           </div>
@@ -282,7 +282,7 @@ export default function ScreenerPage() {
                 key={i}
                 className={cn(
                   "flex items-start gap-2 px-3 py-1.5 rounded text-xs font-medium transition-colors",
-                  log.type === 'skip' && "text-zinc-500",
+                  log.type === 'skip' && "text-zinc-400",
                   log.type === 'info' && "text-zinc-300",
                   log.type === 'found' && "text-emerald-400 bg-emerald-500/5",
                   log.type === 'error' && "text-red-400 bg-red-500/5",
@@ -337,9 +337,9 @@ export default function ScreenerPage() {
       )}
 
       {/* Toolbar & Filters */}
-      <div className="flex flex-wrap items-center gap-3 bg-white/5 p-3 border border-white/5 rounded backdrop-blur-sm">
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/5">
-          <Filter className="h-4 w-4 text-zinc-500" />
+      <div className="flex flex-wrap items-center gap-3 bg-white/5 p-3 border border-white/10 rounded backdrop-blur-sm">
+        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+          <Filter className="h-4 w-4 text-zinc-400" />
           <select
             value={filters.strategy || ''}
             onChange={(e) => { setFilters({ strategy: e.target.value || undefined }); fetchCandidates(); }}
@@ -353,8 +353,8 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/5">
-          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Flag:</span>
+        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+          <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">Flag:</span>
           <select
             value={filters.flag || ''}
             onChange={(e) => { setFilters({ flag: e.target.value || undefined }); fetchCandidates(); }}
@@ -367,8 +367,8 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/5">
-          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Min Pop:</span>
+        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+          <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">Min Pop:</span>
           <input
             type="number"
             min="0" max="100" step="5"
@@ -378,9 +378,9 @@ export default function ScreenerPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/5">
+        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
           <Gauge className="h-4 w-4 text-amber-500" />
-          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">IV Rank ≥</span>
+          <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">IV Rank ≥</span>
           <input
             type="number"
             min="0" max="100" step="5"
@@ -396,7 +396,7 @@ export default function ScreenerPage() {
             }}
             className="w-10 bg-transparent text-sm font-bold text-amber-400 outline-none text-center"
           />
-          <span className="text-xs text-zinc-600">%</span>
+          <span className="text-xs text-zinc-400">%</span>
         </div>
 
         <div className="sm:ml-auto flex items-center gap-2 rounded bg-primary/10 px-4 py-2 border border-primary/20">
@@ -413,12 +413,12 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-1 rounded-xl border border-white/5 bg-zinc-950/50 p-1">
+        <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-zinc-950/50 p-1">
           <button
             onClick={() => setViewMode('grid')}
             className={cn(
               "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
-              viewMode === 'grid' ? "bg-white text-zinc-950" : "text-zinc-500 hover:text-zinc-200"
+              viewMode === 'grid' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
             )}
           >
             <LayoutGrid className="h-3.5 w-3.5" />
@@ -428,7 +428,7 @@ export default function ScreenerPage() {
             onClick={() => setViewMode('list')}
             className={cn(
               "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
-              viewMode === 'list' ? "bg-white text-zinc-950" : "text-zinc-500 hover:text-zinc-200"
+              viewMode === 'list' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
             )}
           >
             <Rows3 className="h-3.5 w-3.5" />
@@ -441,12 +441,12 @@ export default function ScreenerPage() {
       {loading ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded border border-dashed border-white/10 bg-white/5">
           <Loader2 className="h-10 w-10 animate-spin text-primary opacity-50" />
-          <span className="text-sm font-medium text-zinc-500 uppercase tracking-widest">Loading Market Data...</span>
+          <span className="text-sm font-medium text-zinc-400 uppercase tracking-widest">Loading Market Data...</span>
         </div>
       ) : sorted.length === 0 ? (
-        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded border border-dashed border-white/10 bg-white/5 text-zinc-500">
-          <div className="rounded bg-zinc-900 p-4 border border-white/5 mb-2">
-            <Search className="h-10 w-10 opacity-20" />
+        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded border border-dashed border-white/10 bg-white/5 text-zinc-400">
+          <div className="rounded bg-zinc-900 p-4 border border-white/10 mb-2">
+            <Search className="h-10 w-10 opacity-40" />
           </div>
           <div className="text-center">
              <h3 className="text-lg font-bold text-zinc-400">No candidates found</h3>
@@ -465,8 +465,8 @@ export default function ScreenerPage() {
           ))}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm">
-          <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] gap-3 border-b border-white/5 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+          <div className="grid grid-cols-[minmax(0,1.3fr)_repeat(6,minmax(0,0.7fr))_auto] gap-3 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">
             <div>Candidate</div>
             <div className="text-right">Strike</div>
             <div className="text-right">Premium</div>

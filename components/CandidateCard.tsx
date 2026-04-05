@@ -26,7 +26,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
     )}>
       {/* Background Glow */}
       <div className={cn(
-        "absolute -right-8 -top-8 h-24 w-24 rounded-full blur-3xl opacity-20 transition-opacity group-hover:opacity-40",
+        "absolute -right-8 -top-8 h-24 w-24 rounded-full blur-3xl opacity-40 transition-opacity group-hover:opacity-60",
         isGreen ? 'bg-emerald-500' : isYellow ? 'bg-amber-500' : 'bg-red-500'
       )} aria-hidden="true" />
 
@@ -53,13 +53,13 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
         {/* Contract Details */}
         <div className="mb-5 flex rounded bg-zinc-950/50 p-1 border border-white/10">
           <div className="flex-1 px-3 py-2 text-center">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">Strike</div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Strike</div>
             <div className="text-base font-bold text-white">${candidate.strike.toFixed(2)}</div>
           </div>
           <div className="my-2 w-px bg-white/20" />
           <div className="flex-1 px-3 py-2 text-center">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">Expiry</div>
-            <div className="text-base font-bold text-zinc-200">{candidate.expiry} <span className="text-[11px] text-zinc-500">({candidate.dte}d)</span></div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Expiry</div>
+            <div className="text-base font-bold text-zinc-200">{candidate.expiry} <span className="text-[11px] text-zinc-400">({candidate.dte}d)</span></div>
           </div>
         </div>
 
@@ -114,7 +114,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
           inQueue
             ? "bg-emerald-900/40 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-900/60"
             : disabled
-            ? "bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed"
+            ? "bg-zinc-800 text-zinc-400 border border-zinc-700 cursor-not-allowed"
             : "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/50 hover:-translate-y-0.5 active:translate-y-0"
         )}
       >

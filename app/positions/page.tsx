@@ -108,7 +108,7 @@ export default function PositionsPage() {
   const getPnLColor = (pnl: number) => {
     if (pnl > 0) return 'text-emerald-400';
     if (pnl < 0) return 'text-red-400';
-    return 'text-zinc-500';
+    return 'text-zinc-400';
   };
 
   const getTypeBadge = (pos: Position) => {
@@ -125,7 +125,7 @@ export default function PositionsPage() {
     if (pos.assetType === 'OPTION') {
       return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded font-bold uppercase tracking-tight">Option</span>;
     }
-    return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-500 rounded font-bold uppercase tracking-tight">Equity</span>;
+    return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded font-bold uppercase tracking-tight">Equity</span>;
   };
 
   const filtered = positions.filter(p => {
@@ -139,10 +139,10 @@ export default function PositionsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between border-b border-white/5 pb-6 mt-2">
+      <div className="flex items-center justify-between border-b border-white/10 pb-6 mt-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Positions</h1>
-          <p className="text-sm text-zinc-500 mt-1">Real-time data feed from <span className="text-zinc-300 font-medium">{brokerLabel}</span></p>
+          <p className="text-sm text-zinc-400 mt-1">Real-time data feed from <span className="text-zinc-300 font-medium">{brokerLabel}</span></p>
         </div>
         <button 
           onClick={fetchPositions} 
@@ -154,17 +154,17 @@ export default function PositionsPage() {
       </div>
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center border border-dashed border-white/5 rounded">
+        <div className="flex h-64 items-center justify-center border border-dashed border-white/10 rounded">
           <Loader2 className="h-8 w-8 animate-spin text-zinc-700" />
         </div>
       ) : needsAuth ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/5 bg-white/5 p-8 text-center rounded backdrop-blur-sm">
-          <div className="rounded bg-zinc-900 p-4 border border-white/5 shadow-xl">
-             <Key className="h-8 w-8 text-zinc-500" />
+        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/10 bg-white/5 p-8 text-center rounded backdrop-blur-sm">
+          <div className="rounded bg-zinc-900 p-4 border border-white/10 shadow-xl">
+             <Key className="h-8 w-8 text-zinc-400" />
           </div>
           <div>
             <p className="text-lg font-bold text-white">Authentication required</p>
-            <p className="text-sm text-zinc-500 mt-1">Link your {brokerLabel} account to view live portfolio data</p>
+            <p className="text-sm text-zinc-400 mt-1">Link your {brokerLabel} account to view live portfolio data</p>
           </div>
           <button
             onClick={handleConnect}
@@ -180,9 +180,9 @@ export default function PositionsPage() {
           <p className="text-base font-medium text-red-400">{error}</p>
         </div>
       ) : positions.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-dashed border-white/5 bg-white/5 text-zinc-500 rounded">
-          <div className="rounded bg-zinc-900 p-4 border border-white/5">
-            <BarChart3 className="h-10 w-10 opacity-20" />
+        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-dashed border-white/10 bg-white/5 text-zinc-400 rounded">
+          <div className="rounded bg-zinc-900 p-4 border border-white/10">
+            <BarChart3 className="h-10 w-10 opacity-40" />
           </div>
           <span className="text-sm font-medium">No active positions found</span>
         </div>
@@ -190,19 +190,19 @@ export default function PositionsPage() {
         <>
           {/* Summary Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-zinc-900/40 border border-white/5 p-4 rounded backdrop-blur-sm shadow-sm">
-              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Net Liquidity</div>
+            <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Net Liquidity</div>
               <div className="text-2xl font-bold text-white mt-1.5">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
-            <div className="bg-zinc-900/40 border border-white/5 p-4 rounded backdrop-blur-sm shadow-sm">
-              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Day Profit / Loss</div>
+            <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Day Profit / Loss</div>
               <div className={cn("text-2xl font-bold mt-1.5 flex items-center gap-2", getPnLColor(totalDayPnL))}>
                 {totalDayPnL >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
                 ${Math.abs(totalDayPnL).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="bg-zinc-900/40 border border-white/5 p-4 rounded backdrop-blur-sm shadow-sm">
-              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Active Assets</div>
+            <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Active Assets</div>
               <div className="text-2xl font-bold text-zinc-100 mt-1.5">{positions.length}</div>
             </div>
             <div className="bg-white/5 border border-white/10 p-2 rounded flex items-center justify-center gap-1">
@@ -210,7 +210,7 @@ export default function PositionsPage() {
                   <button key={f} onClick={() => setFilter(f)}
                     className={cn(
                       "flex-1 h-full px-3 py-2 text-xs font-bold transition-all rounded",
-                      filter === f ? "bg-white/10 text-white shadow-sm border border-white/10" : "text-zinc-500 hover:text-zinc-300"
+                      filter === f ? "bg-white/10 text-white shadow-sm border border-white/10" : "text-zinc-400 hover:text-zinc-300"
                     )}>
                     {f}
                   </button>
@@ -219,11 +219,11 @@ export default function PositionsPage() {
           </div>
 
           {/* Positions Table */}
-          <div className="border border-white/5 rounded overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
+          <div className="border border-white/10 rounded overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead>
-                  <tr className="bg-white/5 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                  <tr className="bg-white/5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider border-b border-white/10">
                     <th className="px-6 py-4">Symbol</th>
                     <th className="px-6 py-4">Type</th>
                     <th className="px-6 py-4 text-right">Quantity</th>
@@ -250,7 +250,7 @@ export default function PositionsPage() {
                           {pos.dayPnLPct >= 0 ? '▲' : '▼'} {Math.abs(pos.dayPnLPct).toFixed(2)}%
                         </span>
                       </td>
-                      <td className="px-6 py-4 hidden lg:table-cell text-xs text-zinc-500 font-medium truncate max-w-[200px]">
+                      <td className="px-6 py-4 hidden lg:table-cell text-xs text-zinc-400 font-medium truncate max-w-[200px]">
                         {pos.description}
                       </td>
                     </tr>

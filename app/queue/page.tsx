@@ -53,10 +53,10 @@ export default function QueuePage() {
   return (
     <div className="flex flex-col gap-4">
       {/* Header Area */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-6 mt-2">
+      <div className="flex items-center justify-between border-b border-white/10 pb-6 mt-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Trade Queue</h1>
-          <p className="text-sm text-zinc-500 mt-1 font-medium">Order review and batch execution center</p>
+          <p className="text-sm text-zinc-400 mt-1 font-medium">Order review and batch execution center</p>
         </div>
       </div>
 
@@ -83,20 +83,20 @@ export default function QueuePage() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-zinc-900/40 border border-white/5 p-4 rounded backdrop-blur-sm shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Total Orders</div>
+        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Total Orders</div>
           <div className="text-2xl font-bold text-white">{queue.length}</div>
         </div>
-        <div className="bg-zinc-900/40 border border-white/5 p-4 rounded backdrop-blur-sm shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Est. Premium</div>
+        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Est. Premium</div>
           <div className="text-2xl font-bold terminal-green">${totalPremium.toFixed(0)}</div>
         </div>
-        <div className="bg-zinc-900/40 border border-white/5 p-4 rounded backdrop-blur-sm shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Max Risk</div>
+        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Max Risk</div>
           <div className="text-2xl font-bold text-zinc-200">${totalMaxLoss.toLocaleString()}</div>
         </div>
-        <div className="bg-zinc-900/40 border border-white/5 p-4 rounded backdrop-blur-sm shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Cap. Impact</div>
+        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Cap. Impact</div>
           <div className={cn(
             "text-2xl font-bold",
             deployedPct > 50 ? 'terminal-red' : deployedPct > 30 ? 'terminal-amber' : 'terminal-green'
@@ -109,7 +109,7 @@ export default function QueuePage() {
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Order Review List */}
         <div className="lg:col-span-2 flex flex-col gap-4">
-          <div className="bg-zinc-900/20 border border-white/5 p-4 rounded backdrop-blur-sm">
+          <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-sm">
             <div className="flex items-center gap-3 mb-6 px-1">
                <ListChecks className="h-5 w-5 text-primary" />
                <span className="text-base font-bold text-zinc-100 tracking-tight">Order Review</span>
@@ -120,7 +120,7 @@ export default function QueuePage() {
             ) : queue.length === 0 ? (
               <div className="flex h-48 flex-col items-center justify-center border border-dashed border-white/10 bg-white/5 rounded">
                 <ShieldCheck className="h-10 w-10 text-zinc-800 mb-2" />
-                <span className="text-sm font-medium text-zinc-600">The execution queue is currently empty</span>
+                <span className="text-sm font-medium text-zinc-400">The execution queue is currently empty</span>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
@@ -138,13 +138,13 @@ export default function QueuePage() {
                  <CheckCircle2 className="h-5 w-5 terminal-green" />
                  <span className="text-base font-bold terminal-green tracking-tight">Batch Execution Complete</span>
               </div>
-              <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 px-1">
+              <div className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6 px-1">
                 {executionResult.summary.filled} Filled • {executionResult.summary.failed} Failed
               </div>
               <div className="space-y-2">
                 {executionResult.results.map((r, i) => (
                   <div key={i} className={cn(
-                    "flex items-center justify-between border border-white/5 px-4 py-3 text-sm rounded shadow-sm",
+                    "flex items-center justify-between border border-white/10 px-4 py-3 text-sm rounded shadow-sm",
                     r.status === 'FILLED' ? "bg-emerald-500/10 terminal-green" : "bg-red-500/10 terminal-red"
                   )}>
                     <span className="font-bold">{r.symbol}</span>
@@ -181,7 +181,7 @@ export default function QueuePage() {
                   onClick={() => setShowConfirm(true)}
  
                   disabled={executing || !!accountError || (reviewResult?.blockers && reviewResult.blockers.length > 0)}
-                  className="group relative flex w-full items-center justify-center gap-2 rounded bg-gradient-to-r from-emerald-600 to-teal-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:shadow-emerald-600/40 active:translate-y-0 disabled:opacity-30 disabled:grayscale"
+                  className="group relative flex w-full items-center justify-center gap-2 rounded bg-gradient-to-r from-emerald-600 to-teal-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:shadow-emerald-600/40 active:translate-y-0 disabled:opacity-50 disabled:grayscale"
 
                 >
                   <Zap className="h-4 w-4" />
@@ -211,9 +211,9 @@ export default function QueuePage() {
         </div>
 
         {/* Sector Exposure Sidebar */}
-        <div className="bg-zinc-900/20 border border-white/5 p-4 rounded backdrop-blur-sm self-start">
+        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-sm self-start">
            <div className="flex items-center gap-2 mb-6">
-              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Queue Composition</span>
+              <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Queue Composition</span>
            </div>
            <SectorChart data={sectorData} />
         </div>

@@ -11,7 +11,7 @@ export default function ScenarioTable({ scenarios, totalValue }: ScenarioTablePr
   if (scenarios.length === 0) {
     return (
       <div className="flex h-32 items-center justify-center rounded border border-zinc-800 bg-zinc-900/50">
-        <p className="text-sm text-zinc-500">No scenario data available</p>
+        <p className="text-sm text-zinc-400">No scenario data available</p>
       </div>
     );
   }
@@ -20,11 +20,11 @@ export default function ScenarioTable({ scenarios, totalValue }: ScenarioTablePr
     <div className="overflow-hidden rounded border border-zinc-800 bg-zinc-900/50">
       <div className="border-b border-zinc-800 px-4 py-3">
         <h3 className="text-sm font-semibold text-zinc-300">Crash Scenario Stress Test</h3>
-        <p className="text-xs text-zinc-500 mt-0.5">Estimated portfolio impact under market drawdowns</p>
+        <p className="text-xs text-zinc-400 mt-0.5">Estimated portfolio impact under market drawdowns</p>
       </div>
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-zinc-800/50 text-xs text-zinc-500">
+          <tr className="border-b border-zinc-800/50 text-xs text-zinc-400">
             <th className="px-4 py-2.5 text-left font-medium">Scenario</th>
             <th className="px-4 py-2.5 text-right font-medium">Market Move</th>
             <th className="px-4 py-2.5 text-right font-medium">Est. P&L</th>

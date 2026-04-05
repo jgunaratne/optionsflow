@@ -38,13 +38,13 @@ export default function ChatPage() {
   return (
     <div className="flex h-[calc(100vh-10rem)] flex-col">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4 mt-2">
+      <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-4 mt-2">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             AI Intelligence Console
           </h1>
-          <p className="text-sm text-zinc-500 mt-1 font-medium">Quant-driven insights and portfolio analysis</p>
+          <p className="text-sm text-zinc-400 mt-1 font-medium">Quant-driven insights and portfolio analysis</p>
         </div>
         {messages.length > 0 && (
           <button onClick={() => { clearHistory(); }}
@@ -56,7 +56,7 @@ export default function ChatPage() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto border border-white/5 bg-zinc-950/50 backdrop-blur-sm p-4 space-y-6 rounded shadow-inner">
+      <div className="flex-1 overflow-y-auto border border-white/10 bg-zinc-950/50 backdrop-blur-sm p-4 space-y-6 rounded shadow-inner">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-6">
             <div className="relative">
@@ -67,12 +67,12 @@ export default function ChatPage() {
             </div>
             <div className="text-center">
               <h3 className="text-lg font-bold text-white tracking-tight">System Ready</h3>
-              <p className="text-sm text-zinc-500 mt-1">Ask anything about your portfolio or the markets</p>
+              <p className="text-sm text-zinc-400 mt-1">Ask anything about your portfolio or the markets</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl w-full">
               {STARTER_PROMPTS.map((prompt, i) => (
                 <button key={i} onClick={() => { setInput(prompt); }}
-                  className="group flex items-center justify-between border border-white/5 bg-white/5 px-5 py-4 text-left text-xs font-bold text-zinc-400 transition-all hover:border-primary/50 hover:bg-primary/5 hover:text-zinc-200 rounded">
+                  className="group flex items-center justify-between border border-white/10 bg-white/5 px-5 py-4 text-left text-xs font-bold text-zinc-400 transition-all hover:border-primary/50 hover:bg-primary/5 hover:text-zinc-200 rounded">
                   <span>{prompt}</span>
                   <div className="h-5 w-5 rounded bg-zinc-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                      <Send className="h-3 w-3 text-primary" />
@@ -95,7 +95,7 @@ export default function ChatPage() {
                   "max-w-[80%] border px-5 py-4 text-sm leading-relaxed shadow-sm rounded",
                   msg.role === 'user'
                     ? "border-zinc-800 bg-zinc-900 text-zinc-200 rounded-tr-none"
-                    : "border-white/5 bg-white/5 text-zinc-100 rounded-tl-none"
+                    : "border-white/10 bg-white/5 text-zinc-100 rounded-tl-none"
                 )}>
                   <div className="whitespace-pre-wrap">{msg.content}</div>
                 </div>
@@ -106,7 +106,7 @@ export default function ChatPage() {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-primary/30 bg-zinc-900 text-primary rounded animate-pulse">
                   <Loader2 className="h-5 w-5 animate-spin" />
                 </div>
-                <div className="bg-white/5 border border-white/5 px-5 py-4 rounded rounded-tl-none flex items-center gap-3">
+                <div className="bg-white/5 border border-white/10 px-5 py-4 rounded rounded-tl-none flex items-center gap-3">
                   <div className="flex gap-1">
                     <div className="h-1.5 w-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
                     <div className="h-1.5 w-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
@@ -134,7 +134,7 @@ export default function ChatPage() {
             disabled={loading}
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-             <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-white/10 bg-white/5 px-1.5 font-mono text-[10px] font-medium text-zinc-500 opacity-100">
+             <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-white/10 bg-white/5 px-1.5 font-mono text-[10px] font-medium text-zinc-400 opacity-100">
                <span className="text-xs">↵</span> Enter
              </kbd>
           </div>
@@ -142,7 +142,7 @@ export default function ChatPage() {
         <button 
           onClick={handleSend} 
           disabled={loading || !input.trim()}
-          className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-blue-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 disabled:grayscale rounded transition-all"
+          className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-blue-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:grayscale rounded transition-all"
         >
           <Send className="h-4 w-4" />
           <span>Execute</span>
