@@ -239,7 +239,6 @@ export default function ScreenerPage() {
     }
   });
   const eligibleCount = sorted.filter((candidate) => candidate.is_eligible === 1).length;
-  const topPicks = sorted.filter((candidate) => candidate.is_eligible === 1).slice(0, 3);
 
   const handleRunScreener = async () => {
     setScreenerRunning(true);
@@ -329,170 +328,98 @@ export default function ScreenerPage() {
   const progressPercent = progress && progress.totalSymbols > 0
     ? Math.round((progress.currentIndex / progress.totalSymbols) * 100)
     : 0;
-  const dataAsOfLabel = lastScreenedAt
-    ? new Date(lastScreenedAt * 1000).toLocaleString()
-    : 'No screener data yet';
 
   return (
     <div className="flex flex-col gap-6">
       {/* Header Section */}
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Screener</h1>
-          <div className="mt-2 flex items-center gap-6 text-sm text-zinc-400 font-medium">
-             <div className="flex items-center gap-1.5">
-               <Calendar className="h-4 w-4 text-zinc-400" />
-               <span>Last run: {lastScreenedAt ? new Date(lastScreenedAt * 1000).toLocaleString() : 'Never'}</span>
+          <div className="mt-2 flex items-center gap-4 text-xs font-medium">
+             <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-2xl-full border border-emerald-500/20">
+               <Layers className="h-3 w-3" />
+               <span>{eligibleCount} eligible</span>
              </div>
-             <div className="flex items-center gap-1.5">
-               <Layers className="h-4 w-4 text-zinc-600" />
-               <span className="text-emerald-400">{eligibleCount} eligible</span>
-               <span className="text-zinc-600">/</span>
+             <div className="flex items-center gap-1.5 text-zinc-500 bg-white/5 px-2 py-0.5 rounded-2xl-full border border-white/10">
                <span>{candidates.length} screened</span>
+             </div>
+             <div className="flex items-center gap-1.5 text-zinc-500">
+               <Calendar className="h-3.5 w-3.5" />
+               <span>{lastScreenedAt ? new Date(lastScreenedAt * 1000).toLocaleString() : 'Never'}</span>
              </div>
           </div>
         </div>
 
-        <button
-          onClick={handleRunScreener}
-          disabled={screenerRunning}
-          className={cn(
-            "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl px-6 py-3 text-sm font-bold transition-all duration-300",
-            screenerRunning
-              ? "bg-zinc-900 text-zinc-400 border border-white/10"
-              : "bg-gradient-to-r from-zinc-600 to-zinc-800 text-white shadow-lg shadow-black/40 hover:shadow-black/60 hover:-translate-y-0.5 active:translate-y-0"
-          )}
-        >
-          {screenerRunning ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Scanning Markets...</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 fill-current" />
-              <span>Run Screener</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleApplySaferPreset}
+            disabled={applyingPreset}
+            className="inline-flex h-11 items-center justify-center rounded-2xl-xl bg-zinc-900 border border-white/10 px-4 text-sm font-bold text-zinc-300 transition-all hover:bg-zinc-800 disabled:opacity-50"
+          >
+            {applyingPreset ? 'Applying...' : 'Safer Preset'}
+          </button>
+          <button
+            onClick={handleRunScreener}
+            disabled={screenerRunning}
+            className={cn(
+              "relative inline-flex h-11 items-center justify-center gap-2 overflow-hidden rounded-2xl-xl px-6 text-sm font-bold transition-all duration-300",
+              screenerRunning
+                ? "bg-zinc-900 text-zinc-400 border border-white/10"
+                : "bg-white text-zinc-950 shadow-lg hover:bg-zinc-200 active:scale-95"
+            )}
+          >
+            {screenerRunning ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Scanning...</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 fill-current" />
+                <span>Run Screener</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Progress Monitor */}
       {progress && progress.running && (
-        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 p-1 backdrop-blur-md shadow-xl">
-          <div className="rounded-2xl bg-zinc-950/40 p-6">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-white uppercase tracking-wider">{progress.status}</div>
-                  <div className="text-sm font-medium text-zinc-400">
-                    {progress.currentSymbol ? `Analyzing ${progress.currentSymbol}...` : 'Initializing scan...'}
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-bold text-white">{progressPercent}%</div>
-                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                  {progress.candidatesFound} found
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <div>
+                <div className="text-sm font-bold text-white">{progress.status}</div>
+                <div className="text-xs text-zinc-400">
+                  {progress.currentSymbol ? `Analyzing ${progress.currentSymbol}...` : 'Initializing scan...'}
                 </div>
               </div>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-2xl-full bg-white/5">
-              <div
-                className="h-full rounded-2xl-full bg-gradient-to-r from-zinc-500 to-zinc-700 transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              />
+            <div className="text-right">
+              <div className="text-lg font-bold text-white">{progressPercent}%</div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                {progress.candidatesFound} found
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Live Activity Feed */}
-      {progress && progress.logs && progress.logs.length > 0 && (
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/40 backdrop-blur-md shadow-xl">
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-white/[0.02]">
-            <div className="flex items-center gap-2">
-              <div className={cn(
-                "h-2 w-2 rounded-2xl-full",
-                progress.running ? "bg-emerald-400 animate-pulse" : "bg-zinc-600"
-              )} />
-              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Activity Log</span>
-            </div>
-            <span className="text-[10px] font-medium text-zinc-400">
-              {progress.logs.length} events
-            </span>
-          </div>
-          <div className="max-h-48 overflow-y-auto p-2 space-y-0.5 scroll-smooth" ref={logsEndRef}>
-            {progress.logs.map((log, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "flex items-start gap-2 px-3 py-1.5 rounded-2xl text-sm font-medium transition-colors",
-                  log.type === 'skip' && "text-zinc-400",
-                  log.type === 'info' && "text-zinc-300",
-                  log.type === 'found' && "text-emerald-400 bg-emerald-500/5",
-                  log.type === 'error' && "text-red-400 bg-red-500/5",
-                )}
-              >
-                <span className="shrink-0 mt-px">
-                  {log.type === 'skip' && '⏭'}
-                  {log.type === 'info' && '⚡'}
-                  {log.type === 'found' && '✅'}
-                  {log.type === 'error' && '❌'}
-                </span>
-                {log.symbol && (
-                  <span className={cn(
-                    "shrink-0 font-bold min-w-[4ch]",
-                    log.type === 'found' ? "text-emerald-300" : "text-zinc-400"
-                  )}>
-                    {log.symbol}
-                  </span>
-                )}
-                <span className="truncate">{log.message}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {progress && !progress.running && progress.status.includes('Schwab not connected') && (
-        <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-amber-500/5 p-1 backdrop-blur-md shadow-xl">
-          <div className="rounded-2xl bg-zinc-950/30 p-5">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400">
-                  <KeyRound className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold uppercase tracking-wider text-amber-400">Schwab connection required</p>
-                  <p className="mt-1 text-sm text-zinc-300">
-                    The options screener needs Schwab market data. Connect your Schwab account from the Positions page, then run the screener again.
-                  </p>
-                </div>
-              </div>
-              <Link
-                href="/positions"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-zinc-600 to-zinc-800 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/40 transition-all hover:shadow-black/60"
-              >
-                Connect Schwab
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+          <div className="h-1 w-full overflow-hidden rounded-2xl-full bg-white/5">
+            <div
+              className="h-full rounded-2xl-full bg-white transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            />
           </div>
         </div>
       )}
 
       {/* Toolbar & Filters */}
-      <div className="flex flex-wrap items-center gap-5 bg-white/5 p-3 border border-white/10 rounded-2xl backdrop-blur-md shadow-xl">
-        <div className="flex items-center gap-2 rounded-2xl bg-zinc-950/30 px-3 py-2 border border-white/10">
-          <Filter className="h-4 w-4 text-zinc-400" />
+      <div className="flex flex-wrap items-center gap-6 bg-white/5 border border-white/10 px-5 py-3 rounded-2xl-xl">
+        <div className="flex items-center gap-2">
+          <Filter className="h-3.5 w-3.5 text-zinc-500" />
           <select
             value={filters.strategy || ''}
             onChange={(e) => { setFilters({ strategy: e.target.value || undefined }); fetchCandidates(); }}
-            className="bg-transparent text-sm font-medium text-zinc-300 outline-none cursor-pointer"
+            className="bg-transparent text-sm font-semibold text-zinc-300 outline-none cursor-pointer"
           >
             <option value="" className="bg-zinc-900">All Strategies</option>
             <option value="CSP" className="bg-zinc-900">Cash Secured Put</option>
@@ -502,12 +429,14 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded-2xl bg-zinc-950/30 px-3 py-2 border border-white/10">
-          <span className="text-sm font-bold text-zinc-400 uppercase tracking-tight">Flag:</span>
+        <div className="h-4 w-px bg-white/10" />
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Flag:</span>
           <select
             value={filters.flag || ''}
             onChange={(e) => { setFilters({ flag: e.target.value || undefined }); fetchCandidates(); }}
-            className="bg-transparent text-sm font-medium text-zinc-300 outline-none cursor-pointer"
+            className="bg-transparent text-sm font-semibold text-zinc-300 outline-none cursor-pointer"
           >
             <option value="" className="bg-zinc-900">All</option>
             <option value="GREEN" className="bg-zinc-900">Green</option>
@@ -516,8 +445,10 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded-2xl bg-zinc-950/30 px-3 py-2 border border-white/10">
-          <span className="text-sm font-bold text-zinc-400 uppercase tracking-tight">Min Pop:</span>
+        <div className="h-4 w-px bg-white/10" />
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Min Pop:</span>
           <input
             type="number"
             min="0" max="100" step="5"
@@ -527,9 +458,11 @@ export default function ScreenerPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2 rounded-2xl bg-zinc-950/30 px-3 py-2 border border-white/10">
-          <Gauge className="h-4 w-4 text-amber-500" />
-          <span className="text-sm font-bold text-zinc-400 uppercase tracking-tight">Hype Score ≥</span>
+        <div className="h-4 w-px bg-white/10" />
+
+        <div className="flex items-center gap-2">
+          <Gauge className="h-3.5 w-3.5 text-zinc-500" />
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Hype ≥</span>
           <input
             type="number"
             min="0" max="100" step="5"
@@ -543,31 +476,19 @@ export default function ScreenerPage() {
                 body: JSON.stringify({ iv_rank_min: val }),
               }).catch(() => {});
             }}
-            className="w-10 bg-transparent text-sm font-bold text-amber-400 outline-none text-center"
+            className="w-10 bg-transparent text-sm font-bold text-zinc-100 outline-none text-center"
           />
-          <span className="text-sm text-zinc-400">%</span>
+          <span className="text-xs text-zinc-500">%</span>
         </div>
 
-        <div className="sm:ml-auto flex items-center gap-2 rounded-2xl bg-primary/10 px-4 py-2 border border-primary/20">
-          <SortDesc className="h-4 w-4 text-primary" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-transparent text-sm font-bold text-primary outline-none cursor-pointer"
-          >
-            <option value="ai_score" className="bg-zinc-900 text-zinc-200">AI Score</option>
-            <option value="pop" className="bg-zinc-900 text-zinc-200">Win Chance</option>
-            <option value="premium" className="bg-zinc-900 text-zinc-200">Cash Earned</option>
-            <option value="iv_rank" className="bg-zinc-900 text-zinc-200">Hype Score</option>
-          </select>
-        </div>
+        <div className="h-4 w-px bg-white/10" />
 
-        <div className="flex items-center gap-1 rounded-2xl-xl border border-white/10 bg-zinc-950/30 p-1">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => updateUniverseSetting('watchlist')}
             className={cn(
-              "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
-              screenerUniverse === 'watchlist' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
+              "px-3 py-1.5 text-xs font-bold transition-all rounded-2xl-lg",
+              screenerUniverse === 'watchlist' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
             )}
           >
             Watchlist
@@ -575,8 +496,8 @@ export default function ScreenerPage() {
           <button
             onClick={() => updateUniverseSetting('sp500')}
             className={cn(
-              "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors",
-              screenerUniverse === 'sp500' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
+              "px-3 py-1.5 text-xs font-bold transition-all rounded-2xl-lg",
+              screenerUniverse === 'sp500' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
             )}
           >
             S&amp;P 500
@@ -584,8 +505,8 @@ export default function ScreenerPage() {
         </div>
 
         {screenerUniverse === 'sp500' && (
-          <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">Batch Size</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Batch</span>
             <input
               type="number"
               min="25"
@@ -602,162 +523,94 @@ export default function ScreenerPage() {
           </div>
         )}
 
-        <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-zinc-950/50 p-1">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-2xl-lg px-3 py-2 text-sm font-bold transition-colors",
-              viewMode === 'grid' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
-            )}
-          >
-            <LayoutGrid className="h-3.5 w-3.5" />
-            Grid
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-2xl-lg px-3 py-2 text-sm font-bold transition-colors",
-              viewMode === 'list' ? "bg-white text-zinc-950" : "text-zinc-400 hover:text-zinc-200"
-            )}
-          >
-            <Rows3 className="h-3.5 w-3.5" />
-            List
-          </button>
-        </div>
-      </div>
+        <div className="sm:ml-auto flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <SortDesc className="h-3.5 w-3.5 text-zinc-500" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-transparent text-sm font-semibold text-zinc-300 outline-none cursor-pointer"
+            >
+              <option value="ai_score" className="bg-zinc-900 text-zinc-200">AI Score</option>
+              <option value="pop" className="bg-zinc-900 text-zinc-200">Win Chance</option>
+              <option value="premium" className="bg-zinc-900 text-zinc-200">Cash Earned</option>
+              <option value="iv_rank" className="bg-zinc-900 text-zinc-200">Hype Score</option>
+            </select>
+          </div>
 
-      <div className="grid gap-5 rounded-2xl border border-white/10 bg-zinc-900/20 p-6 text-sm text-zinc-300 md:grid-cols-3">
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3">
-          <div className="text-sm font-bold uppercase tracking-wider text-emerald-400">Best Pick</div>
-          <p className="mt-1">Green cards are the app’s favorite ideas. If you want the clearest starting point, look here first.</p>
-        </div>
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3">
-          <div className="text-sm font-bold uppercase tracking-wider text-amber-400">Maybe</div>
-          <p className="mt-1">Yellow cards have some good signs, but they are not as clean. Check them before buying.</p>
-        </div>
-        <div className="rounded-2xl border border-zinc-700 bg-zinc-800/60 p-3">
-          <div className="text-sm font-bold uppercase tracking-wider text-zinc-300">Skip</div>
-          <p className="mt-1">Gray cards did not make the cut. They stay on screen so you can see what was rejected and why.</p>
-        </div>
-      </div>
+          <div className="h-4 w-px bg-white/10" />
 
-      <div className="flex flex-col gap-5 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-sm text-zinc-300 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div className="text-sm font-bold uppercase tracking-wider text-primary">Safer Short-Term Mode</div>
-          <p className="mt-1">This preset looks for options with a better chance of working soon, not the biggest payout.</p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={cn(
+                "p-1.5 rounded-2xl-lg transition-colors",
+                viewMode === 'grid' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
+              )}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                "p-1.5 rounded-2xl-lg transition-colors",
+                viewMode === 'list' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
+              )}
+            >
+              <Rows3 className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-        <button
-          onClick={handleApplySaferPreset}
-          disabled={applyingPreset}
-          className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-primary to-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {applyingPreset ? 'Applying...' : 'Use Safer Settings'}
-        </button>
-      </div>
-
-      <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-300">
-        <span className="font-bold text-white">Data as of:</span> {dataAsOfLabel}
-      </div>
-
-      <div className="rounded border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-300">
-        <span className="font-bold text-white">Universe:</span> {screenerUniverse === 'sp500' ? `S&P 500 (rotating batch of ${sp500BatchSize})` : 'Watchlist'}
       </div>
 
       {universeSummary && (
-        <div className="rounded border border-white/10 bg-zinc-900/40 p-4 text-sm text-zinc-300">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-zinc-500">Stocks Being Screened</div>
-              <p className="mt-1 text-white">
-                {universeSummary.mode === 'watchlist'
-                  ? `The screener is checking these ${universeSummary.symbols.length} watchlist names right now.`
-                  : `The screener is checking this batch of ${universeSummary.symbols.length} stocks from the S&P 500 right now.`}
-              </p>
-            </div>
-            <div className="text-xs font-medium text-zinc-400">
-              {universeSummary.mode === 'sp500' && universeSummary.startIndex !== null
-                ? `Batch ${universeSummary.startIndex + 1}-${(universeSummary.startIndex || 0) + universeSummary.symbols.length} of ${universeSummary.totalAvailable}`
-                : `${universeSummary.totalAvailable} total symbols`}
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-4 px-1 border-b border-white/5 pb-4">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Universe Settings</div>
+            <p className="mt-0.5 text-sm font-medium text-zinc-400">
+              {universeSummary.mode === 'watchlist'
+                ? `Currently scanning ${universeSummary.symbols.length} names from your watchlist.`
+                : `Scanning a rotating batch of ${universeSummary.symbols.length} stocks from the S&P 500.`}
+            </p>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {universeSummary.symbols.map((symbol) => (
-              <span
-                key={symbol}
-                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-zinc-200"
-              >
-                {symbol}
-              </span>
-            ))}
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+            {universeSummary.mode === 'sp500' && universeSummary.startIndex !== null
+              ? `Batch ${universeSummary.startIndex + 1}-${(universeSummary.startIndex || 0) + universeSummary.symbols.length} of ${universeSummary.totalAvailable}`
+              : `${universeSummary.totalAvailable} total symbols`}
           </div>
         </div>
       )}
 
-      {topPicks.length > 0 && (
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6">
-          <div className="flex items-center justify-between gap-5">
-            <div>
-              <h2 className="text-lg font-bold text-white">Start Here</h2>
-              <p className="mt-1 text-sm text-zinc-300">If you want the simplest answer, these are the first contracts to look at.</p>
-            </div>
-            <div className="text-sm font-bold uppercase tracking-wider text-emerald-400">Top 3 picks</div>
-          </div>
-          <div className="mt-4 grid gap-5 md:grid-cols-3">
-            {topPicks.map((candidate, index) => (
-              <div key={candidate.id} className="rounded-2xl border border-white/10 bg-zinc-950/50 p-6">
-                <div className="flex items-center justify-between gap-5">
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Pick {index + 1}</div>
-                    <div className="mt-1 text-xl font-bold text-white">{candidate.symbol}</div>
-                  </div>
-                  <div className="rounded-2xl-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
-                    {getRecommendation(candidate).label}
-                  </div>
-                </div>
-                <div className="mt-3 text-sm text-zinc-300">
-                  Sell the <span className="font-bold text-white">${candidate.strike.toFixed(2)}</span> put that ends on <span className="font-bold text-white">{candidate.expiry}</span>.
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {getSimpleReasons(candidate).map((reason) => (
-                    <span key={reason} className="rounded-2xl-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-zinc-300">
-                      {reason}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                  <div className="rounded-2xl bg-white/5 p-2">
-                    <div className="text-zinc-500">Chance it works</div>
-                    <div className="mt-1 font-bold text-white">{(candidate.pop * 100).toFixed(0)}%</div>
-                  </div>
-                  <div className="rounded-2xl bg-white/5 p-2">
-                    <div className="text-zinc-500">Money in</div>
-                    <div className="mt-1 font-bold text-emerald-400">${candidate.premium.toFixed(2)}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="flex items-center gap-6 px-1 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-2xl-full bg-emerald-500" />
+          Best Pick
         </div>
-      )}
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-2xl-full bg-amber-500" />
+          Maybe
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-2xl-full bg-zinc-700" />
+          Skip
+        </div>
+      </div>
 
       {/* Content Grid */}
       {loading ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/10 bg-white/5">
-          <Loader2 className="h-10 w-10 animate-spin text-primary opacity-50" />
-          <span className="text-sm font-medium text-zinc-400 uppercase tracking-widest">Loading Market Data...</span>
+          <Loader2 className="h-10 w-10 animate-spin text-zinc-500" />
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Loading Market Data...</span>
         </div>
       ) : sorted.length === 0 ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-white/10 bg-white/5 text-zinc-400">
-          <div className="rounded-2xl bg-zinc-900 p-6 border border-white/10 mb-2">
-            <Search className="h-10 w-10 opacity-40" />
-          </div>
           <div className="text-center">
-             <h3 className="text-lg font-bold text-zinc-400">No candidates found</h3>
-             <p className="text-sm max-w-xs mt-1">Adjust your filters or run the screener to find new opportunities.</p>
+             <h3 className="text-lg font-bold text-white">No candidates found</h3>
+             <p className="text-sm mt-1 text-zinc-500">Adjust your filters or run the screener.</p>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           <CandidateScatterChart candidates={sorted} />
 
           {viewMode === 'grid' ? (
@@ -772,15 +625,16 @@ export default function ScreenerPage() {
               ))}
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-xl">
+            <div className="overflow-x-auto border border-white/10 bg-white/5 rounded-2xl">
               <div className="min-w-[1000px]">
-                <div className="grid grid-cols-[1fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_2fr_100px] gap-6 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">                <div>Candidate</div>
+                <div className="grid grid-cols-[1fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_2fr_100px] gap-6 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
+                <div>Candidate</div>
                 <div className="text-right">Strike</div>
-                <div className="text-right">Cash Earned</div>
+                <div className="text-right">Cash</div>
                 <div className="text-right">Risk</div>
-                <div className="text-right">Win Chance</div>
-                <div className="text-right">Hype Score</div>
-                <div className="text-right">Direction Risk</div>
+                <div className="text-right">Win %</div>
+                <div className="text-right">Hype</div>
+                <div className="text-right">Delta</div>
                 <div>AI Brief</div>
                 <div className="text-right">Action</div>
               </div>
@@ -795,7 +649,8 @@ export default function ScreenerPage() {
                 ))}
                 </div>
                 </div>
-                </div>          )}
+                </div>
+          )}
         </div>
       )}    </div>
   );

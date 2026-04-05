@@ -71,32 +71,26 @@ export default function PortfolioPage() {
       )}
 
       {/* Summary Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl flex flex-col items-center justify-center backdrop-blur-md shadow-xl shadow-sm">
+      <div className="flex flex-wrap items-center gap-10 bg-white/5 border border-white/10 p-6 rounded-2xl">
+        <div className="flex flex-col items-center">
           <RiskGauge value={vix || 0} label="VIX" max={50} thresholds={{ green: 20, yellow: 30 }} />
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-          <div className="flex items-center gap-2 text-zinc-400 mb-2">
-            <Wallet className="h-3.5 w-3.5" />
-            <span className="text-[11px] font-bold uppercase tracking-wider">Total Cash Value</span>
-          </div>
+        <div className="h-10 w-px bg-white/10 hidden lg:block" />
+        <div>
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Total Cash</div>
           <div className="text-2xl font-bold text-white">${(account?.totalValue || 0).toLocaleString()}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-          <div className="flex items-center gap-2 text-zinc-400 mb-2">
-            <CreditCard className="h-3.5 w-3.5" />
-            <span className="text-[11px] font-bold uppercase tracking-wider">Available Cash</span>
-          </div>
-          <div className="text-2xl font-bold terminal-green">${(account?.buyingPower || 0).toLocaleString()}</div>
+        <div className="h-10 w-px bg-white/10 hidden sm:block" />
+        <div>
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Available</div>
+          <div className="text-2xl font-bold text-zinc-100">${(account?.buyingPower || 0).toLocaleString()}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-          <div className="flex items-center gap-2 text-zinc-400 mb-2">
-            <Layers className="h-3.5 w-3.5" />
-            <span className="text-[11px] font-bold uppercase tracking-wider">Usage %</span>
-          </div>
+        <div className="h-10 w-px bg-white/10 hidden lg:block" />
+        <div>
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Usage</div>
           <div className={cn(
             "text-2xl font-bold",
-            (account?.deployedPct || 0) > 0.7 ? 'terminal-red' : (account?.deployedPct || 0) > 0.4 ? 'terminal-amber' : 'terminal-green'
+            (account?.deployedPct || 0) > 0.7 ? 'text-red-400' : (account?.deployedPct || 0) > 0.4 ? 'text-amber-400' : 'text-emerald-400'
           )}>
             {((account?.deployedPct || 0) * 100).toFixed(1)}%
           </div>

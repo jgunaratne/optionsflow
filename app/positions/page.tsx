@@ -219,29 +219,31 @@ export default function PositionsPage() {
         </div>
       ) : (
         <>
-          {/* Summary Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Total Cash Value</div>
-              <div className="text-2xl font-bold text-white mt-1.5">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          {/* Summary Section */}
+          <div className="flex flex-wrap items-center gap-8 bg-white/5 border border-white/10 p-6 rounded-2xl">
+            <div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Total Cash Value</div>
+              <div className="text-2xl font-bold text-white mt-1">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
-            <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Day Profit / Loss</div>
-              <div className={cn("text-2xl font-bold mt-1.5 flex items-center gap-2", getPnLColor(totalDayPnL))}>
-                {totalDayPnL >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+            <div className="h-10 w-px bg-white/10 hidden sm:block" />
+            <div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Day Profit / Loss</div>
+              <div className={cn("text-2xl font-bold mt-1 flex items-center gap-2", getPnLColor(totalDayPnL))}>
                 ${Math.abs(totalDayPnL).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-              <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Active Assets</div>
-              <div className="text-2xl font-bold text-zinc-100 mt-1.5">{positions.length}</div>
+            <div className="h-10 w-px bg-white/10 hidden lg:block" />
+            <div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Assets</div>
+              <div className="text-2xl font-bold text-zinc-100 mt-1">{positions.length}</div>
             </div>
-            <div className="bg-white/5 border border-white/10 p-2 rounded-2xl flex items-center justify-center gap-1">
+            
+            <div className="ml-auto flex items-center gap-1 bg-white/5 p-1 rounded-2xl-xl border border-white/5">
                 {(['All', 'Equity', 'Option'] as FilterType[]).map(f => (
                   <button key={f} onClick={() => setFilter(f)}
                     className={cn(
-                      "flex-1 h-full px-3 py-2 text-sm font-bold transition-all rounded-2xl",
-                      filter === f ? "bg-white/10 text-white shadow-sm border border-white/10" : "text-zinc-400 hover:text-zinc-300"
+                      "px-4 py-1.5 text-xs font-bold transition-all rounded-2xl-lg",
+                      filter === f ? "bg-white text-zinc-950 shadow-sm" : "text-zinc-500 hover:text-zinc-300"
                     )}>
                     {f}
                   </button>
