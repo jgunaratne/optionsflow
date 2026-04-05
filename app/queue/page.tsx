@@ -61,7 +61,7 @@ export default function QueuePage() {
       </div>
 
       {accountError && (
-        <div className={cn("rounded border p-4 backdrop-blur-sm", accountError.needsAuth ? "border-amber-900/30 bg-amber-950/20" : "border-red-900/30 bg-red-950/20")}>
+        <div className={cn("rounded border p-4 backdrop-blur-md shadow-xl", accountError.needsAuth ? "border-amber-900/30 bg-amber-950/20" : "border-red-900/30 bg-red-950/20")}>
           <div className="flex items-start gap-3">
             {accountError.needsAuth ? <KeyRound className="mt-0.5 h-4 w-4 text-amber-500" /> : <AlertTriangle className="mt-0.5 h-4 w-4 text-red-500" />}
             <div className="min-w-0 flex-1">
@@ -83,19 +83,19 @@ export default function QueuePage() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
           <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Total Orders</div>
           <div className="text-2xl font-bold text-white">{queue.length}</div>
         </div>
-        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
           <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Est. Premium</div>
           <div className="text-2xl font-bold terminal-green">${totalPremium.toFixed(0)}</div>
         </div>
-        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
           <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Max Risk</div>
           <div className="text-2xl font-bold text-zinc-200">${totalMaxLoss.toLocaleString()}</div>
         </div>
-        <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
           <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Cap. Impact</div>
           <div className={cn(
             "text-2xl font-bold",
@@ -109,7 +109,7 @@ export default function QueuePage() {
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Order Review List */}
         <div className="lg:col-span-2 flex flex-col gap-4">
-          <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-sm">
+          <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl">
             <div className="flex items-center gap-3 mb-6 px-1">
                <ListChecks className="h-5 w-5 text-primary" />
                <span className="text-base font-bold text-zinc-100 tracking-tight">Order Review</span>
@@ -188,7 +188,7 @@ export default function QueuePage() {
                   <span>Execute Order Batch ({queue.length})</span>
                 </button>
               ) : (
-                <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded shadow-xl backdrop-blur-sm">
+                <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded shadow-xl backdrop-blur-md shadow-xl">
                   <div className="flex items-center gap-2 mb-3">
                      <AlertCircle className="h-5 w-5 text-amber-500" />
                      <span className="text-lg font-bold text-amber-500 tracking-tight">Authorize Transaction</span>
@@ -211,7 +211,7 @@ export default function QueuePage() {
         </div>
 
         {/* Sector Exposure Sidebar */}
-        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-sm self-start">
+        <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl self-start">
            <div className="flex items-center gap-2 mb-6">
               <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Queue Composition</span>
            </div>

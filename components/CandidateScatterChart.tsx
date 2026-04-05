@@ -30,7 +30,7 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="rounded border border-zinc-800 bg-zinc-900/90 p-3 shadow-xl backdrop-blur-sm">
+        <div className="rounded border border-zinc-800 bg-zinc-900/90 p-3 shadow-xl backdrop-blur-md shadow-xl">
           <p className="mb-1 text-sm font-bold text-white">{data.symbol} <span className="text-xs font-normal text-zinc-400">({data.strategy})</span></p>
           <p className="text-xs text-zinc-300">POP: <span className="font-semibold text-emerald-400">{data.pop.toFixed(1)}%</span></p>
           <p className="text-xs text-zinc-300">Premium: <span className="font-semibold text-white">${data.premium.toFixed(2)}</span></p>
@@ -42,7 +42,7 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
   };
 
   return (
-    <div className="rounded border border-white/10 bg-zinc-900/40 p-4 backdrop-blur-sm shadow-sm">
+    <div className="rounded border border-white/10 bg-zinc-900/20 p-4 backdrop-blur-md shadow-xl shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Risk / Reward Distribution</h3>

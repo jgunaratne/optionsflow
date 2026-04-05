@@ -30,7 +30,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
 
   return (
     <div className={cn(
-      "group relative flex flex-col justify-between overflow-hidden rounded border bg-zinc-900/60 p-4 backdrop-blur-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-black",
+      "group relative flex flex-col justify-between overflow-hidden rounded border bg-zinc-900/30 p-4 backdrop-blur-md shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-black",
       isRejected ? "opacity-75" : "hover:bg-zinc-800/80 hover:shadow-xl hover:shadow-black/60 hover:-translate-y-1",
       flagBorderClass
     )}>
@@ -66,7 +66,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
         </div>
 
         {/* Contract Details */}
-        <div className="mb-5 flex rounded bg-zinc-950/50 p-1 border border-white/10">
+        <div className="mb-5 flex rounded bg-zinc-950/30 p-1 border border-white/10">
           <div className="flex-1 px-3 py-2 text-center">
             <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Buy At</div>
             <div className="text-base font-bold text-white">${candidate.strike.toFixed(2)}</div>
@@ -80,19 +80,19 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
 
         {/* Primary Metrics Grid */}
         <div className="mb-5 grid grid-cols-2 gap-3">
-          <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
+          <div className="rounded bg-zinc-950/30 p-3 border border-white/10">
             <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Money In</div>
             <div className="text-lg font-extrabold text-emerald-400">${candidate.premium.toFixed(2)}</div>
           </div>
-          <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
+          <div className="rounded bg-zinc-950/30 p-3 border border-white/10">
             <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Worst Case</div>
             <div className="text-lg font-extrabold text-red-400">${candidate.max_loss.toLocaleString()}</div>
           </div>
-          <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
+          <div className="rounded bg-zinc-950/30 p-3 border border-white/10">
             <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Chance It Works</div>
             <div className="text-lg font-extrabold text-zinc-100">{(candidate.pop * 100).toFixed(0)}%</div>
           </div>
-          <div className="rounded bg-zinc-950/50 p-3 border border-white/10">
+          <div className="rounded bg-zinc-950/30 p-3 border border-white/10">
             <div className="text-xs text-zinc-400 uppercase font-bold tracking-tight">Volatility</div>
             <div className="text-lg font-extrabold text-zinc-100">{candidate.iv_rank.toFixed(1)}</div>
           </div>
@@ -106,7 +106,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
         </div>
 
         {/* AI Analysis */}
-        <div className="mb-6 rounded border border-white/10 bg-zinc-950/50 p-4 relative overflow-hidden">
+        <div className="mb-6 rounded border border-white/10 bg-zinc-950/30 p-4 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-zinc-500 to-zinc-700" aria-hidden="true" />
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">AI Insight</span>

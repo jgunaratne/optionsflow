@@ -326,7 +326,7 @@ export default function ScreenerPage() {
 
       {/* Progress Monitor */}
       {progress && progress.running && (
-        <div className="relative overflow-hidden rounded border border-primary/20 bg-primary/5 p-1 backdrop-blur-sm">
+        <div className="relative overflow-hidden rounded border border-primary/20 bg-primary/5 p-1 backdrop-blur-md shadow-xl">
           <div className="rounded bg-zinc-950/40 p-4">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -359,7 +359,7 @@ export default function ScreenerPage() {
 
       {/* Live Activity Feed */}
       {progress && progress.logs && progress.logs.length > 0 && (
-        <div className="relative overflow-hidden rounded border border-white/10 bg-zinc-950/60 backdrop-blur-sm">
+        <div className="relative overflow-hidden rounded border border-white/10 bg-zinc-950/40 backdrop-blur-md shadow-xl">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-white/[0.02]">
             <div className="flex items-center gap-2">
               <div className={cn(
@@ -406,8 +406,8 @@ export default function ScreenerPage() {
       )}
 
       {progress && !progress.running && progress.status.includes('Schwab not connected') && (
-        <div className="relative overflow-hidden rounded border border-amber-500/20 bg-amber-500/5 p-1 backdrop-blur-sm">
-          <div className="rounded bg-zinc-950/50 p-5">
+        <div className="relative overflow-hidden rounded border border-amber-500/20 bg-amber-500/5 p-1 backdrop-blur-md shadow-xl">
+          <div className="rounded bg-zinc-950/30 p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-amber-500/10 text-amber-400">
@@ -433,8 +433,8 @@ export default function ScreenerPage() {
       )}
 
       {/* Toolbar & Filters */}
-      <div className="flex flex-wrap items-center gap-3 bg-white/5 p-3 border border-white/10 rounded backdrop-blur-sm">
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+      <div className="flex flex-wrap items-center gap-3 bg-white/5 p-3 border border-white/10 rounded backdrop-blur-md shadow-xl">
+        <div className="flex items-center gap-2 rounded bg-zinc-950/30 px-3 py-2 border border-white/10">
           <Filter className="h-4 w-4 text-zinc-400" />
           <select
             value={filters.strategy || ''}
@@ -449,7 +449,7 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+        <div className="flex items-center gap-2 rounded bg-zinc-950/30 px-3 py-2 border border-white/10">
           <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">Flag:</span>
           <select
             value={filters.flag || ''}
@@ -463,7 +463,7 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+        <div className="flex items-center gap-2 rounded bg-zinc-950/30 px-3 py-2 border border-white/10">
           <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">Min Pop:</span>
           <input
             type="number"
@@ -474,7 +474,7 @@ export default function ScreenerPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/10">
+        <div className="flex items-center gap-2 rounded bg-zinc-950/30 px-3 py-2 border border-white/10">
           <Gauge className="h-4 w-4 text-amber-500" />
           <span className="text-xs font-bold text-zinc-400 uppercase tracking-tight">IV Rank ≥</span>
           <input
@@ -509,7 +509,7 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-zinc-950/50 p-1">
+        <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-zinc-950/30 p-1">
           <button
             onClick={() => setViewMode('grid')}
             className={cn(
@@ -533,7 +533,7 @@ export default function ScreenerPage() {
         </div>
       </div>
 
-      <div className="grid gap-3 rounded border border-white/10 bg-zinc-900/40 p-4 text-sm text-zinc-300 md:grid-cols-3">
+      <div className="grid gap-3 rounded border border-white/10 bg-zinc-900/20 p-4 text-sm text-zinc-300 md:grid-cols-3">
         <div className="rounded border border-emerald-500/20 bg-emerald-500/10 p-3">
           <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">Best Pick</div>
           <p className="mt-1">Green cards are the app’s favorite ideas. If you want the clearest starting point, look here first.</p>
@@ -645,7 +645,7 @@ export default function ScreenerPage() {
               ))}
             </div>
           ) : (
-            <div className="overflow-x-auto rounded border border-white/10 bg-white/5 backdrop-blur-sm">
+            <div className="overflow-x-auto rounded border border-white/10 bg-white/5 backdrop-blur-md shadow-xl">
               <div className="min-w-[1000px]">
                 <div className="grid grid-cols-[1fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_0.8fr_2fr_100px] gap-4 border-b border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">                <div>Candidate</div>
                 <div className="text-right">Strike</div>

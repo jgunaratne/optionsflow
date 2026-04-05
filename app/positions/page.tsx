@@ -179,7 +179,7 @@ export default function PositionsPage() {
           <Loader2 className="h-8 w-8 animate-spin text-zinc-700" />
         </div>
       ) : needsAuth ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/10 bg-white/5 p-8 text-center rounded backdrop-blur-sm">
+        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/10 bg-white/5 p-8 text-center rounded backdrop-blur-md shadow-xl">
           <div className="rounded bg-zinc-900 p-4 border border-white/10 shadow-xl">
              <Key className="h-8 w-8 text-zinc-400" />
           </div>
@@ -221,18 +221,18 @@ export default function PositionsPage() {
         <>
           {/* Summary Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+            <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
               <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Net Liquidity</div>
               <div className="text-2xl font-bold text-white mt-1.5">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
-            <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+            <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
               <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Day Profit / Loss</div>
               <div className={cn("text-2xl font-bold mt-1.5 flex items-center gap-2", getPnLColor(totalDayPnL))}>
                 {totalDayPnL >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
                 ${Math.abs(totalDayPnL).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="bg-zinc-900/40 border border-white/10 p-4 rounded backdrop-blur-sm shadow-sm">
+            <div className="bg-zinc-900/20 border border-white/10 p-4 rounded backdrop-blur-md shadow-xl shadow-sm">
               <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Active Assets</div>
               <div className="text-2xl font-bold text-zinc-100 mt-1.5">{positions.length}</div>
             </div>
@@ -252,7 +252,7 @@ export default function PositionsPage() {
           {/* PnL Chart */}
           <PositionsChart positions={filtered} />
 
-          {/* Positions Table */}          <div className="border border-white/10 rounded overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
+          {/* Positions Table */}          <div className="border border-white/10 rounded overflow-hidden bg-zinc-900/20 backdrop-blur-md shadow-xl">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead>

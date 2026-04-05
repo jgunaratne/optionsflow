@@ -121,7 +121,7 @@ export default function DbBrowserPage() {
         <div className="flex flex-col gap-4">
           {/* Search & Info Bar */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-lg bg-zinc-950/50 px-3 py-2 border border-white/5 flex-1 max-w-md">
+            <div className="flex items-center gap-2 rounded-lg bg-zinc-950/30 px-3 py-2 border border-white/5 flex-1 max-w-md">
               <Search className="h-4 w-4 text-zinc-500" />
               <input
                 type="text"
@@ -145,7 +145,7 @@ export default function DbBrowserPage() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto rounded-xl border border-white/5 bg-zinc-950/60">
+          <div className="overflow-x-auto rounded-xl border border-white/5 bg-zinc-950/40">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10 bg-white/[0.02]">

@@ -56,7 +56,7 @@ export default function ChatPage() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto border border-white/10 bg-zinc-950/50 backdrop-blur-sm p-4 space-y-6 rounded shadow-inner">
+      <div className="flex-1 overflow-y-auto border border-white/10 bg-zinc-950/30 backdrop-blur-md shadow-xl p-4 space-y-6 rounded shadow-inner">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-6">
             <div className="relative">

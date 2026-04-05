@@ -20,7 +20,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
 
   return (
     <div className={cn(
-      "group flex items-center gap-4 border bg-zinc-900/40 p-4 transition-all hover:bg-zinc-900/60 rounded backdrop-blur-sm",
+      "group flex items-center gap-4 border bg-zinc-900/20 p-4 transition-all hover:bg-zinc-900/30 rounded backdrop-blur-md shadow-xl",
       priceAlert ? "border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]" : "border-white/10 shadow-sm"
     )}>
       {/* Symbol + Identity */}
