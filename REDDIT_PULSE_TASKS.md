@@ -346,7 +346,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ## Phase 6 — Nav Integration (depends on Phase 5)
 
-- [ ] **6.1 — Add Reddit Tab to Nav (`components/Nav.tsx`)**
+- [x] **6.1 — Add Reddit Tab to Nav (`components/Nav.tsx`)**
 
   Modify `/Users/junius/git/optionsflow/components/Nav.tsx`:
 

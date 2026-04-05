@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { useStreamStore, useBrokerStore } from '@/lib/store';
 import { useSSE } from '@/lib/useSSE';
-import { ChevronDown, Check, Activity, LayoutGrid, BarChart2, Shield, MessageSquare, Database } from 'lucide-react';
+import { ChevronDown, Check, Activity, LayoutGrid, BarChart2, Shield, MessageSquare, Radio, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const BROKER_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -89,6 +89,7 @@ export default function Nav() {
     { href: '/positions', label: 'Positions', icon: BarChart2 },
     { href: '/portfolio', label: 'Portfolio', icon: Shield },
     { href: '/chat', label: 'Chat', icon: MessageSquare },
+    { href: '/reddit', label: 'Reddit', icon: Radio },
     { href: '/db', label: 'Database', icon: Database },
   ];
 
