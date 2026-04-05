@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { getDb } from './db';
+import { getDb, getConfig, setConfig } from './db';
 import type {
   Broker, OptionsChainResponse, PriceHistoryResponse,
   AccountDetails, OrderResult, TokenStatus,
@@ -138,9 +138,12 @@ async function schwabRequest<T = unknown>(
   const url = `${baseUrl}${path}`;
   const options: RequestInit = {
     method,
-    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' },
   };
-  if (body) options.body = JSON.stringify(body);
+  if (body) {
+    options.body = JSON.stringify(body);
+    (options.headers as Record<string, string>)['Content-Type'] = 'application/json';
+  }
   const response = await fetch(url, options);
   if (!response.ok) {
     const errorText = await response.text();
@@ -153,12 +156,49 @@ async function schwabRequest<T = unknown>(
 // --- Account Hash ---
 let cachedAccountHash: string | null = null;
 
+function getConfiguredAccountHash(): string | null {
+  const envHash = process.env.SCHWAB_ACCOUNT_HASH?.trim();
+  if (envHash) return envHash;
+
+  try {
+    const dbHash = getConfig('schwab_account_hash');
+    return typeof dbHash === 'string' && dbHash.trim() ? dbHash.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 async function getAccountHash(): Promise<string> {
   if (cachedAccountHash) return cachedAccountHash;
-  const accounts = await schwabRequest<Array<{ hashValue: string }>>('GET', '/accounts/accountNumbers');
-  if (!accounts || accounts.length === 0) throw new Error('No Schwab accounts found');
-  cachedAccountHash = accounts[0].hashValue;
-  return cachedAccountHash;
+
+  const configuredHash = getConfiguredAccountHash();
+  if (configuredHash) {
+    cachedAccountHash = configuredHash;
+    return cachedAccountHash;
+  }
+
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const accounts = await schwabRequest<Array<{ hashValue: string }>>('GET', '/accounts/accountNumbers');
+      if (!accounts || accounts.length === 0) throw new Error('No Schwab accounts found');
+      cachedAccountHash = accounts[0].hashValue;
+      setConfig('schwab_account_hash', cachedAccountHash);
+      return cachedAccountHash;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) {
+        await new Promise(resolve => setTimeout(resolve, attempt * 750));
+      }
+    }
+  }
+
+  const message = lastError instanceof Error ? lastError.message : String(lastError);
+  throw new Error(
+    `Failed to resolve Schwab account hash. ${message}. ` +
+    'Reconnect Schwab or set SCHWAB_ACCOUNT_HASH in .env.local if you already know the hashed account id.'
+  );
 }
 
 // --- OAuth Helpers ---
