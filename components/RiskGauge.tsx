@@ -34,7 +34,7 @@ export default function RiskGauge({ value, label, max = 100, thresholds = { gree
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className={`relative inline-flex shadow-lg ${glowColor} rounded-2xl-full`}>
+      <div className={`relative inline-flex shadow-lg ${glowColor} rounded-full`}>
         <svg width="140" height="80" viewBox="0 0 140 80">
           {/* Background arc */}
           <path

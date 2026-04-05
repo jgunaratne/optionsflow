@@ -101,7 +101,7 @@ function CandidateListRow({
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-bold text-white">{candidate.symbol}</span>
-          <span className={cn("rounded-2xl-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", recommendation.tone)}>
+          <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", recommendation.tone)}>
             {recommendation.label}
           </span>
         </div>
@@ -163,7 +163,7 @@ function CandidateListRow({
           onClick={() => onAddToQueue(candidate.id)}
           disabled={inQueue || candidate.is_eligible === 0}
           className={cn(
-            "inline-flex items-center gap-2 rounded-2xl-lg px-3 py-2 text-sm font-bold transition-all",
+            "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all",
             inQueue
               ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
               : candidate.is_eligible === 0
@@ -336,11 +336,11 @@ export default function ScreenerPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Screener</h1>
           <div className="mt-2 flex items-center gap-4 text-xs font-medium">
-             <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-2xl-full border border-emerald-500/20">
+             <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                <Layers className="h-3 w-3" />
                <span>{eligibleCount} eligible</span>
              </div>
-             <div className="flex items-center gap-1.5 text-zinc-500 bg-white/5 px-2 py-0.5 rounded-2xl-full border border-white/10">
+             <div className="flex items-center gap-1.5 text-zinc-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
                <span>{candidates.length} screened</span>
              </div>
              <div className="flex items-center gap-1.5 text-zinc-500">
@@ -354,7 +354,7 @@ export default function ScreenerPage() {
           <button
             onClick={handleApplySaferPreset}
             disabled={applyingPreset}
-            className="inline-flex h-11 items-center justify-center rounded-2xl-xl bg-zinc-900 border border-white/10 px-4 text-sm font-bold text-zinc-300 transition-all hover:bg-zinc-800 disabled:opacity-50"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 border border-white/10 px-4 text-sm font-bold text-zinc-300 transition-all hover:bg-zinc-800 disabled:opacity-50"
           >
             {applyingPreset ? 'Applying...' : 'Safer Preset'}
           </button>
@@ -362,7 +362,7 @@ export default function ScreenerPage() {
             onClick={handleRunScreener}
             disabled={screenerRunning}
             className={cn(
-              "relative inline-flex h-11 items-center justify-center gap-2 overflow-hidden rounded-2xl-xl px-6 text-sm font-bold transition-all duration-300",
+              "relative inline-flex h-11 items-center justify-center gap-2 overflow-hidden rounded-xl px-6 text-sm font-bold transition-all duration-300",
               screenerRunning
                 ? "bg-zinc-900 text-zinc-400 border border-white/10"
                 : "bg-white text-zinc-950 shadow-lg hover:bg-zinc-200 active:scale-95"
@@ -403,9 +403,9 @@ export default function ScreenerPage() {
               </div>
             </div>
           </div>
-          <div className="h-1 w-full overflow-hidden rounded-2xl-full bg-white/5">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-white/5">
             <div
-              className="h-full rounded-2xl-full bg-white transition-all duration-500"
+              className="h-full rounded-full bg-white transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -413,7 +413,7 @@ export default function ScreenerPage() {
       )}
 
       {/* Toolbar & Filters */}
-      <div className="flex flex-wrap items-center gap-6 bg-white/5 border border-white/10 px-5 py-3 rounded-2xl-xl">
+      <div className="flex flex-wrap items-center gap-6 bg-white/5 border border-white/10 px-5 py-3 rounded-xl">
         <div className="flex items-center gap-2">
           <Filter className="h-3.5 w-3.5 text-zinc-500" />
           <select
@@ -487,7 +487,7 @@ export default function ScreenerPage() {
           <button
             onClick={() => updateUniverseSetting('watchlist')}
             className={cn(
-              "px-3 py-1.5 text-xs font-bold transition-all rounded-2xl-lg",
+              "px-3 py-1.5 text-xs font-bold transition-all rounded-lg",
               screenerUniverse === 'watchlist' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
             )}
           >
@@ -496,7 +496,7 @@ export default function ScreenerPage() {
           <button
             onClick={() => updateUniverseSetting('sp500')}
             className={cn(
-              "px-3 py-1.5 text-xs font-bold transition-all rounded-2xl-lg",
+              "px-3 py-1.5 text-xs font-bold transition-all rounded-lg",
               screenerUniverse === 'sp500' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
             )}
           >
@@ -544,7 +544,7 @@ export default function ScreenerPage() {
             <button
               onClick={() => setViewMode('grid')}
               className={cn(
-                "p-1.5 rounded-2xl-lg transition-colors",
+                "p-1.5 rounded-lg transition-colors",
                 viewMode === 'grid' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
               )}
             >
@@ -553,7 +553,7 @@ export default function ScreenerPage() {
             <button
               onClick={() => setViewMode('list')}
               className={cn(
-                "p-1.5 rounded-2xl-lg transition-colors",
+                "p-1.5 rounded-lg transition-colors",
                 viewMode === 'list' ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
               )}
             >
@@ -583,15 +583,15 @@ export default function ScreenerPage() {
 
       <div className="flex items-center gap-6 px-1 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-2xl-full bg-emerald-500" />
+          <div className="h-2 w-2 rounded-full bg-emerald-500" />
           Best Pick
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-2xl-full bg-amber-500" />
+          <div className="h-2 w-2 rounded-full bg-amber-500" />
           Maybe
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-2xl-full bg-zinc-700" />
+          <div className="h-2 w-2 rounded-full bg-zinc-700" />
           Skip
         </div>
       </div>

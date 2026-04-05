@@ -60,7 +60,7 @@ export default function ChatPage() {
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-2xl-full" />
+              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
               <div className="relative flex h-16 w-16 items-center justify-center border border-zinc-600/30 bg-zinc-900 text-zinc-200 rounded-2xl shadow-2xl">
                 <MessageSquare className="h-8 w-8" />
               </div>
@@ -86,7 +86,7 @@ export default function ChatPage() {
             {messages.map((msg, i) => (
               <div key={i} className={cn("flex gap-4", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}>
                 <div className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center text-sm rounded-2xl-full",
+                  "flex h-8 w-8 shrink-0 items-center justify-center text-sm rounded-full",
                   msg.role === 'user' ? "bg-zinc-800 text-zinc-400" : "bg-white/10 text-white"
                 )}>
                   {msg.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -103,14 +103,14 @@ export default function ChatPage() {
             ))}
             {loading && (
               <div className="flex gap-4">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-white/10 text-white rounded-2xl-full animate-pulse">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-white/10 text-white rounded-full animate-pulse">
                   <Loader2 className="h-4 w-4 animate-spin" />
                 </div>
                 <div className="bg-white/5 px-4 py-3 rounded-2xl flex items-center gap-3">
                   <div className="flex gap-1">
-                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-2xl-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-2xl-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-2xl-full animate-bounce" />
+                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-full animate-bounce" />
                   </div>
                   <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Analyzing Data...</span>
                 </div>

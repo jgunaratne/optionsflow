@@ -52,7 +52,7 @@ export default function SectorChart({ data }: SectorChartProps) {
         {data.map((item, i) => (
           <div key={item.sector} className="flex items-center justify-between gap-3 text-sm">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-2xl-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
               <span className="text-zinc-400 font-medium">{item.sector}</span>
             </div>
             <span className="font-bold text-zinc-200">{(item.pct * 100).toFixed(1)}%</span>

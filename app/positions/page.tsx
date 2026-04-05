@@ -238,11 +238,11 @@ export default function PositionsPage() {
               <div className="text-2xl font-bold text-zinc-100 mt-1">{positions.length}</div>
             </div>
             
-            <div className="ml-auto flex items-center gap-1 bg-white/5 p-1 rounded-2xl-xl border border-white/5">
+            <div className="ml-auto flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
                 {(['All', 'Equity', 'Option'] as FilterType[]).map(f => (
                   <button key={f} onClick={() => setFilter(f)}
                     className={cn(
-                      "px-4 py-1.5 text-xs font-bold transition-all rounded-2xl-lg",
+                      "px-4 py-1.5 text-xs font-bold transition-all rounded-lg",
                       filter === f ? "bg-white text-zinc-950 shadow-sm" : "text-zinc-500 hover:text-zinc-300"
                     )}>
                     {f}

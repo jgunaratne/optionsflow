@@ -98,7 +98,7 @@ export default function DbBrowserPage() {
             key={t.name}
             onClick={() => selectTable(t.name)}
             className={cn(
-              "flex items-center gap-2 rounded-2xl-lg px-4 py-2.5 text-sm font-bold transition-all",
+              "flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-all",
               activeTable === t.name
                 ? "bg-primary text-white shadow-lg shadow-primary/20"
                 : "bg-white/5 text-zinc-400 border border-white/5 hover:bg-white/10 hover:text-zinc-200"
@@ -107,7 +107,7 @@ export default function DbBrowserPage() {
             <Table className="h-3.5 w-3.5" />
             <span>{t.name}</span>
             <span className={cn(
-              "rounded-2xl-full px-2 py-0.5 text-[10px] font-bold",
+              "rounded-full px-2 py-0.5 text-[10px] font-bold",
               activeTable === t.name ? "bg-white/20 text-white" : "bg-white/5 text-zinc-500"
             )}>
               {t.count.toLocaleString()}
@@ -121,7 +121,7 @@ export default function DbBrowserPage() {
         <div className="flex flex-col gap-6">
           {/* Search & Info Bar */}
           <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2 rounded-2xl-lg bg-zinc-950/30 px-3 py-2 border border-white/5 flex-1 max-w-md">
+            <div className="flex items-center gap-2 rounded-lg bg-zinc-950/30 px-3 py-2 border border-white/5 flex-1 max-w-md">
               <Search className="h-4 w-4 text-zinc-500" />
               <input
                 type="text"
@@ -134,7 +134,7 @@ export default function DbBrowserPage() {
             </div>
             <button
               onClick={handleSearch}
-              className="rounded-2xl-lg bg-primary/10 border border-primary/20 px-4 py-2 text-sm font-bold text-primary hover:bg-primary/20 transition-colors"
+              className="rounded-lg bg-primary/10 border border-primary/20 px-4 py-2 text-sm font-bold text-primary hover:bg-primary/20 transition-colors"
             >
               Search
             </button>
@@ -145,7 +145,7 @@ export default function DbBrowserPage() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto rounded-2xl-xl border border-white/5 bg-zinc-950/40">
+          <div className="overflow-x-auto rounded-xl border border-white/5 bg-zinc-950/40">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10 bg-white/[0.02]">
@@ -216,7 +216,7 @@ export default function DbBrowserPage() {
                 <button
                   onClick={() => handlePage(page - 1)}
                   disabled={page <= 1}
-                  className="rounded-2xl-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-bold text-zinc-300 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-bold text-zinc-300 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
@@ -231,7 +231,7 @@ export default function DbBrowserPage() {
                       key={p}
                       onClick={() => handlePage(p)}
                       className={cn(
-                        "rounded-2xl-lg px-3 py-1.5 text-sm font-bold transition-colors",
+                        "rounded-lg px-3 py-1.5 text-sm font-bold transition-colors",
                         p === page
                           ? "bg-primary text-white"
                           : "border border-white/10 bg-white/5 text-zinc-400 hover:bg-white/10"
@@ -244,7 +244,7 @@ export default function DbBrowserPage() {
                 <button
                   onClick={() => handlePage(page + 1)}
                   disabled={page >= totalPages}
-                  className="rounded-2xl-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-bold text-zinc-300 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-bold text-zinc-300 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
@@ -255,7 +255,7 @@ export default function DbBrowserPage() {
       )}
 
       {!activeTable && (
-        <div className="flex min-h-[300px] flex-col items-center justify-center gap-6 rounded-2xl-xl border border-dashed border-white/10 bg-white/5 text-zinc-500">
+        <div className="flex min-h-[300px] flex-col items-center justify-center gap-6 rounded-xl border border-dashed border-white/10 bg-white/5 text-zinc-500">
           <Database className="h-12 w-12 opacity-20" />
           <p className="text-sm">Select a table above to browse its contents.</p>
         </div>

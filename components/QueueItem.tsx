@@ -67,7 +67,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
           </div>
         ) : (
           <div className="flex items-center gap-2 mt-1">
-             <div className="h-1.5 w-1.5 rounded-2xl-full bg-zinc-800 animate-pulse" />
+             <div className="h-1.5 w-1.5 rounded-full bg-zinc-800 animate-pulse" />
              <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Waiting...</span>
           </div>
         )}
@@ -76,7 +76,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* QTY Control */}
       <div className="flex items-center gap-6">
         <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider hidden sm:block">Qty</span>
-        <div className="flex items-center bg-black/20 rounded-2xl-lg overflow-hidden border border-white/5">
+        <div className="flex items-center bg-black/20 rounded-lg overflow-hidden border border-white/5">
           <button
             onClick={() => onQuantityChange(item.queue_id, Math.max(1, item.quantity - 1))}
             className="flex h-8 w-8 items-center justify-center text-zinc-500 hover:bg-white/5 hover:text-white transition-colors"
@@ -96,7 +96,7 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* REMOVE ACTION */}
       <button
         onClick={() => onRemove(item.queue_id)}
-        className="flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-2xl-lg group/trash"
+        className="flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-lg group/trash"
         title="Remove order"
       >
         <Trash2 className="h-4 w-4 transition-transform group-hover/trash:scale-110" />

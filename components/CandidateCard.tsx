@@ -40,8 +40,8 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
               </span>
             </div>
           </div>
-          <div className={cn("flex items-center gap-1.5 rounded-2xl-full border px-2 py-0.5", flagBgClass, flagBorderClass)}>
-            <div className={cn("h-1.5 w-1.5 rounded-2xl-full", isRejected ? 'bg-zinc-500' : isGreen ? 'bg-emerald-400' : isYellow ? 'bg-amber-400' : 'bg-red-400')} aria-hidden="true" />
+          <div className={cn("flex items-center gap-1.5 rounded-full border px-2 py-0.5", flagBgClass, flagBorderClass)}>
+            <div className={cn("h-1.5 w-1.5 rounded-full", isRejected ? 'bg-zinc-500' : isGreen ? 'bg-emerald-400' : isYellow ? 'bg-amber-400' : 'bg-red-400')} aria-hidden="true" />
             <span className={cn("text-[10px] font-bold uppercase tracking-wider", flagColorClass)}>
               {recommendationLabel}
             </span>
@@ -94,7 +94,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
         onClick={() => onAddToQueue(candidate.id)}
         disabled={inQueue || disabled || isRejected}
         className={cn(
-          "w-full rounded-2xl-xl py-2.5 text-xs font-bold transition-all duration-200",
+          "w-full rounded-xl py-2.5 text-xs font-bold transition-all duration-200",
           inQueue
             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
             : isRejected

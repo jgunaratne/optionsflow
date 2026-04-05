@@ -18,8 +18,8 @@ export default function LiveBadge({ price, change, alert }: LiveBadgeProps) {
   return (
     <div className={`inline-flex items-center gap-1.5 rounded-2xl border px-2.5 py-1 ${bgColor}`}>
       <div className="relative flex h-2 w-2">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-2xl-full bg-emerald-400 opacity-75" />
-        <span className="relative inline-flex h-2 w-2 rounded-2xl-full bg-emerald-400" />
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
       </div>
       <span className="text-sm font-semibold text-white">${price.toFixed(2)}</span>
       <span className={`text-sm font-medium ${color}`}>

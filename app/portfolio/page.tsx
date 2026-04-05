@@ -130,15 +130,15 @@ export default function PortfolioPage() {
                <BarChart className="h-4 w-4 text-primary" />
                <span className="text-sm font-bold text-zinc-200">Resource Allocation</span>
             </div>
-            <div className="mb-5 flex h-2.5 bg-white/5 rounded-2xl-sm overflow-hidden border border-white/10">
+            <div className="mb-5 flex h-2.5 bg-white/5 rounded-sm overflow-hidden border border-white/10">
               <div className="bg-primary shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all" style={{ width: `${allocation.deployedPct * 100}%` }} />
               <div className="bg-emerald-500/40 transition-all" style={{ width: `${allocation.availablePct * 100}%` }} />
               <div className="bg-zinc-800 transition-all" style={{ width: `${allocation.bufferPct * 100}%` }} />
             </div>
             <div className="grid grid-cols-3 gap-2 text-[10px] font-bold uppercase tracking-tight text-zinc-400">
-              <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-2xl-full bg-primary" /> Deployed: {(allocation.deployedPct * 100).toFixed(1)}%</div>
-              <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-2xl-full bg-emerald-500/40" /> Available: {(allocation.availablePct * 100).toFixed(1)}%</div>
-              <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-2xl-full bg-zinc-800" /> Buffer: {(allocation.bufferPct * 100).toFixed(1)}%</div>
+              <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-primary" /> Deployed: {(allocation.deployedPct * 100).toFixed(1)}%</div>
+              <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-emerald-500/40" /> Available: {(allocation.availablePct * 100).toFixed(1)}%</div>
+              <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-zinc-800" /> Buffer: {(allocation.bufferPct * 100).toFixed(1)}%</div>
             </div>
           </div>
         )}
