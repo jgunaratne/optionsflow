@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import CandidateCard from '@/components/CandidateCard';
 import type { Candidate } from '@/lib/db';
 import { useCandidatesStore, useQueueStore } from '@/lib/store';
-import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2, Gauge } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScreenerLogEntry {
@@ -111,11 +111,19 @@ export default function ScreenerPage() {
   const [screenerRunning, setScreenerRunning] = useState(false);
   const [progress, setProgress] = useState<ScreenerProgress | null>(null);
   const [sortBy, setSortBy] = useState<string>('ai_score');
+  const [ivRankMin, setIvRankMin] = useState<number>(50);
   const logsEndRef = useRef<HTMLDivElement>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { fetchCandidates(); fetchQueue(); }, [fetchCandidates, fetchQueue]);
+
+  // Load screener settings
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(data => {
+      if (data.settings?.iv_rank_min !== undefined) setIvRankMin(data.settings.iv_rank_min);
+    }).catch(() => {});
+  }, []);
 
   // Auto-scroll activity feed to bottom
   useEffect(() => {
@@ -341,6 +349,27 @@ export default function ScreenerPage() {
             onChange={(e) => { setFilters({ min_pop: e.target.value ? parseFloat(e.target.value) / 100 : undefined }); fetchCandidates(); }}
             className="w-10 bg-transparent text-sm font-bold text-zinc-100 outline-none placeholder:text-zinc-700"
           />
+        </div>
+
+        <div className="flex items-center gap-2 rounded bg-zinc-950/50 px-3 py-2 border border-white/5">
+          <Gauge className="h-4 w-4 text-amber-500" />
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">IV Rank ≥</span>
+          <input
+            type="number"
+            min="0" max="100" step="5"
+            value={ivRankMin}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value) || 0;
+              setIvRankMin(val);
+              fetch('/api/settings', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ iv_rank_min: val }),
+              }).catch(() => {});
+            }}
+            className="w-10 bg-transparent text-sm font-bold text-amber-400 outline-none text-center"
+          />
+          <span className="text-xs text-zinc-600">%</span>
         </div>
 
         <div className="sm:ml-auto flex items-center gap-2 rounded bg-primary/10 px-4 py-2 border border-primary/20">
