@@ -7,7 +7,7 @@ import SectorChart from '@/components/SectorChart';
 import RiskGauge from '@/components/RiskGauge';
 import { useStreamStore, useAccountStore, useBrokerStore } from '@/lib/store';
 import { calculateCapitalAllocation, type CrashScenario, type SectorExposure } from '@/lib/risk';
-import { Activity, ShieldAlert, BarChart, PieChart, Wallet, CreditCard, Layers, RefreshCw } from 'lucide-react';
+import { Activity, ShieldAlert, BarChart, PieChart, RefreshCw } from 'lucide-react';
 import { AlertTriangle, KeyRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

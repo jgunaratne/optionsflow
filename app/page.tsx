@@ -1,12 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import CandidateCard from '@/components/CandidateCard';
 import CandidateScatterChart from '@/components/CandidateScatterChart';
 import type { Candidate } from '@/lib/db';
 import { useCandidatesStore, useQueueStore } from '@/lib/store';
-import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2, Gauge, KeyRound, ArrowRight } from 'lucide-react';
+import { Loader2, Play, Filter, SortDesc, Calendar, Layers, LayoutGrid, Rows3, PlusCircle, CheckCircle2, Gauge } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScreenerLogEntry {
@@ -71,16 +70,6 @@ function getRecommendation(candidate: Candidate) {
     summary: 'The app sees more risk or weaker setup quality here.',
     action: 'Only consider this if you understand why it still passed.',
   };
-}
-
-function getSimpleReasons(candidate: Candidate): string[] {
-  const reasons: string[] = [];
-  if (candidate.pop >= 0.8) reasons.push('High chance of profit');
-  if (candidate.delta <= 0.2) reasons.push('Lower risk entry');
-  if (candidate.dte <= 30) reasons.push('Short time trade');
-  if (candidate.premium >= 1) reasons.push('Solid payout');
-  if (reasons.length === 0) reasons.push('Passed the safety checks');
-  return reasons.slice(0, 3);
 }
 
 function CandidateListRow({

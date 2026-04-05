@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useBrokerStore } from '@/lib/store';
-import { RefreshCw, Key, AlertTriangle, BarChart3, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
+import { RefreshCw, Key, AlertTriangle, BarChart3, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PositionsChart from '@/components/PositionsChart';
 

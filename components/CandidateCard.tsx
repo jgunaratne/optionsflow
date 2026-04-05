@@ -2,7 +2,6 @@
 
 import type { Candidate } from '@/lib/db';
 import { cn } from '@/lib/utils';
-import { PlusCircle, CheckCircle2 } from 'lucide-react';
 
 interface CandidateCardProps {
   candidate: Candidate;
@@ -107,4 +106,3 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
     </div>
   );
 }
-
