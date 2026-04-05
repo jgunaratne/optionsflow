@@ -160,11 +160,12 @@ export function generatePKCE(): { codeVerifier: string; codeChallenge: string } 
   return { codeVerifier, codeChallenge };
 }
 
-export function getAuthorizationUrl(codeChallenge: string): string {
+export function getAuthorizationUrl(codeChallenge: string, state?: string): string {
   const params = new URLSearchParams({
     response_type: 'code', client_id: process.env.SCHWAB_CLIENT_ID!,
     redirect_uri: process.env.SCHWAB_REDIRECT_URI!, code_challenge: codeChallenge, code_challenge_method: 'S256',
   });
+  if (state) params.set('state', state);
   return `${AUTH_URL}?${params.toString()}`;
 }
 

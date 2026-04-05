@@ -1,15 +1,48 @@
 import { NextResponse } from 'next/server';
 import { getActiveBrokerName } from '@/lib/broker-factory';
+import { generatePKCE, getAuthorizationUrl } from '@/lib/schwab';
 
 export async function POST() {
   try {
     const broker = getActiveBrokerName();
 
     if (broker === 'schwab') {
-      return NextResponse.json({
-        error: 'Schwab requires browser-based OAuth. Run: npx tsx scripts/auth-setup.ts',
+      const clientId = process.env.SCHWAB_CLIENT_ID;
+      const clientSecret = process.env.SCHWAB_CLIENT_SECRET;
+      const redirectUri = process.env.SCHWAB_REDIRECT_URI;
+      const encryptionKey = process.env.TOKEN_ENCRYPTION_KEY;
+
+      if (!clientId || !clientSecret || !redirectUri || !encryptionKey) {
+        return NextResponse.json({
+          error: 'SCHWAB_CLIENT_ID, SCHWAB_CLIENT_SECRET, SCHWAB_REDIRECT_URI, and TOKEN_ENCRYPTION_KEY must be set in .env.local',
+          authType: 'credentials_missing',
+        }, { status: 400 });
+      }
+
+      const { codeVerifier, codeChallenge } = generatePKCE();
+      const state = crypto.randomUUID();
+      const response = NextResponse.json({
+        success: true,
         authType: 'oauth',
-      }, { status: 400 });
+        redirectURI: getAuthorizationUrl(codeChallenge, state),
+      });
+
+      response.cookies.set('schwab_oauth_verifier', codeVerifier, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 10 * 60,
+      });
+      response.cookies.set('schwab_oauth_state', state, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 10 * 60,
+      });
+
+      return response;
     }
 
     if (broker === 'webull') {

@@ -29,11 +29,39 @@ export default function PositionsPage() {
 
   const brokerLabel = active.charAt(0).toUpperCase() + active.slice(1);
 
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === 'schwab-connected') {
+        setNeedsAuth(false);
+        setError(null);
+        fetchPositions();
+      }
+      if (event.data?.type === 'schwab-auth-error') {
+        setError(event.data?.message || 'Schwab authorization failed');
+        setConnecting(false);
+      }
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
+
   const handleConnect = async () => {
     setConnecting(true);
     try {
       const res = await fetch('/api/auth/connect', { method: 'POST' });
       const data = await res.json();
+
+      if (data.redirectURI) {
+        const popup = window.open(data.redirectURI, 'optionsflow-broker-auth', 'width=640,height=800');
+        if (!popup) {
+          setError('Popup blocked. Allow popups for this site and try again.');
+          return;
+        }
+        return;
+      }
+
       if (data.success) {
         setNeedsAuth(false);
         setError(null);
@@ -134,19 +162,15 @@ export default function PositionsPage() {
         <div className="flex h-64 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-amber-800/50 bg-amber-900/10">
           <span className="text-4xl">🔑</span>
           <p className="text-sm text-zinc-300">Not connected to <span className="font-semibold text-white">{brokerLabel}</span></p>
-          {active === 'schwab' ? (
-            <div className="text-center">
-              <p className="text-xs text-zinc-500 mb-2">Schwab requires browser-based OAuth</p>
-              <code className="rounded bg-zinc-800 px-3 py-1.5 text-xs text-zinc-300">npx tsx scripts/auth-setup.ts</code>
-            </div>
-          ) : (
-            <button
-              onClick={handleConnect}
-              disabled={connecting}
-              className="rounded-lg bg-gradient-to-r from-orange-600 to-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-600/20 transition-all hover:shadow-orange-600/30 disabled:opacity-50"
-            >
-              {connecting ? 'Connecting…' : `Connect ${brokerLabel}`}
-            </button>
+          <button
+            onClick={handleConnect}
+            disabled={connecting}
+            className="rounded-lg bg-gradient-to-r from-orange-600 to-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-600/20 transition-all hover:shadow-orange-600/30 disabled:opacity-50"
+          >
+            {connecting ? 'Connecting…' : `Connect ${brokerLabel}`}
+          </button>
+          {active === 'schwab' && (
+            <p className="text-center text-xs text-zinc-500">This opens Schwab OAuth in a popup and returns here automatically.</p>
           )}
           {error && <p className="text-xs text-red-400">{error}</p>}
         </div>
