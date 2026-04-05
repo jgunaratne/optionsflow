@@ -30,7 +30,7 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/90 p-3 shadow-xl backdrop-blur-md shadow-xl">
+        <div className="rounded-xl border border-white/10 bg-zinc-950/90 p-3 shadow-xl backdrop-blur-md">
           <p className="mb-1 text-sm font-bold text-white">{data.symbol} <span className="text-sm font-normal text-zinc-400">({data.strategy})</span></p>
           <p className="text-sm text-zinc-300">Win Chance: <span className="font-semibold text-emerald-400">{data.pop.toFixed(1)}%</span></p>
           <p className="text-sm text-zinc-300">Cash Earned: <span className="font-semibold text-white">${data.premium.toFixed(2)}</span></p>
@@ -42,16 +42,16 @@ export default function CandidateScatterChart({ candidates }: CandidateScatterCh
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900/20 p-6 backdrop-blur-md shadow-xl shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-zinc-900/20 p-6 backdrop-blur-md shadow-xl">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-bold text-zinc-200 tracking-tight">Risk / Reward Distribution</h3>
           <p className="text-sm text-zinc-400 mt-0.5">Win Chance vs. Cash Earned</p>
         </div>
         <div className="flex items-center gap-5 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-2xl-full bg-emerald-400" /> High AI</div>
-          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-2xl-full bg-amber-400" /> Med AI</div>
-          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-2xl-full bg-red-400" /> Low AI</div>
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-emerald-400" /> High AI</div>
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-amber-400" /> Med AI</div>
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-red-400" /> Low AI</div>
         </div>
       </div>
       <div className="h-64 w-full">

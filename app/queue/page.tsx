@@ -191,7 +191,7 @@ export default function QueuePage() {
                   <span>Execute Order Batch ({queue.length})</span>
                 </button>
               ) : (
-                <div className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-2xl shadow-xl backdrop-blur-md shadow-xl">
+                <div className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-2xl backdrop-blur-md shadow-xl">
                   <div className="flex items-center gap-2 mb-3">
                      <AlertCircle className="h-5 w-5 text-amber-500" />
                      <span className="text-lg font-bold text-amber-500 tracking-tight">Authorize Transaction</span>
