@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getConfig, setConfig } from '@/lib/db';
 
 const ALLOWED_KEYS = [
+  'screener_universe', 'sp500_batch_size',
   'iv_rank_min', 'dte_min', 'dte_max', 'delta_min', 'delta_max',
   'min_premium', 'max_bid_ask_spread_pct', 'max_position_pct',
   'max_deployed_pct', 'min_open_interest',
@@ -27,6 +28,12 @@ export async function PATCH(request: NextRequest) {
 
     for (const [key, value] of Object.entries(body)) {
       if (!ALLOWED_KEYS.includes(key)) continue;
+      if (key === 'screener_universe') {
+        if (value !== 'watchlist' && value !== 'sp500') continue;
+        setConfig(key, value);
+        updated[key] = value;
+        continue;
+      }
       if (typeof value !== 'number') continue;
       setConfig(key, value);
       updated[key] = value;

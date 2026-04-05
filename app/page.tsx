@@ -64,6 +64,16 @@ function getRecommendation(candidate: Candidate) {
   };
 }
 
+function getSimpleReasons(candidate: Candidate): string[] {
+  const reasons: string[] = [];
+  if (candidate.pop >= 0.8) reasons.push('High chance of profit');
+  if (candidate.delta <= 0.2) reasons.push('Lower risk entry');
+  if (candidate.dte <= 30) reasons.push('Short time trade');
+  if (candidate.premium >= 1) reasons.push('Solid payout');
+  if (reasons.length === 0) reasons.push('Passed the safety checks');
+  return reasons.slice(0, 3);
+}
+
 function CandidateListRow({
   candidate,
   inQueue,
@@ -168,6 +178,7 @@ export default function ScreenerPage() {
   const [sortBy, setSortBy] = useState<string>('ai_score');
   const [ivRankMin, setIvRankMin] = useState<number>(50);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [applyingPreset, setApplyingPreset] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { fetchCandidates(); fetchQueue(); }, [fetchCandidates, fetchQueue]);
@@ -198,6 +209,7 @@ export default function ScreenerPage() {
     }
   });
   const eligibleCount = sorted.filter((candidate) => candidate.is_eligible === 1).length;
+  const topPicks = sorted.filter((candidate) => candidate.is_eligible === 1).slice(0, 3);
 
   const handleRunScreener = async () => {
     setScreenerRunning(true);
@@ -236,6 +248,29 @@ export default function ScreenerPage() {
   const handleAddToQueue = async (id: number) => {
     await addToQueue(id, 1);
     await fetchQueue();
+  };
+
+  const handleApplySaferPreset = async () => {
+    setApplyingPreset(true);
+    try {
+      setIvRankMin(50);
+      await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dte_min: 14,
+          dte_max: 30,
+          delta_min: 0.10,
+          delta_max: 0.20,
+          iv_rank_min: 50,
+          min_premium: 0.50,
+          max_bid_ask_spread_pct: 0.05,
+          min_open_interest: 1000,
+        }),
+      });
+    } finally {
+      setApplyingPreset(false);
+    }
   };
 
   const progressPercent = progress && progress.totalSymbols > 0
@@ -513,9 +548,70 @@ export default function ScreenerPage() {
         </div>
       </div>
 
+      <div className="flex flex-col gap-3 rounded border border-primary/20 bg-primary/5 p-4 text-sm text-zinc-300 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="text-xs font-bold uppercase tracking-wider text-primary">Safer Short-Term Mode</div>
+          <p className="mt-1">This preset looks for options with a better chance of working soon, not the biggest payout.</p>
+        </div>
+        <button
+          onClick={handleApplySaferPreset}
+          disabled={applyingPreset}
+          className="inline-flex items-center justify-center rounded bg-gradient-to-r from-primary to-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {applyingPreset ? 'Applying...' : 'Use Safer Settings'}
+        </button>
+      </div>
+
       <div className="rounded border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-300">
         <span className="font-bold text-white">Data as of:</span> {dataAsOfLabel}
       </div>
+
+      {topPicks.length > 0 && (
+        <div className="rounded border border-emerald-500/20 bg-emerald-500/5 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-white">Start Here</h2>
+              <p className="mt-1 text-sm text-zinc-300">If you want the simplest answer, these are the first contracts to look at.</p>
+            </div>
+            <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">Top 3 picks</div>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {topPicks.map((candidate, index) => (
+              <div key={candidate.id} className="rounded border border-white/10 bg-zinc-950/50 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Pick {index + 1}</div>
+                    <div className="mt-1 text-xl font-bold text-white">{candidate.symbol}</div>
+                  </div>
+                  <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                    {getRecommendation(candidate).label}
+                  </div>
+                </div>
+                <div className="mt-3 text-sm text-zinc-300">
+                  Sell the <span className="font-bold text-white">${candidate.strike.toFixed(2)}</span> put that ends on <span className="font-bold text-white">{candidate.expiry}</span>.
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {getSimpleReasons(candidate).map((reason) => (
+                    <span key={reason} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-zinc-300">
+                      {reason}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                  <div className="rounded bg-white/5 p-2">
+                    <div className="text-zinc-500">Chance it works</div>
+                    <div className="mt-1 font-bold text-white">{(candidate.pop * 100).toFixed(0)}%</div>
+                  </div>
+                  <div className="rounded bg-white/5 p-2">
+                    <div className="text-zinc-500">Money in</div>
+                    <div className="mt-1 font-bold text-emerald-400">${candidate.premium.toFixed(2)}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content Grid */}
       {loading ? (

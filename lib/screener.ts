@@ -4,6 +4,7 @@ import { fetchTickerNews } from './news';
 import type { Broker, OptionContract } from './broker';
 import { SchwabBroker, hasSchwabTokens } from './schwab';
 import { WebullBroker } from './webull';
+import { getSP500Symbols } from './sp500';
 
 interface IVRankCache { ivRank: number; cachedAt: number; }
 
@@ -86,6 +87,46 @@ function getDateString(daysFromNow: number): string {
   return date.toISOString().split('T')[0];
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+async function getUniverseSymbols() {
+  const screenerUniverse = ((getConfig('screener_universe') as string) || 'watchlist') === 'sp500' ? 'sp500' : 'watchlist';
+
+  if (screenerUniverse === 'watchlist') {
+    const watchlist = getWatchlist();
+    return {
+      mode: 'watchlist' as const,
+      symbols: watchlist.map((item) => ({ symbol: item.symbol })),
+      summary: `${watchlist.length} watchlist symbols`,
+    };
+  }
+
+  const allSymbols = await getSP500Symbols();
+  const batchSize = Math.max(25, Math.min(100, Math.round((getConfig('sp500_batch_size') as number) || 50)));
+  const cursor = Math.max(0, Math.round((getConfig('sp500_cursor') as number) || 0));
+  const normalizedCursor = allSymbols.length > 0 ? cursor % allSymbols.length : 0;
+  const symbols = Array.from({ length: Math.min(batchSize, allSymbols.length) }, (_, index) => ({
+    symbol: allSymbols[(normalizedCursor + index) % allSymbols.length],
+  }));
+
+  setConfig('sp500_cursor', (normalizedCursor + symbols.length) % allSymbols.length);
+
+  return {
+    mode: 'sp500' as const,
+    symbols,
+    batchSize,
+    total: allSymbols.length,
+    start: normalizedCursor,
+    summary: `next ${symbols.length} of ${allSymbols.length} S&P symbols`,
+  };
+}
+
 export async function runScreener(): Promise<void> {
   if (progress.running) { console.log('[Screener] Already running, skipping.'); return; }
   progress = { running: true, currentSymbol: '', currentIndex: 0, totalSymbols: 0, status: 'Starting...', candidatesFound: 0, logs: [] };
@@ -93,7 +134,8 @@ export async function runScreener(): Promise<void> {
   console.log('[Screener] Starting screening pipeline...');
 
   try {
-    const watchlist = getWatchlist();
+    const universe = await getUniverseSymbols();
+    const watchlist = universe.symbols;
     const dteMin = (getConfig('dte_min') as number) || 21;
     const dteMax = (getConfig('dte_max') as number) || 45;
     const deltaMin = (getConfig('delta_min') as number) || 0.15;
@@ -106,7 +148,7 @@ export async function runScreener(): Promise<void> {
     const toDate = getDateString(dteMax);
     const historyBroker = new WebullBroker();
 
-    logActivity('', `Scanning ${watchlist.length} symbols (DTE ${dteMin}-${dteMax}, Δ ${deltaMin}-${deltaMax})`, 'info');
+    logActivity('', `Scanning ${universe.summary} (DTE ${dteMin}-${dteMax}, Δ ${deltaMin}-${deltaMax})`, 'info');
 
     if (!hasSchwabTokens()) {
       progress.status = 'Schwab not connected. Connect Schwab to run the options screener.';
@@ -231,12 +273,21 @@ export async function runScreener(): Promise<void> {
           for (const candidate of allCandidates) {
             if (candidate.symbol !== item.symbol || candidate.is_eligible !== 1 || candidate.ai_flag !== 'GRAY') continue;
             const analysis = analyses[analysisIndex++];
-            const premiumYield = Math.min(1, candidate.premium / (candidate.strike * 0.01));
+            const premiumYield = Math.min(1, candidate.premium / Math.max(0.01, candidate.strike * 0.008));
+            const safetyBuffer = candidate.underlying_price > 0
+              ? clamp(((candidate.underlying_price - candidate.strike) / candidate.underlying_price) / 0.15, 0, 1)
+              : 0;
+            const deltaSafety = 1 - clamp(Math.abs(Math.abs(candidate.delta) - 0.15) / 0.10, 0, 1);
             candidate.ai_score = analysis.score;
             candidate.ai_flag = analysis.flag;
             candidate.ai_brief = analysis.brief;
             candidate.ai_risks = JSON.stringify(analysis.risks);
-            candidate.compositeScore = candidate.pop * 0.4 + (candidate.iv_rank / 100) * 0.2 + premiumYield * 0.2 + (analysis.score / 100) * 0.2;
+            candidate.compositeScore =
+              candidate.pop * 0.40 +
+              safetyBuffer * 0.25 +
+              deltaSafety * 0.15 +
+              premiumYield * 0.10 +
+              (analysis.score / 100) * 0.10;
             symbolCandidates++;
           }
         }
@@ -246,9 +297,11 @@ export async function runScreener(): Promise<void> {
         } else {
           logActivity(item.symbol, `No contracts passed filters`, 'skip');
         }
+        await sleep(250);
       } catch (error) {
         logActivity(item.symbol, `Error: ${error instanceof Error ? error.message : 'Unknown'}`, 'error');
         console.error(`[Screener] Error processing ${item.symbol}:`, error);
+        await sleep(500);
       }
     }
 
