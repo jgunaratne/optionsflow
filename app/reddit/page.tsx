@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRedditStore } from '@/lib/store';
-import type { RedditAnalysis } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { Radio, RefreshCw, Loader2, Sparkles, AlertCircle, Newspaper } from 'lucide-react';
 import RedditTickerCard from '@/components/RedditTickerCard';
@@ -30,7 +29,7 @@ export default function RedditPulsePage() {
     fetch('/api/db?table=watchlist')
       .then((res) => res.json())
       .then((data) => {
-        const symbols = new Set<string>((data.rows || []).map((r: any) => r.symbol));
+        const symbols = new Set<string>((data.rows || []).map((r: Record<string, string>) => r.symbol));
         setWatchlistSymbols(symbols);
       })
       .catch(() => {});

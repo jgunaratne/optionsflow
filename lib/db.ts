@@ -439,7 +439,12 @@ export function getCachedRedditPosts(subreddits: string[], maxAgeMinutes = 15): 
     WHERE subreddit IN (${placeholders})
       AND fetched_at > datetime('now', '-${maxAgeMinutes} minutes')
     ORDER BY score DESC
-  `).all(...subreddits) as any[];
+  `).all(...subreddits) as Array<{
+    id: string; subreddit: string; title: string; author: string;
+    score: number; num_comments: number; selftext: string; url: string;
+    permalink: string; created_utc: number; thumbnail: string | null;
+    is_self: number; domain: string; link_flair_text: string | null;
+  }>;
 
   return rows.map((r) => ({
     id: r.id,
@@ -467,6 +472,7 @@ export function cacheRedditAnalysis(subreddits: string[], analysis: string, post
   `).run(JSON.stringify(subreddits.sort()), analysis, postCount);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getCachedRedditAnalysis(subreddits: string[], maxAgeMinutes = 30): any | null {
   const db = getDb();
   const sortedKey = JSON.stringify(subreddits.sort());

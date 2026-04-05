@@ -366,6 +366,7 @@ export const useRedditStore = create<RedditState>((set, get) => ({
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       set({ posts: data.posts || [], lastRefreshed: data.cachedAt, loading: false });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       set({ error: e.message, loading: false });
     }
@@ -382,6 +383,7 @@ export const useRedditStore = create<RedditState>((set, get) => ({
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       set({ analysis: data, analyzing: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       set({ error: e.message, analyzing: false });
     }

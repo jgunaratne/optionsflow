@@ -362,7 +362,7 @@ We are adding a **"Reddit Pulse"** tab to OptionsFlow that monitors stock/option
 
 ## Phase 7 — Testing & Polish (depends on Phase 6)
 
-- [ ] **7.1 — End-to-End Verification**
+- [x] **7.1 — End-to-End Verification**
 
   1. Ensure `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` are set in `.env.local`
   2. Run `npm run dev` and navigate to `/reddit`

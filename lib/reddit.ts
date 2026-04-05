@@ -87,6 +87,7 @@ export async function getAppOnlyToken(): Promise<string> {
 /**
  * Make an authenticated GET request to the Reddit OAuth API.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fetchReddit(endpoint: string, token: string): Promise<any> {
   const url = `https://oauth.reddit.com${endpoint}`;
 
@@ -117,6 +118,7 @@ export async function getHotPosts(
   try {
     const data = await fetchReddit(`/r/${subreddit}/hot?limit=${limit}`, token);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const posts: RedditPost[] = (data?.data?.children || []).map((child: any) => {
       const p = child.data;
       return {
