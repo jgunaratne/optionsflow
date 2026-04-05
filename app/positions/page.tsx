@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useBrokerStore } from '@/lib/store';
-import { RefreshCw, Key, AlertTriangle, BarChart3, Loader2 } from 'lucide-react';
+import { RefreshCw, Key, AlertTriangle, BarChart3, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Position {
@@ -106,8 +106,8 @@ export default function PositionsPage() {
   }, [active]);
 
   const getPnLColor = (pnl: number) => {
-    if (pnl > 0) return 'terminal-green';
-    if (pnl < 0) return 'terminal-red';
+    if (pnl > 0) return 'text-emerald-400';
+    if (pnl < 0) return 'text-red-400';
     return 'text-zinc-500';
   };
 
@@ -115,17 +115,17 @@ export default function PositionsPage() {
     if (pos.assetType === 'OPTION' && pos.putCall) {
       return (
         <span className={cn(
-          "px-2 py-0.5 text-[10px] rounded-sm border",
+          "px-2 py-0.5 text-[10px] rounded-md border font-bold uppercase tracking-tight",
           pos.putCall === 'PUT' ? "border-blue-900/50 bg-blue-950/30 text-blue-400" : "border-emerald-900/50 bg-emerald-950/30 text-emerald-400"
         )}>
-          {pos.putCall === 'PUT' ? 'Put' : 'Call'}
+          {pos.putCall}
         </span>
       );
     }
     if (pos.assetType === 'OPTION') {
-      return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded-sm">Option</span>;
+      return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-400 rounded-md font-bold uppercase tracking-tight">Option</span>;
     }
-    return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-500 rounded-sm">Equity</span>;
+    return <span className="border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[10px] text-zinc-500 rounded-md font-bold uppercase tracking-tight">Equity</span>;
   };
 
   const filtered = positions.filter(p => {
@@ -138,119 +138,126 @@ export default function PositionsPage() {
   const totalDayPnL = positions.reduce((s, p) => s + p.dayPnL, 0);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-4 mt-2">
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between border-b border-white/5 pb-6 mt-2">
         <div>
-          <h1 className="text-xl font-medium text-white tracking-tight">Portfolio positions</h1>
-          <p className="text-xs text-zinc-500 mt-1">Live feed from {brokerLabel}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Positions</h1>
+          <p className="text-sm text-zinc-500 mt-1">Real-time data feed from <span className="text-zinc-300 font-medium">{brokerLabel}</span></p>
         </div>
         <button 
           onClick={fetchPositions} 
-          className="flex items-center gap-2 border border-zinc-800 bg-zinc-900/30 px-4 py-1.5 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white rounded-sm"
+          className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10 hover:text-white rounded-xl"
         >
-          <RefreshCw className="h-3 w-3" />
-          Refresh
+          <RefreshCw className="h-4 w-4" />
+          Refresh Feed
         </button>
       </div>
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center border border-dashed border-zinc-800 rounded-sm">
-          <Loader2 className="h-5 w-5 animate-spin text-zinc-600" />
+        <div className="flex h-64 items-center justify-center border border-dashed border-white/5 rounded-3xl">
+          <Loader2 className="h-8 w-8 animate-spin text-zinc-700" />
         </div>
       ) : needsAuth ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-zinc-800 bg-zinc-950/50 p-6 text-center rounded-sm">
-          <Key className="h-8 w-8 text-zinc-600" />
+        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-white/5 bg-white/5 p-8 text-center rounded-3xl backdrop-blur-sm">
+          <div className="rounded-2xl bg-zinc-900 p-4 border border-white/5 shadow-xl">
+             <Key className="h-8 w-8 text-zinc-500" />
+          </div>
           <div>
-            <p className="text-sm font-medium text-zinc-300">Authentication required</p>
-            <p className="text-xs text-zinc-500 mt-1">Link your {brokerLabel} account to view live data</p>
+            <p className="text-lg font-bold text-white">Authentication required</p>
+            <p className="text-sm text-zinc-500 mt-1">Link your {brokerLabel} account to view live portfolio data</p>
           </div>
           <button
             onClick={handleConnect}
             disabled={connecting}
-            className="border border-primary/50 bg-primary/10 px-6 py-2 text-xs text-primary transition-all hover:bg-primary hover:text-black disabled:opacity-50 rounded-sm mt-2"
+            className="bg-gradient-to-r from-primary to-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 rounded-xl mt-2"
           >
-            {connecting ? 'Connecting...' : `Connect ${brokerLabel}`}
+            {connecting ? 'Connecting...' : `Authorize ${brokerLabel}`}
           </button>
         </div>
       ) : error ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3 border border-red-900/30 bg-red-950/20 p-4 text-center rounded-sm">
-          <AlertTriangle className="h-6 w-6 text-red-500" />
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="flex h-64 flex-col items-center justify-center gap-3 border border-red-500/10 bg-red-500/5 p-8 text-center rounded-3xl">
+          <AlertTriangle className="h-8 w-8 text-red-500 opacity-50" />
+          <p className="text-base font-medium text-red-400">{error}</p>
         </div>
       ) : positions.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3 border border-dashed border-zinc-800 text-zinc-600 rounded-sm">
-          <BarChart3 className="h-8 w-8 opacity-40 mb-2" />
-          <span className="text-sm">No active positions</span>
+        <div className="flex h-64 flex-col items-center justify-center gap-4 border border-dashed border-white/5 bg-white/5 text-zinc-500 rounded-3xl">
+          <div className="rounded-full bg-zinc-900 p-6 border border-white/5">
+            <BarChart3 className="h-10 w-10 opacity-20" />
+          </div>
+          <span className="text-sm font-medium">No active positions found</span>
         </div>
       ) : (
         <>
-          {/* Summary Row */}
-          <div className="grid grid-cols-2 gap-px border border-zinc-800 bg-zinc-800 sm:grid-cols-4 rounded-sm overflow-hidden">
-            <div className="bg-black p-4">
-              <div className="text-xs text-zinc-500">Market value</div>
-              <div className="text-lg text-white mt-1">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          {/* Summary Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl backdrop-blur-sm shadow-sm">
+              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Net Liquidity</div>
+              <div className="text-2xl font-bold text-white mt-1.5">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
-            <div className="bg-black p-4">
-              <div className="text-xs text-zinc-500">Day P&L</div>
-              <div className={cn("text-lg mt-1", getPnLColor(totalDayPnL))}>
-                {totalDayPnL >= 0 ? '+' : ''}${totalDayPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl backdrop-blur-sm shadow-sm">
+              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Day Profit / Loss</div>
+              <div className={cn("text-2xl font-bold mt-1.5 flex items-center gap-2", getPnLColor(totalDayPnL))}>
+                {totalDayPnL >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+                ${Math.abs(totalDayPnL).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="bg-black p-4">
-              <div className="text-xs text-zinc-500">Positions</div>
-              <div className="text-lg text-zinc-300 mt-1">{positions.length}</div>
+            <div className="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl backdrop-blur-sm shadow-sm">
+              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Active Assets</div>
+              <div className="text-2xl font-bold text-zinc-100 mt-1.5">{positions.length}</div>
             </div>
-            <div className="bg-black p-4 flex flex-col justify-center">
-              <div className="flex gap-1.5">
+            <div className="bg-white/5 border border-white/10 p-2 rounded-2xl flex items-center justify-center gap-1">
                 {(['All', 'Equity', 'Option'] as FilterType[]).map(f => (
                   <button key={f} onClick={() => setFilter(f)}
                     className={cn(
-                      "px-3 py-1 text-xs transition-colors border rounded-sm",
-                      filter === f ? "border-primary bg-primary/10 text-primary" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"
+                      "flex-1 h-full px-3 py-2 text-xs font-bold transition-all rounded-xl",
+                      filter === f ? "bg-white/10 text-white shadow-sm border border-white/10" : "text-zinc-500 hover:text-zinc-300"
                     )}>
                     {f}
                   </button>
                 ))}
-              </div>
             </div>
           </div>
 
           {/* Positions Table */}
-          <div className="border border-zinc-800 rounded-sm overflow-x-auto">
-            <table className="w-full text-xs text-left whitespace-nowrap">
-              <thead>
-                <tr className="bg-zinc-900/40 text-zinc-500 border-b border-zinc-800">
-                  <th className="px-4 py-3 font-normal">Symbol</th>
-                  <th className="px-4 py-3 font-normal">Type</th>
-                  <th className="px-4 py-3 font-normal text-right">Qty</th>
-                  <th className="px-4 py-3 font-normal text-right">Avg px</th>
-                  <th className="px-4 py-3 font-normal text-right">Mkt val</th>
-                  <th className="px-4 py-3 font-normal text-right">Day P&L</th>
-                  <th className="px-4 py-3 font-normal text-right">Day %</th>
-                  <th className="px-4 py-3 font-normal hidden lg:table-cell">Description</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/60">
-                {filtered.map((pos, i) => (
-                  <tr key={i} className="bg-black transition-colors hover:bg-zinc-900/30">
-                    <td className="px-4 py-2.5 font-medium text-zinc-100">{pos.symbol}</td>
-                    <td className="px-4 py-2.5">{getTypeBadge(pos)}</td>
-                    <td className="px-4 py-2.5 text-right text-zinc-300">{pos.quantity}</td>
-                    <td className="px-4 py-2.5 text-right text-zinc-400">${pos.averagePrice.toFixed(2)}</td>
-                    <td className="px-4 py-2.5 text-right text-zinc-200">${pos.marketValue.toFixed(2)}</td>
-                    <td className={cn("px-4 py-2.5 text-right", getPnLColor(pos.dayPnL))}>
-                      {pos.dayPnL >= 0 ? '+' : ''}${pos.dayPnL.toFixed(2)}
-                    </td>
-                    <td className={cn("px-4 py-2.5 text-right", getPnLColor(pos.dayPnLPct))}>
-                      {pos.dayPnLPct >= 0 ? '+' : ''}{pos.dayPnLPct.toFixed(2)}%
-                    </td>
-                    <td className="px-4 py-2.5 hidden lg:table-cell text-zinc-500 truncate max-w-[250px]">
-                      {pos.description}
-                    </td>
+          <div className="border border-white/5 rounded-2xl overflow-hidden bg-zinc-900/20 backdrop-blur-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left whitespace-nowrap">
+                <thead>
+                  <tr className="bg-white/5 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                    <th className="px-6 py-4">Symbol</th>
+                    <th className="px-6 py-4">Type</th>
+                    <th className="px-6 py-4 text-right">Quantity</th>
+                    <th className="px-6 py-4 text-right">Avg Price</th>
+                    <th className="px-6 py-4 text-right">Market Value</th>
+                    <th className="px-6 py-4 text-right">Day P&L</th>
+                    <th className="px-6 py-4 text-right">Change %</th>
+                    <th className="px-6 py-4 hidden lg:table-cell">Asset Name</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {filtered.map((pos, i) => (
+                    <tr key={i} className="group hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 font-bold text-white">{pos.symbol}</td>
+                      <td className="px-6 py-4">{getTypeBadge(pos)}</td>
+                      <td className="px-6 py-4 text-right font-medium text-zinc-300">{pos.quantity}</td>
+                      <td className="px-6 py-4 text-right text-zinc-400 font-medium">${pos.averagePrice.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-right font-bold text-zinc-100">${pos.marketValue.toFixed(2)}</td>
+                      <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnL))}>
+                        {pos.dayPnL >= 0 ? '+' : '-'}${Math.abs(pos.dayPnL).toFixed(2)}
+                      </td>
+                      <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnLPct))}>
+                        <span className="px-2 py-1 rounded-lg bg-current/5">
+                          {pos.dayPnLPct >= 0 ? '▲' : '▼'} {Math.abs(pos.dayPnLPct).toFixed(2)}%
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 hidden lg:table-cell text-xs text-zinc-500 font-medium truncate max-w-[200px]">
+                        {pos.description}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}

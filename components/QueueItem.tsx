@@ -2,7 +2,7 @@
 
 import type { QueueItemWithCandidate } from '@/lib/db';
 import { useStreamStore } from '@/lib/store';
-import { Minus, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { Minus, Plus, Trash2, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QueueItemProps {
@@ -20,64 +20,73 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
 
   return (
     <div className={cn(
-      "group flex items-center gap-5 border bg-black p-4 transition-colors hover:bg-zinc-900/30 rounded-sm",
-      priceAlert ? "border-amber-900/50 bg-amber-950/10" : "border-zinc-800"
+      "group flex items-center gap-6 border bg-zinc-900/40 p-4 transition-all hover:bg-zinc-900/60 rounded-2xl backdrop-blur-sm",
+      priceAlert ? "border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]" : "border-white/5 shadow-sm"
     )}>
-      {/* Symbol + Meta */}
-      <div className="min-w-[140px] border-r border-zinc-800 pr-5">
+      {/* Symbol + Identity */}
+      <div className="min-w-[140px] border-r border-white/5 pr-6">
         <div className="flex items-center gap-2">
-          <span className="text-base font-semibold text-white tracking-tight">{item.symbol}</span>
-          <span className="bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-400 rounded-sm">{item.strategy}</span>
+          <span className="text-base font-bold text-white tracking-tight">{item.symbol}</span>
+          <span className="bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-zinc-400 rounded-md uppercase tracking-tighter">{item.strategy}</span>
         </div>
-        <div className="mt-1.5 text-xs text-zinc-500">
-          ${item.strike.toFixed(2)} • {item.expiry}
+        <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-zinc-500">
+          <span>${item.strike.toFixed(2)}</span>
+          <span className="text-zinc-700">•</span>
+          <span>{item.expiry}</span>
         </div>
       </div>
 
       {/* Exposure Metrics */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-1 border-r border-zinc-800 pr-6 min-w-[160px]">
+      <div className="grid grid-cols-2 gap-x-8 gap-y-1 border-r border-white/5 pr-8 min-w-[180px]">
         <div className="flex flex-col">
-          <span className="text-[10px] text-zinc-600">Premium</span>
-          <span className="text-sm terminal-green">${(item.premium * 100 * item.quantity).toFixed(0)}</span>
+          <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Premium</span>
+          <span className="text-sm font-bold terminal-green">${(item.premium * 100 * item.quantity).toFixed(0)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] text-zinc-600">Risk</span>
-          <span className="text-sm terminal-red">${(item.max_loss * item.quantity).toLocaleString()}</span>
+          <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Max Risk</span>
+          <span className="text-sm font-bold text-red-400">${(item.max_loss * item.quantity).toLocaleString()}</span>
         </div>
       </div>
 
       {/* Live Data Feed */}
-      <div className="flex flex-col min-w-[120px]">
-        <span className="text-[10px] text-zinc-600">Underlying px</span>
+      <div className="flex flex-col min-w-[130px]">
+        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Live Underlying</span>
         {livePrice ? (
           <div className="flex items-center gap-2 mt-0.5">
-            <span className={cn("text-sm", priceAlert ? "text-amber-500" : "text-zinc-200")}>
+            <span className={cn("text-sm font-bold", priceAlert ? "text-amber-400" : "text-zinc-200")}>
               ${livePrice.toFixed(2)}
             </span>
-            {priceAlert && <AlertTriangle className="h-3 w-3 text-amber-500 animate-pulse" />}
-            <span className={cn("text-xs ml-1", priceDiff! >= 0 ? "terminal-green" : "terminal-red")}>
-              {priceDiff! >= 0 ? '▲' : '▼'}{Math.abs(priceDiff!).toFixed(2)}%
-            </span>
+            {priceAlert && <AlertTriangle className="h-3.5 w-3.5 text-amber-500 animate-pulse" />}
+            <div className={cn(
+              "flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md", 
+              priceDiff! >= 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
+            )}>
+              {priceDiff! >= 0 ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
+              {Math.abs(priceDiff!).toFixed(2)}%
+            </div>
           </div>
         ) : (
-          <span className="text-xs text-zinc-700 animate-pulse mt-0.5">Waiting...</span>
+          <div className="flex items-center gap-2 mt-1">
+             <div className="h-1.5 w-1.5 rounded-full bg-zinc-800 animate-pulse" />
+             <span className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest">Waiting...</span>
+          </div>
         )}
       </div>
 
       {/* QTY Control */}
-      <div className="flex items-center gap-3 border-l border-zinc-800 pl-5">
-        <span className="text-[10px] text-zinc-600">Qty</span>
-        <div className="flex items-center border border-zinc-800 bg-zinc-950 rounded-sm overflow-hidden">
+      <div className="flex items-center gap-4 border-l border-white/5 pl-6">
+        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Qty</span>
+        <div className="flex items-center border border-white/10 bg-black/40 rounded-xl overflow-hidden shadow-inner">
           <button
             onClick={() => onQuantityChange(item.queue_id, Math.max(1, item.quantity - 1))}
-            className="flex h-7 w-7 items-center justify-center text-zinc-500 hover:bg-zinc-800 hover:text-white transition-colors"
+            className="flex h-8 w-8 items-center justify-center text-zinc-500 hover:bg-white/5 hover:text-white transition-colors"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
-          <span className="w-10 text-center text-sm font-medium text-white">{item.quantity}</span>
+          <span className="w-10 text-center text-sm font-bold text-white">{item.quantity}</span>
           <button
             onClick={() => onQuantityChange(item.queue_id, item.quantity + 1)}
-            className="flex h-7 w-7 items-center justify-center text-zinc-500 hover:bg-zinc-800 hover:text-white transition-colors"
+            className="flex h-8 w-8 items-center justify-center text-zinc-500 hover:bg-white/5 hover:text-white transition-colors"
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
@@ -87,10 +96,10 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* REMOVE ACTION */}
       <button
         onClick={() => onRemove(item.queue_id)}
-        className="ml-auto flex h-9 w-9 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-sm border border-transparent hover:border-red-500/20"
+        className="ml-auto flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-xl border border-transparent hover:border-red-500/20 group/trash"
         title="Remove order"
       >
-        <Trash2 className="h-4 w-4" />
+        <Trash2 className="h-5 w-5 transition-transform group-hover/trash:scale-110" />
       </button>
     </div>
   );

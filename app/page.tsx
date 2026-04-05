@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import CandidateCard from '@/components/CandidateCard';
 import { useCandidatesStore, useQueueStore } from '@/lib/store';
-import { Loader2, Play, Search } from 'lucide-react';
+import { Loader2, Play, Search, Filter, SortDesc, Calendar, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScreenerProgress {
@@ -79,19 +79,19 @@ export default function ScreenerPage() {
     : 0;
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-4 mt-2">
-        <div className="flex items-center gap-6">
-          <h1 className="text-xl font-medium text-white tracking-tight">Market screener</h1>
-          <div className="flex items-center gap-4 text-xs text-zinc-500">
+    <div className="flex flex-col gap-6">
+      {/* Header Section */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/5 pb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Screener</h1>
+          <div className="mt-2 flex items-center gap-4 text-sm text-zinc-500 font-medium">
              <div className="flex items-center gap-1.5">
-               <span className="text-zinc-600">Last run:</span>
-               <span className="text-zinc-300">{lastScreenedAt ? new Date(lastScreenedAt * 1000).toLocaleString() : 'N/A'}</span>
+               <Calendar className="h-4 w-4 text-zinc-600" />
+               <span>Last run: {lastScreenedAt ? new Date(lastScreenedAt * 1000).toLocaleString() : 'Never'}</span>
              </div>
              <div className="flex items-center gap-1.5">
-               <span className="text-zinc-600">Count:</span>
-               <span className="terminal-cyan">{candidates.length}</span>
+               <Layers className="h-4 w-4 text-zinc-600" />
+               <span className="text-emerald-400">{candidates.length} candidates found</span>
              </div>
           </div>
         </div>
@@ -100,43 +100,69 @@ export default function ScreenerPage() {
           onClick={handleRunScreener}
           disabled={screenerRunning}
           className={cn(
-            "flex items-center gap-2 border px-4 py-1.5 text-xs transition-all rounded-sm",
+            "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-6 py-3 text-sm font-bold transition-all duration-300",
             screenerRunning
-              ? "border-zinc-800 bg-zinc-900 text-zinc-600"
-              : "border-primary/50 bg-primary/10 text-primary hover:bg-primary hover:text-black"
+              ? "bg-zinc-900 text-zinc-500 border border-white/5"
+              : "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
           )}
         >
-          {screenerRunning ? <Loader2 className="h-3 w-3 animate-spin" /> : <Play className="h-3 w-3 fill-current" />}
-          {screenerRunning ? 'Scanning...' : 'Run screener'}
+          {screenerRunning ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Scanning Markets...</span>
+            </>
+          ) : (
+            <>
+              <Play className="h-4 w-4 fill-current" />
+              <span>Run Screener</span>
+            </>
+          )}
         </button>
       </div>
 
-      {/* Compact Progress Bar */}
+      {/* Progress Monitor */}
       {progress && progress.running && (
-        <div className="border border-zinc-800 bg-zinc-950 p-3 rounded-sm">
-          <div className="mb-2 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2">
-              <span className="terminal-green">{progress.status}</span>
-              <span className="text-zinc-500">[{progress.currentSymbol || '...'}]</span>
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 p-1 backdrop-blur-sm">
+          <div className="rounded-xl bg-zinc-950/40 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-white uppercase tracking-wider">{progress.status}</div>
+                  <div className="text-xs font-medium text-zinc-500">
+                    {progress.currentSymbol ? `Analyzing ${progress.currentSymbol}...` : 'Initializing scan...'}
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold text-white">{progressPercent}%</div>
+                <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  {progress.candidatesFound} found
+                </div>
+              </div>
             </div>
-            <span className="text-zinc-300">{progressPercent}%</span>
-          </div>
-          <div className="h-1.5 bg-zinc-900 rounded-full overflow-hidden">
-            <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-primary to-indigo-400 transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
         </div>
       )}
 
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-4 text-xs bg-zinc-900/30 p-2 border border-zinc-800 rounded-sm">
-        <div className="flex items-center gap-2 border-r border-zinc-800 pr-4">
-          <span className="text-zinc-500">Strategy:</span>
+      {/* Toolbar & Filters */}
+      <div className="flex flex-wrap items-center gap-3 bg-white/5 p-3 border border-white/5 rounded-2xl backdrop-blur-sm">
+        <div className="flex items-center gap-2 rounded-xl bg-zinc-950/50 px-3 py-2 border border-white/5">
+          <Filter className="h-4 w-4 text-zinc-500" />
           <select
             value={filters.strategy || ''}
             onChange={(e) => { setFilters({ strategy: e.target.value || undefined }); fetchCandidates(); }}
-            className="bg-transparent text-zinc-200 outline-none cursor-pointer"
+            className="bg-transparent text-sm font-medium text-zinc-300 outline-none cursor-pointer"
           >
-            <option value="" className="bg-zinc-900">All</option>
+            <option value="" className="bg-zinc-900">All Strategies</option>
             <option value="CSP" className="bg-zinc-900">Cash Secured Put</option>
             <option value="CC" className="bg-zinc-900">Covered Call</option>
             <option value="BULL_PUT_SPREAD" className="bg-zinc-900">Put Spread</option>
@@ -144,12 +170,12 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 border-r border-zinc-800 pr-4">
-          <span className="text-zinc-500">Flag:</span>
+        <div className="flex items-center gap-2 rounded-xl bg-zinc-950/50 px-3 py-2 border border-white/5">
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Flag:</span>
           <select
             value={filters.flag || ''}
             onChange={(e) => { setFilters({ flag: e.target.value || undefined }); fetchCandidates(); }}
-            className="bg-transparent text-zinc-200 outline-none cursor-pointer"
+            className="bg-transparent text-sm font-medium text-zinc-300 outline-none cursor-pointer"
           >
             <option value="" className="bg-zinc-900">All</option>
             <option value="GREEN" className="bg-zinc-900">Green</option>
@@ -158,26 +184,26 @@ export default function ScreenerPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 border-r border-zinc-800 pr-4">
-          <span className="text-zinc-500">Min POP:</span>
+        <div className="flex items-center gap-2 rounded-xl bg-zinc-950/50 px-3 py-2 border border-white/5">
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">Min Pop:</span>
           <input
             type="number"
             min="0" max="100" step="5"
             placeholder="%"
             onChange={(e) => { setFilters({ min_pop: e.target.value ? parseFloat(e.target.value) / 100 : undefined }); fetchCandidates(); }}
-            className="w-12 bg-transparent text-zinc-200 outline-none placeholder:text-zinc-700"
+            className="w-10 bg-transparent text-sm font-bold text-zinc-100 outline-none placeholder:text-zinc-700"
           />
         </div>
 
-        <div className="ml-auto flex items-center gap-2 pl-2">
-          <span className="text-zinc-500">Sort by:</span>
+        <div className="sm:ml-auto flex items-center gap-2 rounded-xl bg-primary/10 px-4 py-2 border border-primary/20">
+          <SortDesc className="h-4 w-4 text-primary" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-transparent terminal-cyan outline-none cursor-pointer"
+            className="bg-transparent text-sm font-bold text-primary outline-none cursor-pointer"
           >
             <option value="ai_score" className="bg-zinc-900 text-zinc-200">AI Score</option>
-            <option value="pop" className="bg-zinc-900 text-zinc-200">Probability of Profit</option>
+            <option value="pop" className="bg-zinc-900 text-zinc-200">Probability</option>
             <option value="premium" className="bg-zinc-900 text-zinc-200">Premium</option>
             <option value="iv_rank" className="bg-zinc-900 text-zinc-200">IV Rank</option>
           </select>
@@ -186,17 +212,22 @@ export default function ScreenerPage() {
 
       {/* Content Grid */}
       {loading ? (
-        <div className="flex h-64 items-center justify-center border border-dashed border-zinc-800 rounded-sm">
-          <Loader2 className="h-5 w-5 animate-spin text-zinc-600 mr-3" />
-          <span className="text-sm text-zinc-500">Loading data...</span>
+        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-white/5">
+          <Loader2 className="h-10 w-10 animate-spin text-primary opacity-50" />
+          <span className="text-sm font-medium text-zinc-500 uppercase tracking-widest">Loading Market Data...</span>
         </div>
       ) : sorted.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center border border-dashed border-zinc-800 text-zinc-600 rounded-sm">
-          <Search className="h-8 w-8 mb-3 opacity-30" />
-          <span className="text-sm">No records found</span>
+        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-white/5 text-zinc-500">
+          <div className="rounded-full bg-zinc-900 p-6 border border-white/5 mb-2">
+            <Search className="h-10 w-10 opacity-20" />
+          </div>
+          <div className="text-center">
+             <h3 className="text-lg font-bold text-zinc-400">No candidates found</h3>
+             <p className="text-sm max-w-xs mt-1">Adjust your filters or run the screener to find new opportunities.</p>
+          </div>
         </div>
       ) : (
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {sorted.map(candidate => (
             <CandidateCard
               key={candidate.id}
