@@ -22,43 +22,42 @@ export default function SectorChart({ data }: SectorChartProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <h3 className="mb-3 text-sm font-semibold text-zinc-300">Sector Exposure</h3>
-      <div className="flex items-center gap-6">
-        <div className="h-52 w-52">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                dataKey="pct"
-                nameKey="sector"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                innerRadius={40}
-                paddingAngle={2}
-                strokeWidth={0}
-              >
-                {data.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px', fontSize: 12 }}
-                formatter={(value: unknown) => [`${(Number(value) * 100).toFixed(1)}%`, 'Exposure']}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="flex flex-col gap-2">
-          {data.map((item, i) => (
-            <div key={item.sector} className="flex items-center gap-2 text-sm">
-              <div className="h-3 w-3 rounded-2xl-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-              <span className="text-zinc-400">{item.sector}</span>
-              <span className="ml-auto font-semibold text-zinc-200">{(item.pct * 100).toFixed(1)}%</span>
+    <div className="flex items-center justify-around gap-6">
+      <div className="h-52 w-52 shrink-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="pct"
+              nameKey="sector"
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              innerRadius={40}
+              paddingAngle={2}
+              strokeWidth={0}
+            >
+              {data.map((_, i) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '16px', fontSize: 12 }}
+              formatter={(value: unknown) => [`${(Number(value) * 100).toFixed(1)}%`, 'Exposure']}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="flex flex-col gap-3 min-w-[120px]">
+        {data.map((item, i) => (
+          <div key={item.sector} className="flex items-center justify-between gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-2xl-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+              <span className="text-zinc-400 font-medium">{item.sector}</span>
             </div>
-          ))}
-        </div>
+            <span className="font-bold text-zinc-200">{(item.pct * 100).toFixed(1)}%</span>
+          </div>
+        ))}
       </div>
     </div>
   );

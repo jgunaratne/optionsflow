@@ -20,14 +20,14 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
 
   return (
     <div className={cn(
-      "group flex items-center gap-6 border bg-zinc-900/20 p-6 transition-all hover:bg-zinc-900/30 rounded-2xl backdrop-blur-md shadow-xl",
-      priceAlert ? "border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]" : "border-white/10 shadow-sm"
+      "group flex flex-wrap lg:flex-nowrap items-center justify-between gap-6 bg-zinc-900/20 p-5 transition-all hover:bg-zinc-900/40 rounded-2xl",
+      priceAlert ? "border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]" : "border border-white/5"
     )}>
       {/* Symbol + Identity */}
-      <div className="min-w-[140px] border-r border-white/10 pr-6">
+      <div className="min-w-[140px]">
         <div className="flex items-center gap-2">
           <span className="text-base font-bold text-white tracking-tight">{item.symbol}</span>
-          <span className="bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-zinc-400 rounded-2xl uppercase tracking-tighter">{item.strategy}</span>
+          <span className="bg-white/5 px-2 py-0.5 text-[10px] font-bold text-zinc-400 rounded-2xl uppercase tracking-tighter">{item.strategy}</span>
         </div>
         <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
           <span>${item.strike.toFixed(2)}</span>
@@ -37,20 +37,20 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       </div>
 
       {/* Exposure Metrics */}
-      <div className="grid grid-cols-2 gap-x-8 gap-y-1 border-r border-white/10 pr-8 min-w-[180px]">
+      <div className="flex gap-8">
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Cash Earned</span>
-          <span className="text-sm font-bold terminal-green">${(item.premium * 100 * item.quantity).toFixed(0)}</span>
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Cash Earned</span>
+          <span className="text-sm font-bold text-emerald-400">${(item.premium * 100 * item.quantity).toFixed(0)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Max Risk</span>
-          <span className="text-sm font-bold text-red-400">${(item.max_loss * item.quantity).toLocaleString()}</span>
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Max Risk</span>
+          <span className="text-sm font-bold text-zinc-200">${(item.max_loss * item.quantity).toLocaleString()}</span>
         </div>
       </div>
 
       {/* Live Data Feed */}
       <div className="flex flex-col min-w-[130px]">
-        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Live Underlying</span>
+        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Live Underlying</span>
         {livePrice ? (
           <div className="flex items-center gap-2 mt-0.5">
             <span className={cn("text-sm font-bold", priceAlert ? "text-amber-400" : "text-zinc-200")}>
@@ -68,25 +68,25 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
         ) : (
           <div className="flex items-center gap-2 mt-1">
              <div className="h-1.5 w-1.5 rounded-2xl-full bg-zinc-800 animate-pulse" />
-             <span className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest">Waiting...</span>
+             <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Waiting...</span>
           </div>
         )}
       </div>
 
       {/* QTY Control */}
-      <div className="flex items-center gap-6 border-l border-white/10 pl-6">
-        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Qty</span>
-        <div className="flex items-center border border-white/10 bg-black/40 rounded-2xl overflow-hidden shadow-inner">
+      <div className="flex items-center gap-6">
+        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider hidden sm:block">Qty</span>
+        <div className="flex items-center bg-black/20 rounded-2xl-lg overflow-hidden border border-white/5">
           <button
             onClick={() => onQuantityChange(item.queue_id, Math.max(1, item.quantity - 1))}
-            className="flex h-8 w-8 items-center justify-center text-zinc-400 hover:bg-white/5 hover:text-white transition-colors"
+            className="flex h-8 w-8 items-center justify-center text-zinc-500 hover:bg-white/5 hover:text-white transition-colors"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
-          <span className="w-10 text-center text-sm font-bold text-white">{item.quantity}</span>
+          <span className="w-8 text-center text-sm font-bold text-white">{item.quantity}</span>
           <button
             onClick={() => onQuantityChange(item.queue_id, item.quantity + 1)}
-            className="flex h-8 w-8 items-center justify-center text-zinc-400 hover:bg-white/5 hover:text-white transition-colors"
+            className="flex h-8 w-8 items-center justify-center text-zinc-500 hover:bg-white/5 hover:text-white transition-colors"
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
@@ -96,10 +96,10 @@ export default function QueueItem({ item, onRemove, onQuantityChange }: QueueIte
       {/* REMOVE ACTION */}
       <button
         onClick={() => onRemove(item.queue_id)}
-        className="ml-auto flex h-10 w-10 items-center justify-center text-zinc-400 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-2xl border border-transparent hover:border-red-500/20 group/trash"
+        className="flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-red-500/10 hover:text-red-400 transition-all rounded-2xl-lg group/trash"
         title="Remove order"
       >
-        <Trash2 className="h-5 w-5 transition-transform group-hover/trash:scale-110" />
+        <Trash2 className="h-4 w-4 transition-transform group-hover/trash:scale-110" />
       </button>
     </div>
   );

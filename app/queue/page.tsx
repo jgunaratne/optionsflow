@@ -82,24 +82,27 @@ export default function QueuePage() {
       )}
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Total Orders</div>
+      <div className="flex flex-wrap items-center gap-10 bg-white/5 border border-white/10 p-6 rounded-2xl">
+        <div>
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Total Orders</div>
           <div className="text-2xl font-bold text-white">{queue.length}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Est. Cash Earned</div>
-          <div className="text-2xl font-bold terminal-green">${totalCashEarned.toFixed(0)}</div>
+        <div className="h-10 w-px bg-white/10 hidden sm:block" />
+        <div>
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Est. Cash Earned</div>
+          <div className="text-2xl font-bold text-emerald-400">${totalCashEarned.toFixed(0)}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Max Risk</div>
+        <div className="h-10 w-px bg-white/10 hidden lg:block" />
+        <div>
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Max Risk</div>
           <div className="text-2xl font-bold text-zinc-200">${totalMaxLoss.toLocaleString()}</div>
         </div>
-        <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl shadow-sm">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Cap. Impact</div>
+        <div className="h-10 w-px bg-white/10 hidden sm:block" />
+        <div>
+          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Cap. Impact</div>
           <div className={cn(
             "text-2xl font-bold",
-            deployedPct > 50 ? 'terminal-red' : deployedPct > 30 ? 'terminal-amber' : 'terminal-green'
+            deployedPct > 50 ? 'text-red-400' : deployedPct > 30 ? 'text-amber-400' : 'text-emerald-400'
           )}>
             {deployedPct.toFixed(1)}%
           </div>

@@ -254,45 +254,44 @@ export default function PositionsPage() {
           {/* PnL Chart */}
           <PositionsChart positions={filtered} />
 
-          {/* Positions Table */}          <div className="border border-white/10 rounded-2xl overflow-hidden bg-zinc-900/20 backdrop-blur-md shadow-xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left whitespace-nowrap">
-                <thead>
-                  <tr className="bg-white/5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider border-b border-white/10">
-                    <th className="px-6 py-4">Symbol</th>
-                    <th className="px-6 py-4">Type</th>
-                    <th className="px-6 py-4 text-right">Quantity</th>
-                    <th className="px-6 py-4 text-right">Avg Price</th>
-                    <th className="px-6 py-4 text-right">Market Value</th>
-                    <th className="px-6 py-4 text-right">Day P&L</th>
-                    <th className="px-6 py-4 text-right">Change %</th>
-                    <th className="px-6 py-4 hidden lg:table-cell">Asset Name</th>
+          {/* Positions Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left whitespace-nowrap">
+              <thead>
+                <tr className="bg-white/5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider border-b border-white/10">
+                  <th className="px-6 py-4">Symbol</th>
+                  <th className="px-6 py-4">Type</th>
+                  <th className="px-6 py-4 text-right">Quantity</th>
+                  <th className="px-6 py-4 text-right">Avg Price</th>
+                  <th className="px-6 py-4 text-right">Market Value</th>
+                  <th className="px-6 py-4 text-right">Day P&L</th>
+                  <th className="px-6 py-4 text-right">Change %</th>
+                  <th className="px-6 py-4 hidden lg:table-cell">Asset Name</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {filtered.map((pos, i) => (
+                  <tr key={i} className="group hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 font-bold text-white">{pos.symbol}</td>
+                    <td className="px-6 py-4">{getTypeBadge(pos)}</td>
+                    <td className="px-6 py-4 text-right font-medium text-zinc-300">{pos.quantity}</td>
+                    <td className="px-6 py-4 text-right text-zinc-400 font-medium">${pos.averagePrice.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right font-bold text-zinc-100">${pos.marketValue.toFixed(2)}</td>
+                    <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnL))}>
+                      {pos.dayPnL >= 0 ? '+' : '-'}${Math.abs(pos.dayPnL).toFixed(2)}
+                    </td>
+                    <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnLPct))}>
+                      <span className="px-2 py-1 rounded-2xl bg-current/5">
+                        {pos.dayPnLPct >= 0 ? '▲' : '▼'} {Math.abs(pos.dayPnLPct).toFixed(2)}%
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 hidden lg:table-cell text-sm text-zinc-400 font-medium truncate max-w-[200px]">
+                      {pos.description}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {filtered.map((pos, i) => (
-                    <tr key={i} className="group hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 font-bold text-white">{pos.symbol}</td>
-                      <td className="px-6 py-4">{getTypeBadge(pos)}</td>
-                      <td className="px-6 py-4 text-right font-medium text-zinc-300">{pos.quantity}</td>
-                      <td className="px-6 py-4 text-right text-zinc-400 font-medium">${pos.averagePrice.toFixed(2)}</td>
-                      <td className="px-6 py-4 text-right font-bold text-zinc-100">${pos.marketValue.toFixed(2)}</td>
-                      <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnL))}>
-                        {pos.dayPnL >= 0 ? '+' : '-'}${Math.abs(pos.dayPnL).toFixed(2)}
-                      </td>
-                      <td className={cn("px-6 py-4 text-right font-bold", getPnLColor(pos.dayPnLPct))}>
-                        <span className="px-2 py-1 rounded-2xl bg-current/5">
-                          {pos.dayPnLPct >= 0 ? '▲' : '▼'} {Math.abs(pos.dayPnLPct).toFixed(2)}%
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 hidden lg:table-cell text-sm text-zinc-400 font-medium truncate max-w-[200px]">
-                        {pos.description}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </>
       )}

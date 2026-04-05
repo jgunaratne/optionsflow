@@ -101,21 +101,23 @@ export default function PortfolioPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Portfolio Greeks */}
         <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
              <Activity className="h-4 w-4 text-primary" />
              <span className="text-sm font-bold text-zinc-200">Portfolio Greeks</span>
           </div>
-          <div className="grid grid-cols-3 gap-5">
-            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-              <div className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Direction Risk</div>
+          <div className="flex flex-wrap items-center justify-around gap-4 text-center">
+            <div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Direction Risk</div>
               <div className="text-lg font-bold text-zinc-100">{greeks.totalDelta.toFixed(1)}</div>
             </div>
-            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-              <div className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Time Value</div>
-              <div className="text-lg font-bold terminal-green">+${greeks.totalTheta.toFixed(2)}</div>
+            <div className="h-10 w-px bg-white/10" />
+            <div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Time Value</div>
+              <div className="text-lg font-bold text-emerald-400">+${greeks.totalTheta.toFixed(2)}</div>
             </div>
-            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-              <div className="text-[10px] font-bold text-zinc-400 uppercase mb-1">Hype Risk</div>
+            <div className="h-10 w-px bg-white/10" />
+            <div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Hype Risk</div>
               <div className="text-lg font-bold text-zinc-100">{greeks.totalVega.toFixed(1)}</div>
             </div>
           </div>
@@ -124,7 +126,7 @@ export default function PortfolioPage() {
         {/* Resource Allocation */}
         {allocation && (
           <div className="bg-zinc-900/20 border border-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
                <BarChart className="h-4 w-4 text-primary" />
                <span className="text-sm font-bold text-zinc-200">Resource Allocation</span>
             </div>
@@ -161,9 +163,9 @@ export default function PortfolioPage() {
            <ShieldAlert className="h-5 w-5 text-amber-500" />
            <span className="text-base font-bold text-zinc-100 tracking-tight">Active Hedging Engine</span>
         </div>
-        <p className="text-sm text-zinc-400 mb-6">Real-time collar recommendations for SPY, QQQ, and IWM positions</p>
-        <div className="flex h-32 items-center justify-center border border-dashed border-white/10 bg-black/20 rounded-2xl">
-          <p className="text-sm font-medium text-zinc-400 uppercase tracking-widest">Waiting for data feed from broker...</p>
+        <p className="text-sm text-zinc-400 mb-8">Real-time collar recommendations for SPY, QQQ, and IWM positions</p>
+        <div className="flex h-16 items-center justify-center">
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest">Waiting for data feed from broker...</p>
         </div>
       </div>
     </div>

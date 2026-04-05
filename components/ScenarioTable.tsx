@@ -17,22 +17,22 @@ export default function ScenarioTable({ scenarios, totalValue }: ScenarioTablePr
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
-      <div className="border-b border-zinc-800 px-4 py-3">
-        <h3 className="text-sm font-semibold text-zinc-300">Crash Scenario Stress Test</h3>
+    <div className="overflow-x-auto">
+      <div className="mb-4">
+        <h3 className="text-sm font-bold text-zinc-200">Crash Scenario Stress Test</h3>
         <p className="text-sm text-zinc-400 mt-0.5">Estimated portfolio impact under market drawdowns</p>
       </div>
-      <table className="w-full text-sm">
+      <table className="w-full text-sm text-left">
         <thead>
-          <tr className="border-b border-zinc-800/50 text-sm text-zinc-400">
-            <th className="px-4 py-2.5 text-left font-medium">Scenario</th>
-            <th className="px-4 py-2.5 text-right font-medium">Market Move</th>
-            <th className="px-4 py-2.5 text-right font-medium">Est. P&L</th>
-            <th className="px-4 py-2.5 text-right font-medium">Portfolio After</th>
-            <th className="px-4 py-2.5 text-right font-medium">Drawdown</th>
+          <tr className="border-b border-white/10 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+            <th className="px-4 py-3 font-medium">Scenario</th>
+            <th className="px-4 py-3 text-right font-medium">Market Move</th>
+            <th className="px-4 py-3 text-right font-medium">Est. P&L</th>
+            <th className="px-4 py-3 text-right font-medium">Portfolio After</th>
+            <th className="px-4 py-3 text-right font-medium">Drawdown</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-white/5">
           {scenarios.map((scenario, i) => {
             const drawdown = totalValue > 0
               ? ((scenario.portfolioValueAfter - totalValue) / totalValue) * 100
@@ -45,7 +45,7 @@ export default function ScenarioTable({ scenarios, totalValue }: ScenarioTablePr
               : '';
 
             return (
-              <tr key={i} className={`border-b border-zinc-800/30 ${rowBg} transition-colors hover:bg-zinc-800/20`}>
+              <tr key={i} className={`${rowBg} transition-colors hover:bg-white/5`}>
                 <td className="px-4 py-3 font-medium text-zinc-200">{scenario.label}</td>
                 <td className="px-4 py-3 text-right font-semibold text-red-400">
                   {(scenario.marketMove * 100).toFixed(0)}%

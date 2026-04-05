@@ -56,7 +56,7 @@ export default function ChatPage() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto border border-white/10 bg-zinc-950/30 backdrop-blur-md shadow-xl p-6 space-y-6 rounded-2xl shadow-inner">
+      <div className="flex-1 overflow-y-auto px-2 py-4 space-y-6">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-6">
             <div className="relative">
@@ -84,35 +84,35 @@ export default function ChatPage() {
         ) : (
           <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
             {messages.map((msg, i) => (
-              <div key={i} className={cn("flex gap-6", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}>
+              <div key={i} className={cn("flex gap-4", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}>
                 <div className={cn(
-                  "flex h-10 w-10 shrink-0 items-center justify-center border text-sm shadow-lg rounded-2xl",
-                  msg.role === 'user' ? "border-zinc-700 bg-zinc-800 text-zinc-300" : "border-zinc-600/30 bg-gradient-to-br from-zinc-700/50 to-zinc-800/50 text-zinc-200"
+                  "flex h-8 w-8 shrink-0 items-center justify-center text-sm rounded-2xl-full",
+                  msg.role === 'user' ? "bg-zinc-800 text-zinc-400" : "bg-white/10 text-white"
                 )}>
-                  {msg.role === 'user' ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
+                  {msg.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                 </div>
                 <div className={cn(
-                  "max-w-[80%] border px-5 py-4 text-sm leading-relaxed shadow-sm rounded-2xl",
+                  "max-w-[85%] px-4 py-3 text-sm leading-relaxed rounded-2xl",
                   msg.role === 'user'
-                    ? "border-zinc-800 bg-zinc-900 text-zinc-200 rounded-2xl-tr-none"
-                    : "border-white/10 bg-white/5 text-zinc-100 rounded-2xl-tl-none"
+                    ? "bg-zinc-800/50 text-zinc-300"
+                    : "bg-white/5 text-zinc-200"
                 )}>
                   <div className="whitespace-pre-wrap">{msg.content}</div>
                 </div>
               </div>
             ))}
             {loading && (
-              <div className="flex gap-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-zinc-600/30 bg-zinc-900 text-zinc-200 rounded-2xl animate-pulse">
-                  <Loader2 className="h-5 w-5 animate-spin" />
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-white/10 text-white rounded-2xl-full animate-pulse">
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 </div>
-                <div className="bg-white/5 border border-white/10 px-5 py-4 rounded-2xl rounded-2xl-tl-none flex items-center gap-5">
+                <div className="bg-white/5 px-4 py-3 rounded-2xl flex items-center gap-3">
                   <div className="flex gap-1">
-                    <div className="h-1.5 w-1.5 bg-primary rounded-2xl-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="h-1.5 w-1.5 bg-primary rounded-2xl-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="h-1.5 w-1.5 bg-primary rounded-2xl-full animate-bounce" />
+                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-2xl-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-2xl-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="h-1.5 w-1.5 bg-zinc-500 rounded-2xl-full animate-bounce" />
                   </div>
-                  <span className="text-sm font-bold text-zinc-200/70 uppercase tracking-widest">Analyzing Data...</span>
+                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Analyzing Data...</span>
                 </div>
               </div>
             )}
