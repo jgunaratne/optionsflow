@@ -53,7 +53,7 @@ export default function ScreenerPage() {
 
   const handleRunScreener = async () => {
     setScreenerRunning(true);
-    setProgress({ running: true, currentSymbol: '', currentIndex: 0, totalSymbols: 0, status: 'Starting', candidatesFound: 0 });
+    setProgress({ running: true, currentSymbol: '', currentIndex: 0, totalSymbols: 0, status: 'Starting', candidatesFound: 0, logs: [] });
     try {
       await fetch('/api/screener/run', { method: 'POST' });
       const pollStatus = async () => {

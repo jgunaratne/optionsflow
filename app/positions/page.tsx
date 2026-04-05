@@ -91,7 +91,7 @@ export default function PositionsPage() {
         return;
       }
       setPositions(data.positions || []);
-    } catch (err) {
+    } catch {
       setError('Server error');
     } finally {
       setLoading(false);

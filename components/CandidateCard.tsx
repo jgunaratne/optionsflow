@@ -100,7 +100,7 @@ export default function CandidateCard({ candidate, onAddToQueue, inQueue, disabl
               candidate.ai_score > 80 ? "text-emerald-400" : candidate.ai_score > 60 ? "text-amber-400" : "text-red-400"
             )}>{candidate.ai_score.toFixed(0)}/100</span>
           </div>
-          <p className="text-sm leading-relaxed text-zinc-300">"{candidate.ai_brief}"</p>
+          <p className="text-sm leading-relaxed text-zinc-300">&quot;{candidate.ai_brief}&quot;</p>
         </div>
       </div>
 
